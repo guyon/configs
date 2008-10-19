@@ -1,0 +1,316 @@
+*best_tips1.txt*
+----------------------------------------
+" diff 機能 (Brilliant)
+gvim -d file1 file2        : vimdiff (差分を比較）
+dp                         : カーソル下の差分を他方のファイルに "put" する
+do                         : カーソル下の差分を他方のファイルから "get" する
+----------------------------------------
+" Vim のトラップ
+正規表現 バックスラッシュが必要 \+ （1個以上）
+正規表現 バックスラッシュが必要 \| （or）
+正規表現 バックスラッシュが必要 \( （グループ化）
+正規表現 バックスラッシュが必要 \{ （繰り返し）
+/fred\+/                   : fredまたはfreddyにマッチ。しかしfreeにはマッチしない
+/\(fred\)\{2,3}/           : note what you have to break
+----------------------------------------
+" \v または very magic (usually) を使うとバックスラッシュの数を減らせる
+/codes\(\n\|\s\)*where  : 通常の正規表現
+/\vcodes(\n|\s)*where   : very magic
+----------------------------------------
+" オブジェクトをコマンド／検索ラインにひっぱり出す (SUPER)
+<C-R><C-W> : カーソル下の word をコマンドラインや検索にひっぱり出す
+<C-R><C-A> : カーソル下の WORD をコマンドラインや検索にひっぱり出す
+<C-R>-                  : スモールレジスタの中身を挿入 (also insert mode)
+<C-R>[0-9a-z]           : 名前付きレジスタの中身を挿入 (also insert mode)
+<C-R>%                  : ファイル名を挿入 (# も可) (also insert mode)
+<C-R>=somevar           : 変数の値を挿入 (例 :let sray="ray[0-9]")
+----------------------------------------
+" レジスタ操作
+:let @a=@_              : レジスタaをクリア
+:let @a=""              : レジスタaをクリア
+:let @*=@a              : レジスタaをペーストバッファにコピー
+:let @*=@:              : 最後のコマンドをペーストバッファにコピー
+:let @*=@/              : 最後の検索語をペーストバッファにコピー
+:let @*=@%              : 現在のファイル名をペーストバッファにコピー
+----------------------------------------
+" help for help (USE TAB)
+:h quickref             : VIM クイックリファレンスシート (ultra)
+:h tips                 : Vim 自身の tips help
+:h visual<C-D><tab>     : visual に関するヘルプを全部リストする
+                        : その後 tab でそれらを1個1個回っていける
+:h ctrl<C-D>            : コントロールキーのヘルプを全部リストする
+:helpg uganda           : grep HELP Files use :cn, :cp to find next
+:helpgrep edit.*director: 正規表現を使ってヘルプを検索
+:h :r                   : :ex コマンドのヘルプ
+:h CTRL-R               : ノーマルモード
+:h /\r                  : 正規表現中で \r は何を意味するか(<CR>にマッチする)
+:h \\zs                 : ヘルプで \zs を見つけるにはバックスラッシュを2個にする
+:h i_CTRL-R             : インサートモードでの<C-R>のヘルプ
+:h c_CTRL-R             : コマンドモードでの<C-R>のヘルプ
+:h v_CTRL-V             : ヴィジュアルモード
+:h tutor                : VIM チュートリアル
+<C-[>, <C-T>            : ヘルプの履歴を前後に移動
+gvim -h                 : VIM コマンドラインヘルプ
+----------------------------------------
+" このオプションはどこで :set されたのか
+:scriptnames            : 読み込まれたプラグイン, _vimrc らを全て表示(super)
+:verbose set history?   : history の値とどこで設定されたかを表示
+:function               : 関数をリストする
+:func SearchCompl       : 特定の関数をリストする
+----------------------------------------
+" 独自の vim help を作る
+:helptags /vim/vim64/doc  : rebuild all *.txt help files in /doc
+:help add-local-help
+----------------------------------------
+" ファイルに外部プログラムをかける(例 php)
+map   <f9>   :w<CR>:!c:/php/php.exe %<CR>
+map   <f2>   :w<CR>:!perl -c %<CR>
+----------------------------------------
+" 現在のスクリプトの出力を別のバッファに出力する
+:new | r!perl #                   : 新しいバッファを開き、それまでいたバッファの実行結果を読み込む
+:new! x.out | r!perl #            : 上と同様。名前付きのファイル。
+:new+read!ls
+----------------------------------------
+" 新規バッファを作り、その中にレジスタqをペーストし、新バッファをソートする
+:new +put q|%!sort
+----------------------------------------
+" DOS 改行を挿入する
+:%s/$/\<C-V><C-M>&/g          :  that's what you type
+:%s/$/\<C-Q><C-M>&/g          :  for Win32
+:%s/$/\^M&/g                  :  what you'll see where ^M is ONE character
+----------------------------------------
+" 自動的に行末のDOS改行、ホワイトスペースを削除
+autocmd BufRead * silent! %s/[\r \t]\+$//
+autocmd BufEnter *.php :%s/[ \t\r]\+$//e
+----------------------------------------
+" 特定のファイルやファイルタイプに対してアクションを引き起こす
+autocmd VimEnter c:/intranet/note011.txt normal! ggVGg?
+autocmd FileType *.pl exec('set fileformats=unix')
+----------------------------------------
+" 最後のコマンドラインコマンドをテキストに挿入する
+i<c-r>:
+" 最後の検索語をテキストに挿入する
+i<c-r>/
+----------------------------------------
+" さらなる補完
+<C-X><C-F>                        :カレントディレクトリのファイル名を挿入
+----------------------------------------
+" 選択範囲内で置換
+" 普通に選択して(:h visual) :s/Emacs/Vim/ などとタイプする
+:'<,'>s/Emacs/Vim/g               : '<.'> はタイプする必要ない
+gv                                : 前に選択した範囲を再選択 (ULTRA)
+----------------------------------------
+" ファイルに行番号を挿入
+:g/^/exec "s/^/".strpart(line(".")."    ", 0, 4)
+:%s/^/\=strpart(line(".")."     ", 0, 5)
+:%s/^/\=line('.'). ' '
+----------------------------------------
+#numbering lines VIM way
+:set number                       : 行番号を表示
+:map <F12> :set number!<CR>       : 行番号を表示（トグル）
+:%s/^/\=strpart(line('.')."        ",0,&ts)
+任意の数字から始めて行を番号づける（PC上では Perl が必要）
+:'a,'b!perl -pne 'BEGIN{$a=223} substr($_,2,0)=$a++'
+#数字のリストを生成
+#Type in number on line say 223 in an empty file
+qqmnYP`n^Aq                       : q にレコードするので @q で繰り返す
+" ファイルの最後まで、すでにある数字をインクリメント(type <c-a> as 5 characters)
+:.,$g/^\d/exe "normal! \<c-a>"
+" 高度なインクリメンティング
+http://vim.sourceforge.net/tip_view.php?tip_id=150
+----------------------------------------
+" 高度なインクリメンティング (really useful)
+" 以下を _vimrc に書く
+let g:I=0
+function! INC(increment)
+let g:I =g:I + a:increment
+return g:I
+endfunction
+" 例）マークa,bの間に223から始まり5ずつ増えるリストを作成
+:let I=223
+:'a,'bs/^/\=INC(5)/
+" create a map for INC
+cab viminc :let I=223 \| 'a,'bs/$/\=INC(5)/
+----------------------------------------
+" 23から64までの数字を挿入する
+o23<ESC>qqYp<C-A>q40@q
+----------------------------------------
+" 現在のインサートモード内での編集／移動 (Really useful)
+<C-U>                             : 挿入したテキストをすべて削除
+<C-W>                             : 最後の単語を削除
+<HOME><END>                       : 行頭／行末
+<C-LEFTARROW><C-RIGHTARROW>       : 単語移動
+<C-X><C-E>,<C-X><C-Y>             : インサートモードを抜けずにスクロール
+----------------------------------------
+#暗号化 (使うときは鍵を忘れないように）
+:X                                : 鍵の入力を促される
+:h :X
+----------------------------------------
+" モードライン（ファイルを読み込み専用にするなど）は最初/最後の5行以内に無ければならない
+// vim:noai:ts=2:sw=4:readonly:
+" vim:ft=html:                    : HTML 構文強調を使うように指示
+:h modeline
+----------------------------------------
+" 独自の GUI ツールバーのエントリを作る
+amenu  Modeline.Insert\ a\ VIM\ modeline <Esc><Esc>ggOvim:ff=unix ts=4 ss=4<CR>vim60:fdm=marker<esc>gg
+----------------------------------------
+" カーソル下の単語をファイルに保存する関数
+function! SaveWord()
+   normal yiw
+   exe ':!echo '.@0.' >> word.txt'
+endfunction
+map ,p :call SaveWord()
+----------------------------------------
+" 重複する行を削除する関数
+function! Del()
+ if getline(".") == getline(line(".") - 1)
+   norm dd
+ endif
+endfunction
+
+:g/^/ call Del()
+----------------------------------------
+" 合字 (非アルファベット・数字）
+:digraphs                         : display table
+:h dig                            : help
+i<C-K>e'                          : enters  
+i<C-V>233                         : enters   (Unix)
+i<C-Q>233                         : enters   (Win32)
+ga                                : View hex value of any character
+# 非アスキー文字を削除する(いくつかは不可視文字)
+:%s/[<C-V>128-<C-V>255]//gi       : Control-v をタイプすること
+:%s/[ - ]//gi                     : Should see a black square & a dotted y
+:%s/[<C-V>128-<C-V>255<C-V>01-<C-V>31]//gi : All pesky non-asciis
+:exec "norm /[\x00-\x1f\x80-\xff]/"        : same thing
+#Pull a non-ascii character onto search bar
+yl/<C-R>"                         :
+/[^a-zA-Z0-9_[:space:][:punct:]]  : すべての非アスキーを検索する
+----------------------------------------
+" All file completions grouped (for example main_c.c)
+:e main_<tab>                     : タブ補完
+gf                                : カーソル下のファイル名を開く  (normal)
+main_<C-X><C-F>                   : ファイル名を挿入 (insert mode)
+----------------------------------------
+" Complex Vim
+" 2つの単語をスワップする
+:%s/\<\(on\|off\)\>/\=strpart("offon", 3 * ("off" == submatch(0)), 3)/g
+" swap two words
+:vnoremap <C-X> <Esc>`.``gvP``P
+----------------------------------------
+" テキストファイルを html に変換する
+:runtime! syntax/2html.vim        : txt を html に変換する
+:h 2html
+----------------------------------------
+" vim 内部から grep。（vim7からはvimに組み込みのgrepもある。:h vimgrep）
+:grep some_keyword *.c            : some_keyword を含む .c ファイルのリストを得る
+:cn                               : 次のヒット場所にジャンプ
+----------------------------------------
+" 拡張子が .pl でないファイルの色づけを強制的に Perl のものにする
+:set syntax=perl
+" 色づけをやめる (useful for all sorts of reasons)
+:set syntax off
+" カラースキームを変更 (any file in ~vim/vim??/colors)
+:colorscheme blue
+" モードラインによって html の色づけをさせる
+# vim:ft=html:
+" 自動的に色づけを強制する (非標準の拡張子をもつファイルのために）
+au BufRead,BufNewFile */Content.IE?/* setfiletype html
+----------------------------------------
+:set noma (non modifiable)        : ファイルの変更を阻止する
+:set ro (Read Only)               : 意図しないファイルの書き込みを阻止する
+----------------------------------------
+" セッション（ファイルのセットを開く）
+gvim file1.c file2.c lib/lib.h lib/lib2.h : 「セッション」用のファイルを読み込む
+:mksession                        : Session ファイルを作成 (デフォルトでは Session.vim)
+:q
+gvim -S Session.vim               : すべてのファイルを読み直す
+----------------------------------------
+#tags (サブルーチン／関数へジャンプ）
+taglist.vim                       : 人気の高いプラグイン
+:Tlist                            : タグを表示（関数のリスト）
+<C-]>                             : カーソル下の関数へジャンプ
+----------------------------------------
+" columnise a csv file for display only as may crop wide columns
+:let width = 20
+:let fill=' ' | while strlen(fill) < width | let fill=fill.fill | endwhile
+:%s/\([^;]*\);\=/\=strpart(submatch(1).fill, 0, width)/ge
+:%s/\s\+$//ge
+" csv の特定のカラムをハイライト (put in .vimrc)
+function! CSVH(x)
+    execute 'match Keyword /^\([^,]*,\)\{'.a:x.'}\zs[^,]*/'
+    execute 'normal ^'.a:x.'f,'
+endfunction
+command! -nargs=1 Csv :call CSVH(<args>)
+" call with
+:Csv 5                             : 5番めのカラムをハイライト
+----------------------------------------
+" 折り畳み : hide sections to allow easier comparisons
+zf}                               : モーションを使ってパラグラフを折り畳む
+v}zf                              : ヴィジュアル選択を使ってパラグラフを折り畳む
+zf'a                              : マーク位置までを折り畳む
+zo                                : 折り畳みを開く
+zc                                : 折り畳みをまた閉じる
+----------------------------------------
+" 不可視文字を表示
+:set list
+:h listchars
+----------------------------------------
+" インサートモードに入らずに「ノーマルコマンド」をペーストする方法
+:norm qqy$jq
+----------------------------------------
+" ファイル名操作
+:h filename-modifiers             : ヘルプ
+:w %                              : 現在のファイル名に書き出す
+:w %:r.cfm                        : 拡張子を .cfm に変える
+:!echo %:p                        : フルパス＆ファイル名
+:!echo %:p:h                      : フルパスオンリー
+:!echo %:t                        : ファイル名オンリー
+:reg %                            : ファイル名を表示
+<C-R>%                            : ファイル名を挿入 (insert mode)
+"%p                               : ファイル名を挿入 (normal mode)
+/<C-R>%                           : テキスト中からファイル名を検索
+----------------------------------------
+" 無名レジスタに記録せずに削除
+"_d                               : what you've ALWAYS wanted
+"_dw                              : eg delete word (use blackhole)
+----------------------------------------
+" フルパスをペーストバッファにコピー。emailに貼り付けるときなんかに
+nnoremap <F2> :let @*=expand("%:p")<cr> :unix
+nnoremap <F2> :let @*=substitute(expand("%:p"), "/", "\\", "g")<cr> :win32
+----------------------------------------
+" vim を抜けずにファイルをリネームするシェルスクリプト
+$ vim
+:r! ls *.c
+:%s/\(.*\).c/mv & \1.bla
+:w !sh
+:q!
+----------------------------------------
+" ファイル中の単語数を数える
+g<C-G>
+----------------------------------------
+" 独自のハイライティングを定義する例
+:syn match DoubleSpace "  "
+:hi def DoubleSpace guibg=#e0e0e0
+----------------------------------------
+" 上の行を現在行に単語ごとにコピーする
+imap ]  @@@<ESC>hhkyWjl?@@@<CR>P/@@@<CR>3s
+nmap ] i@@@<ESC>hhkyWjl?@@@<CR>P/@@@<CR>3s
+" Programming keys depending on file type
+:autocmd bufenter *.tex map <F1> :!latex %<CR>
+:autocmd bufenter *.tex map <F2> :!xdvi -hush %<.dvi&<CR>
+----------------------------------------
+" Ms-Word のドキュメントを読む, antiword が必要
+:autocmd BufReadPre *.doc set ro
+:autocmd BufReadPre *.doc set hlsearch!
+:autocmd BufReadPost *.doc %!antiword "%"
+----------------------------------------
+" 折り畳み法
+vim: filetype=help foldmethod=marker foldmarker=<<<,>>>
+A really big section closed with a tag <<<
+--- remember folds can be nested ---
+Closing tag >>>
+----------------------------------------
+" Just Another Vim Hacker JAVH
+vim -c ":%s%s*%Cyrnfr)fcbafbe[Oenz(Zbbyranne%|:%s)[[()])-)Ig|norm Vg?"
+----------------------------------------
+

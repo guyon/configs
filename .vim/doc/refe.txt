@@ -1,0 +1,178 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html><head><title>~/svn/dotfiles/vim/.vim/doc/refe.txt.html</title>
+
+
+
+<meta name="Generator" content="Vim/7.0">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<style type="text/css">
+<!--
+.Identifier { color: #008080; }
+.PreProc { color: #c000c0; }
+.Comment { color: #0000c0; }
+.Statement { color: #804000; }
+.Special { color: #c000c0; }
+.Type { color: #008000; }
+pre { color: #000000; background-color: #ffffff; }
+body { color: #000000; background-color: #ffffff; }
+.Ignore { color: #ffffff; }
+.Constant { color: #c00000; }
+-->
+</style></head><body>
+<pre><span class="Ignore">*</span><span class="Constant">refe.txt</span><span class="Ignore">*</span> ReFe Browser  For <span class="Identifier">Vim version 7.0.</span>
+
+Author: Yuichi Tateno aka secondlife&lt;hotchpotch@NOSPAM@gmail.com&gt;   <span class="Ignore">|</span><span class="Identifier">refe-plugin-author</span><span class="Ignore">|</span>
+
+<span class="Ignore">|</span><span class="Identifier">refe-introduction</span><span class="Ignore">|</span>   イントロダクション
+<span class="Ignore">|</span><span class="Identifier">refe-install</span><span class="Ignore">|</span>    インストール方法
+<span class="Ignore">|</span><span class="Identifier">refe-usage</span><span class="Ignore">|</span>    簡単な使い方
+<span class="Ignore">|</span><span class="Identifier">refe-commands</span><span class="Ignore">|</span>   コマンド
+<span class="Ignore">|</span><span class="Identifier">refe-keyboard</span><span class="Ignore">|</span>   キーボード操作
+<span class="Ignore">|</span><span class="Identifier">refe-settings</span><span class="Ignore">|</span>   設定
+<span class="Ignore">|</span><span class="Identifier">refe-about</span><span class="Ignore">|</span>      refe.vim について
+<span class="Ignore">|</span><span class="Identifier">refe-license</span><span class="Ignore">|</span>      ライセンスについて
+
+<span class="PreProc">==============================================================================</span>
+イントロダクション <span class="Ignore">*</span><span class="Constant">refe-introduction</span><span class="Ignore">*</span> <span class="Ignore">*</span><span class="Constant">refe</span><span class="Ignore">*</span>
+
+Ruby のドキュメントを読むとき、青木さん作の Ruby
+リファレンスマニュアル引きのコマンドラインツール、
+ReFe ( <span class="Constant"><a href="http://i.loveruby.net/ja/prog/refe.html">http://i.loveruby.net/ja/prog/refe.html</a></span> )を使うと大変便利です。
+しかし vim を使っているとどうしても vim 上からさくさく ReFe
+で検索したくなります。なるのです。
+
+そんなとき、この refe.vim を使うと、まるで vim の help を読み進めるように、
+ReFe を vim 上から利用することができます。
+
+実際に refe.vim でリファレンスを引いている動画は
+<span class="Constant"><a href="http://rails2u.com/projects/refe.vim/screencast.html">http://rails2u.com/projects/refe.vim/screencast.html</a></span>
+をご覧下さい。
+
+<span class="PreProc">==============================================================================</span>
+インストール方法  <span class="Ignore">*</span><span class="Constant">refe-install</span><span class="Ignore">*</span>
+
+インストール方法は、<span class="Constant"><a href="http://rails2u.com/projects/refe.vim/refe.vba">http://rails2u.com/projects/refe.vim/refe.vba</a></span> を
+ダウンロードして、<span class="Ignore"> &gt;</span>
+<span class="Comment">  vim -c 'so %' refe.vba</span>
+<span class="Ignore">&lt;e3&gt;&lt;82&gt;</span>&lt;b3&gt;マンドで終わりです。
+
+また事前に ReFe をインストールしておく必要があります。
+RubyGems を使っているなら<span class="Ignore"> &gt;</span>
+<span class="Comment">  gem install refe</span>
+<span class="Ignore">&lt;e3&gt;&lt;81&gt;</span>&lt;a7&gt;インストールは完了です。
+
+<span class="PreProc">==============================================================================</span>
+簡単な使い方 <span class="Ignore">*</span><span class="Constant">refe-usage</span><span class="Ignore">*</span>
+
+それではどのようにして利用するのでしょうか。基本は :Refe コマンドで
+リファレンスを引きます。
+たとえば、Array#each のリファレンスを読みたければ、<span class="Ignore"> &gt;</span>
+<span class="Comment"> :Refe a#each</span>
+<span class="Ignore">&lt;e3&gt;&lt;81&gt;</span>&lt;a7&gt;もいいですし、<span class="Ignore"> &gt;</span>
+<span class="Comment"> :Refe each</span>
+<span class="Ignore">&lt;e3&gt;&lt;81&gt;</span>&lt;a7&gt;表示されるメソッドリストの中から選択することも可能です。
+
+また、すばらしいプラグイン、lookupfile.vim
+( <span class="Constant"><a href="http://www.vim.org/scripts/script.php?script_id=1581">http://www.vim.org/scripts/script.php?script_id=1581</a></span> ) を利用すると、
+Vim7の新機能を利用した、使いやすいインクリメンタル検索を行うことが可能です。
+
+ReFe によるリファレンス表示バッファでは、o キーを押すことで、
+カーソル下の単語から よしなにリファレンスを引いてくれます。
+たとえば、CGI::Cookie という箇所の上で o を押すと CGI::Cookie に、
+sub! の上で o を押すと sub!  の検索候補がリストとして表示され、
+すぐに目的のリファレンスを読むことができるでしょう。
+B で元読んでいたリファレンスに戻る(Back)することもできますし、- キーで、今開いているクラス、
+Array#each を開いているなら Array のリファレンスを読むことができます。
+
+その他、クラス、モジュールリファレンスの
+<span class="Ignore">&gt;</span>
+<span class="Comment">  ---- Singleton methods ----</span>
+<span class="Comment"> [] new</span>
+<span class="Comment"> ---- Instance methods ----</span>
+<span class="Comment"> &amp; * + - &lt;&lt; &lt;=&gt; == [] []= assoc at clear clone collect!</span>
+<span class="Ignore">&gt;</span>
+<span class="Ignore">&lt;e3&gt;&lt;81&gt;</span>&lt;ae&gt;ような特異メソッド、インスタンスメソッドの表示箇所で o を押すと、
+そのクラス/モジュールのメソッド名のリファレンスを引いてくれます。
+
+<span class="PreProc">==============================================================================</span>
+コマンド <span class="Ignore">*</span><span class="Constant">refe-commands</span><span class="Ignore">*</span>
+
+refe.vim で使うコマンドは現在 :Refe のみです。
+
+<span class="Statement">                                       </span><span class="Ignore">*</span><span class="Constant">refe-:Refe</span><span class="Ignore">*</span>
+:Refe <span class="Special">{word}</span>
+                      <span class="Special">{word}</span> が refe の検索結果に一件のみマッチする場合、
+                      refe バッファで内容を表示します。
+                      複数件マッチする場合、LookupFile を利用できる環境ならば
+                      LookupFile でのインクリメンタルサーチが、ない環境
+                      もしくは <span class="Ignore">|</span><span class="Identifier">g:RefeUseLookupFile</span><span class="Ignore">|</span> が 0 ならば独自の候補
+                      バッファを表示します。
+                      また、<span class="Special">{word}</span> が文字列 <span class="Special">&lt;cword&gt;</span> であった場合、呼び出した
+                      カーソル下の文字列で検索します。
+
+<span class="PreProc">==============================================================================</span>
+キーボード操作 <span class="Ignore">*</span><span class="Constant">refe-keyboard</span><span class="Ignore">*</span>
+
+refe のバッファでは独自のキーバインドで操作が可能です。
+
+<span class="PreProc">キー       挙動</span><span class="Ignore">~</span>
+q, <span class="Special">&lt;C-C&gt;</span>   バッファを閉じる
+B          一つ戻る
+o, K       カーソル下の単語で検索する
+-          見ているメソッドのクラス/モジュールを開く。
+s, <span class="Special">&lt;C-K&gt;</span>   検索
+
+<span class="PreProc">==============================================================================</span>
+設定 <span class="Ignore">*</span><span class="Constant">refe-global-settings</span><span class="Ignore">*</span>
+
+いくつかのグローバル変数を変更することで、挙動を変えることができます。
+
+<span class="Statement">                                      </span><span class="Ignore">*</span><span class="Constant">g:RefeUseLookupFile</span><span class="Ignore">*</span> <span class="Ignore"> &gt;</span>
+<span class="Comment">     let g:RefeUseLookupFile=0</span>
+lookupfile.vim がインストールしてある場合、検索で LookupFile を使うかどうかの
+設定です。デフォルトは 1 (使う)です。
+
+<span class="Statement">                                      </span><span class="Ignore">*</span><span class="Constant">g:RefeMinPatLength</span><span class="Ignore">*</span> <span class="Ignore"> &gt;</span>
+<span class="Comment">     let g:RefeMinPatLength=3</span>
+LookupFile を使う場合、何文字からインクリメンタルな検索を行うかの設定です。
+デフォルトでは 3 です。
+
+<span class="Statement">                                      </span><span class="Ignore">*</span><span class="Constant">g:RefeCommand</span><span class="Ignore">*</span> <span class="Ignore"> &gt;</span>
+<span class="Comment">     let g:RefeCommand='/home/example/bin/refe'</span>
+refe コマンドの名前です。デフォルトは <span class="Type">'refe'</span> です。
+
+<span class="PreProc">==============================================================================</span>
+Tips <span class="Ignore">*</span><span class="Constant">refe-tips</span><span class="Ignore">*</span>
+
+ruby なファイルを編集している場合、カーソル下の単語を refe.vim で検索したい、
+や :Refe と打つのが面倒ですぐ検索したい、と思ったりします。そんなときは、
+~/.vim/ftplugin/ruby.vim などに
+<span class="Ignore">&gt;</span>
+<span class="Comment">  nnoremap &lt;buffer&gt; &lt;silent&gt; K :Refe &lt;cword&gt;&lt;CR&gt;</span>
+<span class="Comment">  nnoremap &lt;buffer&gt; &lt;silent&gt; &lt;C-K&gt; :Refe&lt;CR&gt;</span>
+<span class="Ignore">&gt;</span>
+<span class="Ignore">&lt;e3&gt;&lt;82&gt;</span>&lt;92&gt;追加すると、K でカーソル下の単語を、<span class="Special">&lt;C-K&gt;</span>ですぐに :Refe でインクリメンタルな
+検索などが行え、便利です。
+
+<span class="PreProc">==============================================================================</span>
+ToDo <span class="Ignore">*</span><span class="Constant">refe-todo</span><span class="Ignore">*</span>
+
+- ときたま buffer が削除されない場合のバグ修正
+- refe -e/-C モードの対応
+
+<span class="PreProc">==============================================================================</span>
+refe.vim について <span class="Ignore">*</span><span class="Constant">refe-about</span><span class="Ignore">*</span>
+
+このプラグインは Yuichi Tateno aka secondlife によって作られました。
+
+
+<span class="PreProc">==============================================================================</span>
+ライセンス <span class="Ignore">*</span><span class="Constant">refe-license</span><span class="Ignore">*</span>
+
+このプラグインは MIT ライセンスとします。
+
+<span class="PreProc">==============================================================================</span>
+vim:ts=4:ft=help:tw=78:
+</pre>
+
+</body></html>

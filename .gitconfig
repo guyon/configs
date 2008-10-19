@@ -1,0 +1,23 @@
+[gui]
+	recentrepo = /Users/yuki/test
+[user]
+	name = guyon
+	email = guyon@exsample.local
+[alias]
+	ci = commit -a
+	co = checkout
+	st = status -a
+	praise = blame 
+
+[apply]
+	whitespace = strip
+
+[diff]
+	color = auto
+	rename = copy 
+
+[pager]
+	color = true 
+
+[status]
+	color = auto

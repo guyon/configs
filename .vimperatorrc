@@ -1,0 +1,176 @@
+" Options: ======================================================== {{{1
+" exモード時の補完候補がTabキーを押さなくても自動的に表示されて、キー入力するたびに更新される
+set wildoptions=auto
+" AwesomeBarの補完候補をopenやtabopenの時に使う事が出来る
+set complete=sl
+" クイックヒントモードでMigemoを使えるようにする。
+set hintmatching=custom
+" GUI関係の表示（メニュー/ツール/リンク）
+"set guioptions=mTb
+set guioptions=b
+" ビープ音を鳴らさずビジュアルベルを使用
+set visualbell
+" ビジュアルベルを無効化
+set visualbellstyle=display:none;
+" ヒストリー回数
+set history=1000
+
+"Google Suggest
+set complete+=g
+
+" Mapping: ======================================================== {{{1
+" タブの移動
+map h <C-p>
+map l <C-n>
+map j 5<C-e>
+map k 5<C-y>
+
+" bookmarkコメントを表示
+map ,c :viewSBMComments -t h<cr>
+
+" URLショートカット
+map gG <esc>:t http://www.google.co.jp/webhp?hl=ja&complete=1<cr>
+map gY <esc>:t http://www.yahoo.co.jp/<cr>
+map gB <esc>:t chrome://livedoorclip_incsearch/content/view.html<cr>
+map gR <esc>:t http://reader.livedoor.com/reader/<cr>
+
+" Mac標準のキーを使えるように
+noremap  <M-c> <C-v><M-c>
+inoremap <M-a> <C-v><M-a>
+inoremap <M-z> <C-v><M-z>
+inoremap <M-x> <C-v><M-x>
+inoremap <M-c> <C-v><M-c>
+inoremap <M-v> <C-v><M-v>
+cnoremap <M-a> <C-v><M-a>
+cnoremap <M-z> <C-v><M-z>
+cnoremap <M-x> <C-v><M-x>
+cnoremap <M-c> <C-v><M-c>
+cnoremap <M-v> <C-v><M-v>
+
+" MacでCtrl+[でESC 
+" Bug 432951の為使用できず
+" http://developer.mozilla.org/ja/Gecko_Keypress_Event
+noremap  <Ctrl-[> <esc>
+inoremap  <Ctrl-[> <esc>
+cnoremap  <Ctrl-[> <esc>
+
+" Plugins ========================================================={{{1
+
+" direct_bookmark.js
+let g:direct_sbm_use_services_by_tag = "l"
+let g:direct_sbm_use_services_by_post = "l"
+
+" Migemo検索の時にvimperatorをOFFにする {{{2
+:javascript <<EOF
+vimperator.mappings.add(new Map(vimperator.modes.NORMAL,
+	['\\'],\
+	function() {
+		vimperator.addMode(null,vimperator.modes.ESCAPE_ALL_KEYS);
+		var orgFunc = XMigemoUI.timerCallback;
+		XMigemoUI.timerCallback = function(aThis){
+			orgFunc(aThis);
+			vimperator.events.onEscape();
+			XMigemoUI.timerCallback = orgFunc;
+		}
+		XMigemoUI.start();
+  },{
+    shortHelp: 'Start Migemo/XUL',
+    help: 'Start Migemo/XUL'
+  }
+));
+EOF
+
+" 選択時の<C-c>を制御 {{{2
+vimperator.mappings.add(new vimperator.Map(
+    [vimperator.modes.NORMAL,vimperator.modes.VISUAL],
+    ['<C-c>'],
+    function() {
+        var sel = window.content.document.getSelection();
+        if (sel) {
+            vimperator.copyToClipboard(sel, true);
+        } else {
+            BrowserStop();
+            vimperator.echo('Stopped loading !');
+        }
+    },{
+        shortHelp: 'Copy selected text or ',
+        help: 'The currently selected text is copied to the system clipboard.<br/>' +
+              'If selected text is none, stops loading the current web page.'
+    }
+));
+
+" autoIgnoreKey.jsの設定 {{{2
+javascript <<EOM
+liberator.globalVariables.autoignorekey_pages = uneval([
+  /^https?:\/\/mail\.google\.com\//,
+  /^https?:\/\/fastladder\.com\//,
+  /^https?:\/\/reader\.livedoor\.com\/reader/,
+]);
+EOM
+
+" lookupDictionary.jsの設定 {{{2
+javascript <<EOM
+var dictionalyList = [
+    {
+        names: ['eiji[ro]'],
+        url: 'http://eow.alc.co.jp/%s/UTF-8/',
+        shortHelp: '英辞郎',
+        xpath: '//*[@id="resultList"]'
+    },{
+        names: ['goo'],
+        url: 'http://dictionary.goo.ne.jp/search.php?MT=%s&kind=all&mode=0',
+        shortHelp: 'goo辞書',
+        encode: 'EUC-JP',
+        xpath: '//div[@id="incontents"]/*[@class="ch04" or @class="fs14" or contains(@class,"diclst")]',
+        multi: true
+    }
+];
+EOM
+
+" ステータスバーにfeedボタンを表示 {{{2
+" http://d.hatena.ne.jp/teramako/20071205/p1
+js <<EOM
+(function(){
+ var feedPanel = document.createElement('statusbarpanel');
+ var feedButton = document.getElementById('feed-button');
+ feedPanel.setAttribute('id','feed-panel-clone');
+ feedPanel.appendChild(feedButton.cloneNode(true));
+ feedButton.parentNode.removeChild(feedButton);
+ document.getElementById('status-bar').insertBefore(feedPanel,document.getElementById('security-button'));
+})();
+EOM
+
+" wildoption=auto でウザいmap対策 {{{2
+" http://unsigned.g.hatena.ne.jp/Trapezoid/20080620/1213961754
+js <<EOM
+[
+    ['<C-r>',':restart'],
+    ['<C-h>',':tabmove! -1'],
+    ['<C-l>',':tabmove! +1'],
+    ['!',':set invum'],
+    ['b',':viewSBMComments'],
+    ['B',':bentry'],
+    ['a',':sbm'],
+    [',a',':btags'],
+    ['q',':toggleldrc'],
+    ['M',':qmarks'],
+].forEach(function([key,command]){
+    liberator.mappings.addUserMap([liberator.modes.NORMAL], [key],
+        "User defined mapping",
+        function () { liberator.execute(command); },
+        {
+            rhs: key,
+            noremap: true
+        });
+});
+EOM
+
+" feedSomeKeys_2.jsの設定 {{{2
+" (livedoor reader)
+"autocmd LocationChange reader\\.livedoor\\.com/reader :fmap! j k s a p o v c <Space> <S-Space> z b < >
+
+" Etc: ============================================================ {{{1
+
+" }}}1
+"source! ~/.vimperatorrc
+" vim: set ft=vimperator:

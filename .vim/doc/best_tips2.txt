@@ -1,0 +1,503 @@
+*best_tips2.txt*
+----------------------------------------------------------------------------------------
+" 検索
+/joe/e                      : カーソルをマッチの末尾へ
+/joe/e+1                    : カーソルをマッチの末尾＋1へ
+/joe/s-2                    : カーソルをマッチの先頭－2へ
+/^joe.*fred.*bill/          : normal
+/^[A-J]\+/                  : 1個以上のA-Jで始まる行を検索
+/begin\_.*end               : 複数行にまたがることを許す検索
+/fred\_s*joe/i              : 改行を含む任意のホワイトスペース
+/fred\|joe                  : fred または joe を検索
+/.*fred\&.*joe              : fred と joe を検索（順序は問わない！）
+/\<fred\>/i                 : fred を検索。alfred や frederick を除く
+/\<\d\d\d\d\>               : ちょうど4個の数字を検索
+/\D\d\d\d\d\D               : ちょうど4個の数字を検索
+/\<\d\{4}\>                 : 同じ
+/\([^0-9]\|^\)%.*%          : Search for absence of a digit or beginning of line
+" 空行を検索
+/^\n\{3}                    : 連続する3つの空行を検索
+" 正規表現の記憶を検索中で使う
+/\(fred\).*\(joe\).*\2.*\1
+" パターンの繰り返し (rather than what the Regexp finds)
+/^\([^,]*,\)\{8}
+" ヴィジュアル検索
+:vmap // y/<C-R>"<CR>       : 選択したテキストを検索
+:vmap <silent> //    y/<C-R>=escape(@", '\\/.*$^~[]')<CR><CR> : 特殊文字のエスケープ付き版
+" \zs and \ze 正規表現のデリミタ :h /\zs
+/<\zs[^>]*\ze>              : タグの中身を検索。<> は無視
+" ゼロ幅 :h /\@=
+/<\@<=[^>]*>\@=             : タグの中身を検索。<> は無視
+/<\@<=\_[^>]*>\@=           : 複数行にわたってタグを検索
+" 複数行に渡る検索。 \_ は改行を含むという意味
+/<!--\_p\{-}-->                   : 複数行に渡るコメントを検索
+/fred\_s*joe/i                    : 改行を含む任意のホワイトスペース
+/bugs\(\_.\)*bunny                : bunny が後に続く bugs。ファイル中のどこでも。
+:h \_                             : help
+<moge>     <sage>
+" カーソル下のサブルーチン／関数の宣言を検索
+:nmap gx yiw/^\(sub\<bar>function\)\s\+<C-R>"<CR>
+" 複数ファイルから検索
+:bufdo /searchstr/                : 検索を再開するには :rewind を使う
+" 複数ファイルからの検索。ベターだがチート
+:bufdo %s/searchstr/&/gic   : 停止するには n を選択してから a
+" バックスラッシュを使わないで URL を検索する方法
+?http://www.vim.org/        : 後方検索を使う。clever huh!
+" 「探さない」ものを指定する（母音）
+/\c\v([^aeiou]&\a){4}       : 連続する4つの子音を検索
+----------------------------------------
+#substitution
+:%s/fred/joe/igc            : 一般的な置換コマンド
+:%s/\r//g                   : DOS の改行 ^M を削除
+" ファイルがぐちゃぐちゃになっていたらこれを使う
+:%s/\r/\r/g                 : DOS の改行 ^M を本当の改行に置換
+:%s=  *$==                  : 行末のスペースを削除
+:%s= \+$==                  : 同上
+:%s#\s*\r\?$##              : 行末の空白とDOSの改行両方を削除
+:%s#\s*\r*$##               : 同上
+" 空行を削除する
+:%s/^\n\{3}//               : 3個の連続する空行を削除
+:%s/^\n\+/\r/               : 空行を圧縮する
+:%s#<[^>]\+>##g             : テキストを残したままhtmlタグを削除(non-greedy)
+:%s#<\_.\{-1,}>##g          : 複数行にわたってhtmlタグを削除(non-greedy)
+" IF YOU ONLY WANT TO KNOW ONE THING
+:'a,'bg/fred/s/dick/joe/igc : VERY USEFUL
+" カラムを重複させる
+:%s= [^ ]\+$=&&=            : 最後のカラムを重複させる
+:%s= \f\+$=&&=              : 同上
+:%s= \S\+$=&&               : 普通は同上
+" 記憶
+:s/\(.*\):\(.*\)/\2 : \1/   : : で区切られるフィールドを反転
+:%s/^\(.*\)\n\1$/\1/        : 重複する行を削除
+" non-greedy matching \{-}
+:%s/^.\{-}pdf/new.pdf/      : 最初のpdfまでを削除
+" 直前の項目が0個または1個を意味するアトム \?
+:%s#\<[zy]\?tbl_[a-z_]\+\>#\L&#gc : lowercase with optional leading characters
+" 複数行に渡ることを許す
+:%s/<!--\_.\{-}-->//        : 複数行に渡るコメントを削除
+:help /\{-}                 : help non-greedy
+" レジスタを使った置換
+:s/fred/<c-r>a/g            : "fred" をレジスタ"a"の中身で置き換える
+:s/fred/<c-r>asome_text<c-r>s/g
+:s/fred/\=@a/g              : レジスタの中身が表示されないのでベター
+" 1行に対して複数のコマンド
+:%s/\f\+\.gif\>/\r&\r/g | v/\.gif$/d | %s/gif/jpg/
+:%s/a/but/gie|:update|:next : これを繰り返すには @: を使う
+" ORing（分岐）
+:%s/suck\|buck/loopy/gc     : ORing (パイプ記号 | をエスケープすること)
+" VIM の関数を呼ぶ
+:s/__date__/\=strftime("%c")/ : 日付を挿入する
+" 列を操作する。3列目の str1 を置換する
+:%s:\(\(\w\+\s\+\)\{2}\)str1:\1str2:
+" 最初と最後の列を入れ替える（4列ある場合）
+:%s:\(\w\+\)\(.*\s\+\)\(\w\+\)$:\3\2\1:
+" form の全ての要素をペーストレジスタに入れる
+:redir @*|sil exec 'g#<\(input\|select\|textarea\|/\=form\)\>#p'|redir END
+:nmap ,z :redir @*<Bar>sil exec 'g@<\(input\<Bar>select\<Bar>textarea\<Bar>/\=form\)\>@p'<Bar>redir END<CR>
+" 数字を3デクリメントする
+:%s/\d\+/\=(submatch(0)-3)/
+" ある行についてだけ数字を6インクリメントする
+:g/loc\|function/s/\d/\=submatch(0)+6/
+" ベター
+:%s#txtdev\zs\d#\=submatch(0)+1#g
+:h /\zs
+" gg\d\d の数字だけを6インクリメントする
+:%s/\(gg\)\@<=\d\+/\=submatch(0)+6/
+:h zero-width
+" 文字列を増加していく数字で置き換える
+:let i=10 | 'a,'bg/Abc/s/yy/\=i/ |let i=i+1 # yy を10,11,12 ...で置き換える
+" 同上。ただしより正確
+:let i=10 | 'a,'bg/Abc/s/xx\zsyy\ze/\=i/ |let i=i+1 # convert xxyy to xx11,xx12,xx13
+" 置換するテキストを見つけ、メモリにおく。それから \zs を使って単純に置換する
+:%s/"\([^.]\+\).*\zsxx/\1/
+" カーソル下の単語を置換の検索語として挿入する
+:nmap <leader>z :%s#\<<c-r>=expand("<cword>")<cr>\>#
+" 選択されたテキストを置換の検索語として挿入する
+:vmap <leader>z :<C-U>%s/\<<c-r>*\>/
+----------------------------------------
+" all following performing similar task, substitute within substitution
+" Multiple single character substitution in a portion of line only
+:%s,\(all/.*\)\@<=/,_,g     : "all/" の後に現れる / をすべて _ で置換する
+" 同上
+:s#all/\zs.*#\=substitute(submatch(0), '/', '_', 'g')#
+" 行を分割し、再結合することによって置換
+:s#all/#&^M#|s#/#_#g|-j!
+" 置換中で置換する
+:%s/.*/\='cp '.submatch(0).' all/'.substitute(submatch(0),'/','_','g')/
+----------------------------------------
+" global コマンドの表示
+:g/gladiolli/#              : g/ の結果を行番号つきで表示(YOU WANT THIS!)
+:g/fred.*joe.*dick/         : fred,joe & dick すべてを含む行を表示
+:g/\<fred\>/                : fred に一致する単語を含む行すべてを表示
+:g/^\s*$/d                  : 空行をすべて削除
+:g!/^dd/d                   : 文字列を含まない行を削除
+:v/^dd/d                    : 文字列を含まない行を削除
+:g/fred/,/joe/d             : 非行指向(very powerfull)
+:g/-------/.-10,.d          : 文字列と上の10行を削除
+:g/{/ ,/}/- s/\n\+/\r/g     : {...}の中の空行を削除
+:v/\S/d                     : 空行を削除 (both types)
+:v/./,/./-j                 : 空行を圧縮
+:g/^$/,/./-j                : 空行を圧縮
+:g/<input\|<form/p          : OR
+:g/^/put_                   : 全ての行と行の間に空行を挿入(pu = put) "_はブラックホールレジスタ
+:g/^/m0                     : ファイルを反転させる(m = move)
+:'a,'bg/^/m'b               : a から b のセクションを反転
+:g/^/t.                     : 各行を重複させる
+:g/fred/t$                  : fredにマッチする行をEOFにコピー
+:g/stage/t'a                : stageにマッチする行をマークaへコピー
+:g/\(^I[^^I]*\)\{80}/d      : 80個以上のタブを含む行すべてを削除
+" 1行おきに置換を行う
+:g/^/ if line('.')%2|s/^/zz /
+" マーク a と b の間で"somestr"を含む行すべてにマッチ
+:'a,'bg/somestr/co/otherstr/ : co(py) or mo(ve)
+" 同上。ただし置換も行う
+:'a,'bg/str1/s/str1/&&&/|mo/str2/
+:%norm jdd                  : 1行置きに削除
+" 数字をインクリメントする（<c-a>は5文字タイプすること）
+:.,$g/^\d/exe "norm! \<c-a>": 数字をインクリメント
+:'a,'bg/\d\+/norm! ^A       : 数字をインクリメント
+" :g の結果を保存する（レジスタ名を大文字にしなければならない）。最初に qaq でレジスタを空にしておくこと。
+" 結果をレジスタ／ペーストバッファに保存する
+:g/fred/y A                 : fred を含む行すべてをレジスタaに追加する
+:g/fred/y A | :let @*=@a    : ペーストバッファにコピー
+:let @a=''|g/Barratt/y A |:let @*=@a
+" 行をフィルタしてファイルに書き出す（ファイルは既に存在しなければならない）
+:'a,'b g/^Error/ . w >> errors.txt
+" duplicate every line in a file wrap a print '' around each duplicate
+:g/./yank|put|-1s/'/"/g|s/.*/Print '&'/
+" 文字列をファイルの中身で置換する。-d が MARK を削除する
+:g/^MARK$/r tmp.txt | -d
+" きれいに表示
+:g/<pattern>/z#.5           : コンテキストつきで表示
+:g/<pattern>/z#.5|echo "=========="  : 美しく表示
+" g// とノーマルモードコマンドを組み合わせる
+:g/|/norm 2f|r*                      : 2番めの | を * で置き換える
+" global コマンドの出力を新しいウィンドウに送る
+:nmap <F3>  :redir @a<CR>:g//<CR>:redir END<CR>:new<CR>:put! a<CR><CR>
+----------------------------------------
+" :global と置換を組み合わせる(power editing)
+:'a,'bg/fred/s/joe/susan/gic :  can use memory to extend matching
+:g/fred/,/joe/s/fred/joe/gic :  non-line based (ultra)
+----------------------------------------
+" joe の検索を始める前に fred を見つける
+:/fred/;/joe/-2,/sid/+3s/sally/alley/gIC
+----------------------------------------
+" ファイル中の各行に対して新しいファイルを作る。1.txt, 2.txt, 3.txt etc
+:g/^/exe ".w ".line(".").".txt"
+----------------------------------------
+" Absolutely essential
+----------------------------------------
+* # g* g#           : カーソル下の単語を検索 (<cword>) (forwards/backwards)
+%                   : 対応括弧に移動 {}[]()
+.                   : 最後の変更を繰り返す
+@:                  : 最後の : コマンドを繰り返す (then @@)
+matchit.vim         : % で <tr><td><script> <?php などのタグにマッチさせるプラグイン
+<C-N><C-P>          : インサートモードで単語補完
+<C-X><C-L>          : 行補完 SUPER USEFUL
+/<C-R><C-W>         : <cword> を検索／コマンドラインに挿入する
+/<C-R><C-A>         : <CWORD> を検索／コマンドラインに挿入する
+:set ignorecase     : you nearly always want this
+:syntax on          : Perl,HTML,PHP などで色づけを有効にする
+:h regexp<C-D>      : control-D をタイプすると regexp を含むヘルプトピックを全てリスト
+                      （tabでそのリスト中を巡回）
+----------------------------------------
+" _vimrc の更新、再読み込みを簡単にするマップ
+:nmap ,s :source $VIM/_vimrc
+:nmap ,v :e $VIM/_vimrc
+----------------------------------------
+"VISUAL MODE (easy to add other HTML Tags)
+:vmap sb "zdi<b><C-R>z</b><ESC>  : 選択したテキストを<b></b> で囲む
+:vmap st "zdi<?= <C-R>z ?><ESC>  : 選択したテキストを <?=   ?> で囲む
+----------------------------------------
+"vim 7 tabs
+:tabe fred.php
+:tab ball
+vim -p fred.php joe.php          : ファイルをタブで開く
+" vim 7 forcing use of tabs
+nnoremap gf <C-W>gf
+cab      e  tabe
+----------------------------------------
+" Exploring
+:e .                            : ファイルエクスプローラ
+:Exp(lore)                      : file explorer note capital Ex
+:Sex(plore)                     : ファイルエクスプローラ。ウィンドウ分割
+:browse e                       : ウィンドウズスタイルのファイルを開くダイアログ
+:ls                             : バッファのリスト
+:cd ..                          : 親ディレクトリへ移動
+:args                           : ファイルのリスト
+:lcd %:p:h                      : 現在のファイルのディレクトリへ移動
+:autocmd BufEnter * lcd %:p:h   : 自動的に現在のファイルのディレクトリへ移動(_vimrcに書く）
+----------------------------------------
+" バッファエクスプローラ (Top Ten Vim Script)
+" bufexplorer.vim が必要 http://www.vim.org/script.php?script_id=42
+\be                             : バッファリスト
+\bs                             : バッファエクスプローラ（ウィンドウ分割）
+----------------------------------------
+" Changing Case
+guu                             : 行を小文字に
+gUU                             : 行を大文字に
+Vu                              : 行を小文字に
+VU                              : 行を大文字に
+g~~                             : 大文字小文字を反転
+vEU                             : 単語を大文字に
+vE~                             : 単語の大文字小文字を反転
+ggguG                           : ファイル全体を小文字に
+" 選択したテキストをキャピタライズ (map for .vimrc)
+vmap ,c :s/\<\(.\)\(\k*\)\>/\u\1\L\2/g<CR>
+" 文の最初の文字を大文字に
+:%s/[.!?]\_s\+\a/\U&\E/g
+----------------------------------------
+gf                              : カーソル下のファイル名を開く (SUPER)
+:nnoremap gF :view <cfile><cr>  : カーソル下のファイル名を開く。なければ作る
+ga                              : カーソルしたの文字の16進アスキー値を表示
+ggVGg?                          : ファイル全体を rot13 変換
+ggg?G                           : ファイル全体を rot13 変換（大きいファイルに対して速い）
+:8 | normal VGg?                : 8行目から rot13
+:normal 10GVGg?                 : 8行目から rot13
+<C-A>,<C-X>                     : カーソル下の数字をインクリメント、デクリメント
+                                  win32 users must remap CNTRL-A
+<C-R>=5*5                       : 25 をテキストに挿入 (ミニ計算機）
+----------------------------------------
+" Makes all other tips superfluous
+:h 42            : also http://www.google.com/search?q=42
+:h holy-grail
+:h!
+----------------------------------------
+" マークと移動
+'.               : 最後に変更された行へ移動 (SUPER)
+`.               : 最後に変更された行、桁へ移動
+g;               : 最近の変更箇所を回る（古いのが最初）(new in vim6.3)
+g,               : 逆方向 (new in vim6.3)
+:changes
+:h changelist    : help for above
+<C-O>            : ジャンプ履歴を戻る
+<C-I>            : ジャンプ履歴を進む
+:ju(mps)         : ジャンプの履歴
+:help jump-motions
+:history         : あなたが打ったコマンドを表示
+:his c           : コマンドライン履歴
+:his s           : 検索履歴
+q/               : 検索履歴ウィンドウ (puts you in full edit mode)
+q:               : コマンドライン履歴ウィンドウ (puts you in full edit mode)
+:<C-F>           : 履歴ウィンドウ
+----------------------------------------
+" 略語とマップ
+:map   <f7>   :'a,'bw! c:/aaa/x
+:map   <f8>   :r c:/aaa/x
+:map   <f11>  :.w! c:/aaa/xr<CR>
+:map   <f12>  :r c:/aaa/xr<CR>
+:ab php          : php で始まる略語を表示
+:map ,           : , で始まるマッピングを表示
+" F10 をマッピングに使えるようにする (win32)
+set wak=no       : :h winaltkeys
+" For use in Maps
+<CR>             : リターン
+<ESC>            : エスケープ
+<LEADER>         : 通常は \
+<BAR>            : | パイプ記号
+<BACKSPACE>      : バックスペース
+<SILENT>         : シェルウィンドウを出さない
+#display RGB colour under the cursor eg #445588
+:nmap <leader>c :hi Normal guibg=#<c-r>=expand("<cword>")<cr><cr>
+map <f2> /price only\\|versus/ :バックスラッシュが必要
+----------------------------------------
+" Simple PHP debugging display all variables yanked into register a
+iab phpdb exit("<hr>Debug <C-R>a  ");
+----------------------------------------
+" レジスタをマップとして使う（.vimrc 中に書いておくと起動時に設定される）
+:let @m=":'a,'bs/"
+:let @s=":%!sort -u"
+----------------------------------------
+" レジスタの中身を表示する
+:reg             : 全レジスタの中身を表示
+:reg a           : 個個のレジスタの中身を表示
+"1p....          : 数字つきレジスタ("1, "2, "3, ...)を順番に引き出す
+:let @y='yy@"'   : レジスタの pre-loading (.vimrcに書く)
+qqq              : レジスタqを空にする
+----------------------------------------
+" 便利なトリック
+"ayy@a           : テキストファイル中の vim コマンドを実行
+yy@"             : 同上（無名レジスタを使う）
+u@.              : たった今入力したテキストを実行
+----------------------------------------
+" 他のコマンドの出力を取得する（外部プログラムが必要）
+:r!ls.exe        : ls の出力を読む
+!!date           : 同上（しかし現在行を出力で置き換える）
+" 外部コマンドの sort でソート
+:%!sort -u       : 外部プログラムを使ってバッファをフィルタリング
+:'a,'b!sort -u   : 外部プログラムを使ってバッファをフィルタリング
+!1} sort -u      : パラグラフをソート(ノーマルモードに注意！)
+:g/^$/;,/^$/-1!sort : 各ブロックをソート (note the crucial ;)
+----------------------------------------
+" 複数ファイルの管理 (Essential)
+:bn              : 次のバッファへ
+:bp              : 前のバッファへ
+:wn              : ファイルを保存し次へ(super)
+:wp              : ファイルを保存し前へ
+:bd              : ファイルをバッファリストから削除 (super)
+:bun             : バッファをアンロード（ウィンドウを消すがバッファリストからは消さない）
+:badd file.c     : バッファリストにファイルを追加
+:b 3             : バッファ3へ
+:b main          : 名前に main (例. main.c)を含むバッファを開く。(ultra)
+:sav php.html    : カレントファイルを php.html に保存して php.html を開く
+:sav! %<.bak     : カレントファイルの拡張子を変えて保存 （古い方法）
+:sav! %:r.cfm    : カレントファイルの拡張子を変えて保存
+:sav %:s/fred/joe/           : ファイル名の一部を置換する
+:sav %:s/fred/joe/:r.bak2    : ファイル名と拡張子の一部を置換する
+:!mv % %:r.bak   : rename current file (DOS use Rename or DEL)
+:e!              : 修正されていない状態に戻す
+:w c:/aaa/%      : ファイルを他の場所に保存する
+:e #             : 代替ファイルを編集する (C-^ でも同じ)
+:rew             : 編集ファイルリストの最初に戻る (:args)
+:brew            : buffer rewind
+:sp fred.txt     : ウィンドウを分割して fred.txt を開く
+:sball,:sb       : 全てのバッファを分割する (super)
+:scrollbind      : これを分割した各ウィンドウ中で実行する
+:map   <F5> :ls<CR>:e # : F5 を押すと全バッファリストを表示するので番号をタイプするだけ
+:set hidden      : カレントバッファを保存せずに他のバッファに移動できるようになる
+----------------------------------------
+" 分割ウィンドウ間ですばやい移動
+map <C-J> <C-W>j<C-W>_
+map <C-K> <C-W>k<C-W>_
+----------------------------------------
+" レコーディング(BEST TIPS of ALL)
+qq  # record to q
+your complex series of commands
+q   # end recording
+@q to execute
+@@ to Repeat
+5@@ to Repeat 5 times
+" レジスタ／レコーディングを編集する
+"qp                               :レジスタqの中身を表示する (ノーマルモード )
+<ctrl-R>q                         :レジスタqの中身を表示する (インサートモード )
+" キーレコーディングの中身を見ることができる。必要なら編集もできる
+"qdd                              :put changed contacts back into q
+@q                                :レジスタqの中身を実行する
+" 矩形範囲に対してレコーディングを実行する
+1) define recording/register
+qq:s/ to/ from/g^Mq
+2) Define Visual BLOCK
+V}
+3) hit : and the following appears
+:'<,'>
+4)Complete as follows
+:'<,'>norm @q
+----------------------------------------
+" レコーディングとマップを組み合わせる(to end up in command mode)
+nnoremap ] @q:w!<bar>bd
+----------------------------------------
+" ヴィジュアルモードは新しく通常もっとも直感的な編集モード
+" ヴィジュアルモード基礎
+v                               : ヴィジュアルモードに入る
+V                               : ヴィジュアルモード行全体
+<C-V>                           : ヴィジュアルブロックモードに入る
+gv                              : 最後の選択範囲を再選択 (ultra)
+o                               : navigate visual area
+"*y                             : 選択範囲をペーストバッファにヤンク
+V%                              : 対応するところまで選択
+V}J                             : 選択範囲を連結(great)
+V}gJ                            : 選択範囲を連結。スペースをはさまずに
+----------------------------------------
+" 以下10行の最初の2文字を削除する
+0<c-v>10j2ld
+----------------------------------------
+" 矩形選択を使って列をコピーする
+" <C-V> それから移動コマンドを使って列を選択し、c,d,y,r など
+then c,d,y,r etc
+----------------------------------------
+" 矩形選択範囲のテキストを別のブロックで上書きする方法
+最初のブロックを拾う: ctrl-v 移動 "ay
+2番めのブロックを拾う: ctrl-v 移動 c ctrl-o "aP <esc>
+----------------------------------------
+" _vimrc essentials
+:set incsearch : タイプする度に単語を検索してジャンプする(annoying but excellent)
+:set wildignore=*.o,*.obj,*.bak,*.exe : タブ補完がこれらを無視するようになる
+:set shiftwidth=3                     : シフト／タブに関係する
+:set vb t_vb=".                       : 静かにさせる（ビープを止める）
+:set browsedir=buffer                 : GUI の「ファイルを開く」ダイアログでカレントバッファ
+                                        のディレクトリをカレントディレクトリにさせる。
+----------------------------------------
+" Windows インターネットエクスプローラを起動する
+:nmap ,f :update<CR>:silent !start c:\progra~1\intern~1\iexplore.exe file://%:p<CR>
+:nmap ,i :update<CR>: !start c:\progra~1\intern~1\iexplore.exe <cWORD><CR>
+----------------------------------------
+" FTPing from VIM
+cmap ,r  :Nread ftp://209.51.134.122/public_html/index.html
+cmap ,w  :Nwrite ftp://209.51.134.122/public_html/index.html
+gvim ftp://www.somedomain.com/index.html # uses netrw.vim
+----------------------------------------
+" レジスタに追加する (大文字にする)
+" 5行を "a" にヤンクし、さらに5行追加する
+"a5yy
+10j
+"A5yy
+----------------------------------------
+[I     : カーソル下の単語 <cword> にマッチする行を一覧表示 (super)
+----------------------------------------
+" 昔ながらのシフト／インデント
+:'a,'b>>
+" 選択してシフト (選択範囲が解除されないのでそのまま繰り返せる)
+:vnoremap < <gv
+:vnoremap > >gv
+" ブロックをシフトする (magic)
+>i{
+>a{
+" または
+>% and <%
+----------------------------------------
+" リダイレクトとペーストレジスタ *
+:redir @*                    : コマンドの出力をペーストバッファにリダイレクト
+:redir END                   : リダイレクト終了
+:redir >> out.txt            : ファイルへリダイレクト
+" ペーストバッファを使う
+"*yy                         : ペーストバッファにヤンク
+"*p                          : ペーストバッファから貼り付け
+" ペーストバッファにヤンク
+:'a,'by*                     : 範囲をヤンク
+:%y*                         : バッファ全体をヤンク
+:.y*                         : 現在行をヤンク
+" 印字不能文字をフィルタする
+" gui アプリから貼りつけたときに便利
+:nmap <leader>p :let @* = substitute(@*,'[^[:print:]]','','g')<cr>"*p
+----------------------------------------
+" テキストの整形
+gq}                          : パラグラフを整形する
+gqap                         : パラグラフを整形する
+ggVGgq                       : ファイル全体を整形
+Vgq                          : 現在行
+" 70 文字目で改行を挿入する。できるなら ; の後で
+:s/.\{,69\};\s*\|.\{,69\}\s\+/&\r/g
+----------------------------------------
+" コマンドを複数ファイルに対して実行
+:argdo %s/foo/bar/e          : :args のすべてのファイルに対して実行
+:bufdo %s/foo/bar/e
+:windo %s/foo/bar/e
+:argdo exe '%!sort'|w!       : 外部コマンドを含む例
+----------------------------------------
+" コマンドラインのトリック
+gvim -h                    : help
+ls | gvim -                : ストリームを編集する！
+cat xx | gvim - -c "v/^\d\d\|^[3-9]/d " : ストリームをフィルタする
+gvim -o file1 file2        : 分割して開く
+" ファイルを開いた後でコマンドを実行する
+gvim.exe -c "/main" joe.c  : Open joe.c & jump to "main"
+" 1つのファイルに複数のコマンドを実行する
+vim -c "%s/ABC/DEF/ge | update" file1.c
+" 複数ファイルに複数コマンドを実行する
+vim -c "argdo %s/ABC/DEF/ge | update" *.c
+" 複数ファイルからテキストのブロックを削除
+vim -c "argdo /begin/+1,/end/-1g/^/d | update" *.c
+" ファイルの編集を自動化する（convert.vim中のExコマンド）
+vim -s "convert.vim" file.c
+#.vimrcとプラグインを読まずにVIMを起動する(clean VIM)
+gvim -u NONE -U NONE -N
+" Access paste buffer contents (put in a script/batch file)
+" ペーストバッファの中身にアクセス（スクリプトかバッチファイルに書く）
+gvim -c 'normal ggdG"*p' c:/aaa/xp
+" ペーストバッファの中身をデフォルトのプリンタに出力
+gvim -c 's/^/\=@*/|hardcopy!|q!'
+" gvim の外部grepの使い道(Win32 or *nix)
+:grep somestring *.php     : creates a list of all matching files
+" リストを進む・戻るには :cn(ext) :cp(rev)
+:h grep
+
