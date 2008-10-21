@@ -62,9 +62,6 @@ set mousehide
 " ビジュアル選択(D&D他)を自動的にクリップボードへ (:help guioptions_a)
 "set guioptions+=a
 
-" Constants: 定数値の設定 ============================================= {{{1
-let html_use_css = 1              " code2html
-
 " Command: コマンド設定  ============================================== {{{1
 "
 "best_of_tipsを開く
@@ -125,7 +122,6 @@ set ambiwidth=double                     " UTF-8で文字幅表示を２文字�
 set completeopt=menuone,preview
 set complete+=k                          " 辞書ファイルからの単語補間
 set nrformats=""                         " 8進数はインクリメントしない
-set noexpandtab                          " タブをスペースに展開しない！
 set expandtab                            " タブを展開
 set tabstop=4
 set softtabstop=4
@@ -304,8 +300,7 @@ nnoremap <C-P> :call PhpDocSingle()<CR>
 vnoremap <C-P> :call PhpDocRange()<CR>
 
 " Plugin: プラグイン設定 ============================================== {{{1
-
-
+let html_use_css = 1              " code2html
 "SourceExplorer
 "自動でプレビューを表示する。TODOうざくなってきたら手動にする。またはソースを追う時だけ自動に変更する
 let g:SrcExpl_RefreshTime   = 1
@@ -318,23 +313,23 @@ let g:SrcExpl_GoBackMapKey  = "<C-b>"
 nmap <F8> :SrcExplToggle<CR>
 
 "QuickFix
-map mm <Plug>QuickFixNote
+noremap mm <Plug>QuickFixNote
 noremap <silent> <F9> :copen<CR>
-map ms <Plug>QuickFixSave
+noremap ms <Plug>QuickFixSave
 
 "CamelCase Motion
 "Replace the default 'w', 'b' and 'e' mappings instead of defining
-map <silent> w <Plug>CamelCaseMotion_w
-map <silent> b <Plug>CamelCaseMotion_b
-map <silent> e <Plug>CamelCaseMotion_e
+noremap <silent> w <Plug>CamelCaseMotion_w
+noremap <silent> b <Plug>CamelCaseMotion_b
+noremap <silent> e <Plug>CamelCaseMotion_e
 
 "Replace default 'iw' text-object and define 'ie' and 'ib' motions: 
-omap <silent> iw <Plug>CamelCaseMotion_iw
-vmap <silent> iw <Plug>CamelCaseMotion_iw
-omap <silent> ib <Plug>CamelCaseMotion_ib
-vmap <silent> ib <Plug>CamelCaseMotion_ib
-omap <silent> ie <Plug>CamelCaseMotion_ie
-vmap <silent> ie <Plug>CamelCaseMotion_ie
+onoremap <silent> iw <Plug>CamelCaseMotion_iw
+vnoremap <silent> iw <Plug>CamelCaseMotion_iw
+onoremap <silent> ib <Plug>CamelCaseMotion_ib
+vnoremap <silent> ib <Plug>CamelCaseMotion_ib
+onoremap <silent> ie <Plug>CamelCaseMotion_ie
+vnoremap <silent> ie <Plug>CamelCaseMotion_ie
 
 "Gauche
 autocmd FileType scheme :let is_gauche=1
@@ -346,41 +341,15 @@ let g:sqlutil_align_comma = 1
 
 " PluginMapping: プラグインに関するマッピング ========================= {{{1
 "FuzzyFinder用 ------------------------------------------------------------ {{{2
-nmap <silent> <Leader>fa :FuzzyFinderAddFavFile<CR>
-nmap <silent> <Leader>fb :FuzzyFinderBuffer<CR>
-nmap <silent> <Leader>fc :FuzzyFinderMruCmd<CR>
-nmap <silent> <Leader>fd :FuzzyFinderDir<CR>
-nmap <silent> <Leader>ff :FuzzyFinderFile<CR>
-nmap <silent> <Leader>fm :FuzzyFinderMruFile<CR>
-nmap <silent> <Leader>fv :FuzzyFinderFavFile<CR>
-nmap <silent> <Leader>ft :FuzzyFinderTag<CR>
+nnoremap <silent> <Leader>fa :FuzzyFinderAddFavFile<CR>
+nnoremap <silent> <Leader>fb :FuzzyFinderBuffer<CR>
+nnoremap <silent> <Leader>fc :FuzzyFinderMruCmd<CR>
+nnoremap <silent> <Leader>fd :FuzzyFinderDir<CR>
+nnoremap <silent> <Leader>ff :FuzzyFinderFile<CR>
+nnoremap <silent> <Leader>fm :FuzzyFinderMruFile<CR>
+nnoremap <silent> <Leader>fv :FuzzyFinderFavFile<CR>
+nnoremap <silent> <Leader>ft :FuzzyFinderTag<CR>
 let g:FuzzyFinder_IgnoreCase = 1
-"tabbar.vim用のマッピング ------------------------------------------------- {{{2
-if has('mac')
-	"NORMAL mode bindings for gvim
-	noremap <unique> <script> <D-1> :call <SID>Bf_SwitchTo(1)<CR>:<BS>
-	noremap <unique> <script> <D-2> :call <SID>Bf_SwitchTo(2)<CR>:<BS>
-	noremap <unique> <script> <D-3> :call <SID>Bf_SwitchTo(3)<CR>:<BS>
-	noremap <unique> <script> <D-4> :call <SID>Bf_SwitchTo(4)<CR>:<BS>
-	noremap <unique> <script> <D-5> :call <SID>Bf_SwitchTo(5)<CR>:<BS>
-	noremap <unique> <script> <D-6> :call <SID>Bf_SwitchTo(6)<CR>:<BS>
-	noremap <unique> <script> <D-7> :call <SID>Bf_SwitchTo(7)<CR>:<BS>
-	noremap <unique> <script> <D-8> :call <SID>Bf_SwitchTo(8)<CR>:<BS>
-	noremap <unique> <script> <D-9> :call <SID>Bf_SwitchTo(9)<CR>:<BS>
-	noremap <unique> <script> <D-0> :call <SID>Bf_SwitchTo(10)<CR>:<BS>
-	"INSERT mode bindings for gvim
-	inoremap <unique> <script> <D-1> <esc>:call <SID>Bf_SwitchTo(1)<CR>:<BS>a
-	inoremap <unique> <script> <D-2> <esc>:call <SID>Bf_SwitchTo(2)<CR>:<BS>a
-	inoremap <unique> <script> <D-3> <esc>:call <SID>Bf_SwitchTo(3)<CR>:<BS>a
-	inoremap <unique> <script> <D-4> <esc>:call <SID>Bf_SwitchTo(4)<CR>:<BS>a
-	inoremap <unique> <script> <D-5> <esc>:call <SID>Bf_SwitchTo(5)<CR>:<BS>a
-	inoremap <unique> <script> <D-6> <esc>:call <SID>Bf_SwitchTo(6)<CR>:<BS>a
-	inoremap <unique> <script> <D-7> <esc>:call <SID>Bf_SwitchTo(7)<CR>:<BS>a
-	inoremap <unique> <script> <D-8> <esc>:call <SID>Bf_SwitchTo(8)<CR>:<BS>a
-	inoremap <unique> <script> <D-9> <esc>:call <SID>Bf_SwitchTo(9)<CR>:<BS>a
-	inoremap <unique> <script> <D-0> <esc>:call <SID>Bf_SwitchTo(10)<CR>:<BS>a
-endif
-
 "speeddating.vim用のマッピング -------------------------------------------- {{{2
 " システム日付を挿入する
 inoremap <Leader>dF  <C-r>=strftime('%Y-%m-%dT%H:%M:%S+09:00')<Return>
@@ -393,7 +362,6 @@ inoremap <Leader>dt  <C-r>=strftime('%H:%M')<Return>
 "let g:calendar_erafmt = '平成,-1988'
 "let g:calendar_mruler ='1月,2月,3月,4月,5月,6月,7月,8月,9月,10月,11月,12月'
 "let g:calendar_wruler = '日 月 火 水 木 金 土 日'
-
 
 " NERD_comments.vim ------------------------------------------------------- {{{2
 " コメントの間にスペースを空ける
