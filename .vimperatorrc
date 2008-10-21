@@ -50,9 +50,9 @@ cnoremap <M-v> <C-v><M-v>
 " MacでCtrl+[でESC 
 " Bug 432951の為使用できず
 " http://developer.mozilla.org/ja/Gecko_Keypress_Event
-noremap  <Ctrl-[> <esc>
-inoremap  <Ctrl-[> <esc>
-cnoremap  <Ctrl-[> <esc>
+" noremap  <Ctrl-[> <esc>
+" inoremap  <Ctrl-[> <esc>
+" cnoremap  <Ctrl-[> <esc>
 
 " Plugins ========================================================={{{1
 
@@ -61,7 +61,7 @@ let g:direct_sbm_use_services_by_tag = "l"
 let g:direct_sbm_use_services_by_post = "l"
 
 " Migemo検索の時にvimperatorをOFFにする {{{2
-:javascript <<EOF
+javascript <<EOF
 vimperator.mappings.add(new Map(vimperator.modes.NORMAL,
 	['\\'],\
 	function() {
@@ -129,7 +129,7 @@ EOM
 
 " ステータスバーにfeedボタンを表示 {{{2
 " http://d.hatena.ne.jp/teramako/20071205/p1
-js <<EOM
+javascript <<EOM
 (function(){
  var feedPanel = document.createElement('statusbarpanel');
  var feedButton = document.getElementById('feed-button');
@@ -142,7 +142,7 @@ EOM
 
 " wildoption=auto でウザいmap対策 {{{2
 " http://unsigned.g.hatena.ne.jp/Trapezoid/20080620/1213961754
-js <<EOM
+javascript <<EOM
 [
     ['<C-r>',':restart'],
     ['<C-h>',':tabmove! -1'],
