@@ -3,7 +3,7 @@
 require "find"
 require 'rake/packagetask'
 
-# ’è”’l
+# å®šæ•°å€¤
 VERSION = Time.now.strftime("%Y%m%d%H%M%S").to_s
 HOME = File.expand_path("~")
 EXCLUDE_FILES = /pkg\/|\.git\/|\.DS_Store|\.swp$|\.swo$|\.back$|Rakefile.rb$/
@@ -17,16 +17,16 @@ task :default    => ["update"]
 task :rep_build  => ["rep_download","update","rep_remove"]
 task :rep_update => ["rep_download","update"]
 
-# ƒz[ƒ€ƒfƒBƒŒƒNƒgƒŠ‚ÌupdateÅV‚É‚·‚é
+# ãƒ›ãƒ¼ãƒ ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªã®updateæœ€æ–°ã«ã™ã‚‹
 task "update" do
     src_path = File.expand_path("./")
     dst_path = File.expand_path(HOME)
 
-    # --”z•z
+    # --é…å¸ƒ
     file_copy src_path, dst_path
 
-    # --íœ
-    # ƒŠƒ|ƒWƒgƒŠ’¼‰º‚ÌƒfƒBƒŒƒNƒgƒŠ‚Ì‚İíœ‘ÎÛ‚Æ‚·‚é
+    # --å‰Šé™¤
+    # ãƒªãƒã‚¸ãƒˆãƒªç›´ä¸‹ã®ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªã®ã¿å‰Šé™¤å¯¾è±¡ã¨ã™ã‚‹
     Dir.foreach(src_path) {|file|
         if File.ftype(file) == "directory" && file.to_str !~ /^\.$|^\.\.$/
             remove_src_path = src_path + "/" + file.to_str
@@ -39,7 +39,7 @@ end
 
 def file_copy(src_path,dst_path)
     Find.find(src_path){|src_file|
-        # ƒfƒvƒƒC‚µ‚È‚¢ƒtƒ@ƒCƒ‹
+        # ãƒ‡ãƒ—ãƒ­ã‚¤ã—ãªã„ãƒ•ã‚¡ã‚¤ãƒ«
         next if src_file.to_str =~ EXCLUDE_FILES
         if File.file?(src_file)
             match = Regexp.new("^" + src_path)
@@ -90,7 +90,7 @@ end
 Rake::PackageTask.new("configs",VERSION) do |p|
     p.package_dir = "./pkg"
     p.need_zip = true
-    # ƒŠƒ|ƒWƒgƒŠ’¼‰º‚ÌƒfƒBƒŒƒNƒgƒŠ‚Ì‚İíœ‘ÎÛ‚Æ‚·‚é
+    # ãƒªãƒã‚¸ãƒˆãƒªç›´ä¸‹ã®ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªã®ã¿å‰Šé™¤å¯¾è±¡ã¨ã™ã‚‹
     Dir.foreach("./") {|file|
         next if file.to_str =~ EXCLUDE_FILES
         if File.ftype(file) == "directory" && file.to_str !~ /^\.$|^\.\.$/
