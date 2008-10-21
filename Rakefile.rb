@@ -4,7 +4,7 @@ require "find"
 require 'rake/packagetask'
 
 # 定数値
-VERSION = Time.now.strftime("%Y%m%d%H%M%S").to_s
+NOW = Time.now.strftime("%Y%m%d%H%M%S").to_s
 HOME = File.expand_path("~")
 EXCLUDE_FILES = Regexp.new("pkg\/|\.git\/|\.DS_Store|\.swp$|\.swo$|\.back$|Rakefile.rb$")
 GIT_REPO = "git@guyon.unfuddle.com:guyon/configs.git"
@@ -39,7 +39,7 @@ task "update" do
 end
 
 task "rep_clone" do
-    work_dir = HOME + "/configs_work/" + VERSION
+    work_dir = HOME + "/configs_work/" + NOW
     mkdir_p work_dir
     cd work_dir
     sh "git clone #{GIT_REPO}"
@@ -51,7 +51,7 @@ task "work_rep_remove" do
     rm_rf remove_dir
 end
 
-Rake::PackageTask.new("configs",VERSION) do |p|
+Rake::PackageTask.new("configs",NOW) do |p|
     p.package_dir = "./pkg"
     p.need_zip = true
     # リポジトリ直下のディレクトリのみ削除対象とする
