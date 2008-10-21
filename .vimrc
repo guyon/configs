@@ -682,8 +682,8 @@ endfunction
 
 " Tmp: 一時な設定 ===================================================== {{{1
 " Load private information
-if findfile("$HOME/.vimrc_private") != ""
-    source $HOME/.vimrc_private
+if findfile("$HOME/.private/.vimrc_private") != ""
+    source $HOME/.private/.vimrc_private
 endif
 
 " Etc: その他 ========================================================= {{{1
