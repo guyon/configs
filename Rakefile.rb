@@ -18,7 +18,7 @@ task :default    => ["update"]
 task :rep_build  => ["rep_clone","update","work_dir_remove"]
 task :rep_update => ["rep_clone","update"]
 
-desc "ホームディレクトリのupdate最新にする"
+desc "カレントディレクトリのConfigsからHOMEディレクトリにBuildする"
 task "update" do
     src_path = File.expand_path("./")
     dst_path = File.expand_path(HOME)
