@@ -15,10 +15,10 @@ end
 
 # タスクの関連付け
 task :default    => ["update"]
-task :rep_build  => ["rep_clone","update","work_rep_remove"]
+task :rep_build  => ["rep_clone","update","work_dir_remove"]
 task :rep_update => ["rep_clone","update"]
 
-# ホームディレクトリのupdate最新にする
+desc "ホームディレクトリのupdate最新にする"
 task "update" do
     src_path = File.expand_path("./")
     dst_path = File.expand_path(HOME)
@@ -38,6 +38,7 @@ task "update" do
     p "Update Finish."
 end
 
+desc "リポジトリからconfigsをクローンする"
 task "rep_clone" do
     work_dir = HOME + "/configs_work/" + NOW
     mkdir_p work_dir
@@ -46,7 +47,8 @@ task "rep_clone" do
     cd "./configs"
 end
 
-task "work_rep_remove" do
+desc "workディレクトリを削除する"
+task "work_dir_remove" do
     remove_dir = HOME + "/configs_work/"
     rm_rf remove_dir
 end
