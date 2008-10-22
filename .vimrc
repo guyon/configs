@@ -319,17 +319,18 @@ noremap ms <Plug>QuickFixSave
 
 "CamelCase Motion
 "Replace the default 'w', 'b' and 'e' mappings instead of defining
-noremap <silent> w <Plug>CamelCaseMotion_w
-noremap <silent> b <Plug>CamelCaseMotion_b
-noremap <silent> e <Plug>CamelCaseMotion_e
+"TODO:nnoremapにすると動作しなくなる。後で調べる。
+nmap <silent> w <Plug>CamelCaseMotion_w
+nmap <silent> b <Plug>CamelCaseMotion_b
+nmap <silent> e <Plug>CamelCaseMotion_e
 
 "Replace default 'iw' text-object and define 'ie' and 'ib' motions: 
-onoremap <silent> iw <Plug>CamelCaseMotion_iw
-vnoremap <silent> iw <Plug>CamelCaseMotion_iw
-onoremap <silent> ib <Plug>CamelCaseMotion_ib
-vnoremap <silent> ib <Plug>CamelCaseMotion_ib
-onoremap <silent> ie <Plug>CamelCaseMotion_ie
-vnoremap <silent> ie <Plug>CamelCaseMotion_ie
+omap <silent> iw <Plug>CamelCaseMotion_iw
+vmap <silent> iw <Plug>CamelCaseMotion_iw
+omap <silent> ib <Plug>CamelCaseMotion_ib
+vmap <silent> ib <Plug>CamelCaseMotion_ib
+omap <silent> ie <Plug>CamelCaseMotion_ie
+vmap <silent> ie <Plug>CamelCaseMotion_ie
 
 "Gauche
 autocmd FileType scheme :let is_gauche=1
