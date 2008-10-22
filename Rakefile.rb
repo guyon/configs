@@ -38,7 +38,7 @@ task "update" do
     p "Update Finish."
 end
 
-desc "リポジトリからconfigsをクローンを作成する"
+desc "最新バージョンのconfigsリポジトリを作成する"
 task "rep_clone" do
     work_dir = HOME + "/configs_work/" + NOW
     mkdir_p work_dir
@@ -63,6 +63,7 @@ Rake::PackageTask.new("configs",NOW) do |p|
             p.package_files.include(".*")
             p.package_files.include(file.to_s + "/**/*")
             p.package_files.exclude('**/*~')
+            #TODO:パターンを定数値化する
             p.package_files.exclude("pkg/**",/^\.git$/,/\.git\//,".DS_Store",/\.swp$/,/\.swo$/,/\.back$/,"Rakefile.rb")
         end
     }
