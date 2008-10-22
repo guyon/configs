@@ -38,7 +38,7 @@ task "update" do
     p "Update Finish."
 end
 
-desc "リポジトリからconfigsをクローンする"
+desc "リポジトリからconfigsをクローンを作成する"
 task "rep_clone" do
     work_dir = HOME + "/configs_work/" + NOW
     mkdir_p work_dir
@@ -54,7 +54,7 @@ task "work_dir_remove" do
 end
 
 Rake::PackageTask.new("configs",NOW) do |p|
-    p.package_dir = "./pkg"
+    p.package_dir = HOME + "/configs_work/pkg/"
     p.need_zip = true
     # リポジトリ直下のディレクトリのみ削除対象とする
     Dir.foreach("./") {|file|
