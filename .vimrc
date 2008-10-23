@@ -2,7 +2,7 @@
 " Windowsでも.vimをRumtimeディレクトリにする
 set runtimepath+=$HOME/.vim
 " hatena.vimを使う
-set runtimepath+=$HOME/.vim/hatena
+"set runtimepath+=$HOME/.vim/hatena
 "ヘルプファイルをパスを指定する
 helptags $HOME/.vim/doc/
 
