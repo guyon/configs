@@ -6,6 +6,7 @@ require 'rake/packagetask'
 # 定数値
 NOW = Time.now.strftime("%Y%m%d%H%M%S").to_s
 HOME = File.expand_path("~")
+WIN_RENAME = {".vimperator" => "vimperator"}
 EXCLUDE_FILES = Regexp.new("pkg\/|\.git\/|\.DS_Store|\.swp$|\.swo$|\.back$|Rakefile.rb$")
 GIT_REPO = "git@guyon.unfuddle.com:guyon/configs.git"
 unless HOME
@@ -14,12 +15,12 @@ unless HOME
 end
 
 # タスクの関連付け
-task :default    => ["update"]
-task :rep_build  => ["rep_clone","update","work_dir_remove"]
-task :rep_update => ["rep_clone","update"]
+task :default    => ["update","win_rename_after"]
+task :rep_build  => ["rep_clone","update","win_rename_after","work_dir_remove"]
+task :rep_update => ["rep_clone","update","win_rename_after"]
 
 desc "カレントディレクトリのConfigsからHOMEディレクトリにBuildする"
-task "update" do
+task "update" => "win_rename_before"do
     src_path = File.expand_path("./")
     dst_path = File.expand_path(HOME)
 
@@ -51,6 +52,24 @@ desc "workディレクトリを削除する"
 task "work_dir_remove" do
     remove_dir = HOME + "/configs_work/"
     rm_rf remove_dir
+end
+
+desc "Windowsの命名規約のファイルがあれば元に戻す"
+task "win_rename_before" do
+    return unless Rake::Win32::windows?
+    WIN_RENAME.each_pair{|key,value|
+       next unless File.exist?(HOME + "/" + value)
+       FileUtils.mv(HOME + "/" + value, HOME + "/" + key)
+    }
+end
+
+desc "Windowsの命名規約に変更する"
+task "win_rename_after" do
+    return unless Rake::Win32::windows?
+    WIN_RENAME.each_pair{|key,value|
+       #FileUtils.rm_rf(HOME + "/" + value)
+       FileUtils.mv(HOME + "/" + key, HOME + "/" + value)
+    }
 end
 
 Rake::PackageTask.new("configs",NOW) do |p|

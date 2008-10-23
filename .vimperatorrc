@@ -16,7 +16,8 @@ set visualbellstyle=display:none;
 set history=1000
 
 "Google Suggest
-set complete+=g
+set complete=bshf
+
 
 " Mapping: ======================================================== {{{1
 " タブの移動
