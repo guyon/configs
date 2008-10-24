@@ -16,7 +16,8 @@ set visualbellstyle=display:none;
 set history=1000
 
 "Google Suggest
-set complete=bshf
+"set complete=bshf
+"set complete+=g
 
 
 " Mapping: ======================================================== {{{1
