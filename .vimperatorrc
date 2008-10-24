@@ -19,6 +19,8 @@ set history=1000
 "set complete=bshf
 "set complete+=g
 
+"" onload時の自動フォーカスを取りやめる。
+set focuscontent
 
 " Mapping: ======================================================== {{{1
 " タブの移動
@@ -26,6 +28,10 @@ map h <C-p>
 map l <C-n>
 map j 5<C-e>
 map k 5<C-y>
+
+"" 設定ファイルの再読み込み
+map ,s :so .vimperatorrc<CR>
+map ,S :mapc<CR>:cmapc<CR>:imapc<CR>:so .vimperatorrc<CR>
 
 " bookmarkコメントを表示
 map ,c :viewSBMComments -t h<cr>
@@ -142,7 +148,7 @@ javascript <<EOM
 })();
 EOM
 
-" wildoption=auto でウザいmap対策 {{{2
+" wildoption=auto で余計なmap対策 {{{2
 " http://unsigned.g.hatena.ne.jp/Trapezoid/20080620/1213961754
 javascript <<EOM
 [
