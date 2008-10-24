@@ -79,8 +79,8 @@ if has("autocmd")
     "ファイルタイプにあわせたインデントを利用する
     filetype indent on
     " これらのftではインデントを無効に
-    autocmd FileType html :set indentexpr=
-    autocmd FileType xhtml :set indentexpr=
+    autocmd FileType html :setlocal indentexpr=
+    autocmd FileType xhtml :setlocal indentexpr=
 
     " autocomplpop.vim --------------------------------------------------------
     "コマンドラインウインドウの中はAutoComplPopを停止する
@@ -88,17 +88,17 @@ if has("autocmd")
     autocmd CmdwinLeave * AutoComplPopEnable
 
     " rubycomplete.vim --------------------------------------------------------
-    autocmd FileType ruby,eruby set omnifunc=rubycomplete#Complete
+    autocmd FileType ruby,eruby setlocal omnifunc=rubycomplete#Complete
     autocmd FileType ruby,eruby let g:rubycomplete_buffer_loading = 1
     autocmd FileType ruby,eruby let g:rubycomplete_rails = 1
     autocmd FileType ruby,eruby let g:rubycomplete_classes_in_global = 1
 
     " PHPの辞書補完とomni補完 -----------------------------------------------------------
-    autocmd FileType php set omnifunc=phpcomplete#CompletePHP
-    autocmd FileType php :set dictionary+=~/.vim/dict/php5_functions.dict
+    autocmd FileType php setlocal omnifunc=phpcomplete#CompletePHP
+    autocmd FileType php :setlocal dictionary+=~/.vim/dict/php5_functions.dict
 
     " svnの時は文字コードをutf8設定 -----------------------------------
-    autocmd FileType svn :set fileencoding=utf-8
+    autocmd FileType svn :setlocal fileencoding=utf-8
 
     " changelog ---------------------------------------------------------------
     autocmd BufNewFile,BufRead *.changelog setf changelog
@@ -333,7 +333,7 @@ vmap <silent> ie <Plug>CamelCaseMotion_ie
 
 "Gauche
 autocmd FileType scheme :let is_gauche=1
-autocmd FileType scheme :set dictionary+=~/.vim/dict/gosh_completions.dict
+autocmd FileType scheme :setlocal dictionary+=~/.vim/dict/gosh_completions.dict
 
 " sqlUtil
 let g:sqlutil_align_where = 1
@@ -393,9 +393,11 @@ let g:Tb_MaxSize=3
 "highlight ZenkakuSpace cterm=underline ctermfg=lightblue guibg=white
 "match ZenkakuSpace /　/
 if !has('gui_running')
-    highlight Pmenu ctermfg=0 ctermbg=6  guibg=#606060
+	highlight Folded ctermfg=2 ctermbg=2
+	highlight FoldColumn ctermfg=2 ctermbg=2
+    highlight Pmenu ctermfg=1 ctermbg=6  guibg=#606060
     highlight PmenuSel ctermbg=4 guibg=SlateBlue
-    highlight PmenuSbar ctermbg=2 guibg=#404040
+    highlight PmenuSbar ctermbg=1 guibg=#404040
 endif
 
 " Tags: tags設定 ====================================================== {{{1
