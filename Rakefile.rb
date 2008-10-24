@@ -57,18 +57,20 @@ end
 
 desc "Windowsの命名規約のファイルをunix系に戻す"
 task "win_rename_before" do
-    return unless Rake::Win32::windows?
-    WIN_RENAME.each_pair{|key,value|
-       next unless File.exist?(HOME + "/" + value)
-       FileUtils.mv(HOME + "/" + value, HOME + "/" + key)
-    }
+    if Config::CONFIG['host_os'] =~ /mswin/
+        WIN_RENAME.each_pair{|key,value|
+            next unless File.exist?(HOME + "/" + value)
+            FileUtils.mv(HOME + "/" + value, HOME + "/" + key)
+        }
+    end
 end
 
 def win_rename_after
-    return unless Rake::Win32::windows?
-    WIN_RENAME.each_pair{|key,value|
-       FileUtils.mv(HOME + "/" + key, HOME + "/" + value)
-    }
+    if Config::CONFIG['host_os'] =~ /mswin/
+        WIN_RENAME.each_pair{|key,value|
+            FileUtils.mv(HOME + "/" + key, HOME + "/" + value)
+        }
+    end
 end
 
 Rake::PackageTask.new("configs",NOW) do |p|
