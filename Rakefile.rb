@@ -55,7 +55,7 @@ task "work_dir_remove" do
     rm_rf remove_dir
 end
 
-desc "Windowsの命名規約のファイルがあれば元に戻す"
+desc "Windowsの命名規約のファイルをunix系に戻す"
 task "win_rename_before" do
     return unless Rake::Win32::windows?
     WIN_RENAME.each_pair{|key,value|
