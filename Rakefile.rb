@@ -15,9 +15,9 @@ unless HOME
 end
 
 # タスクの関連付け
-task :default    => ["update","win_rename_after"]
-task :rep_build  => ["rep_clone","update","win_rename_after","work_dir_remove"]
-task :rep_update => ["rep_clone","update","win_rename_after"]
+task :default    => ["update"]
+task :rep_build  => ["rep_clone","update","work_dir_remove"]
+task :rep_update => ["rep_clone","update"]
 
 desc "カレントディレクトリのConfigsからHOMEディレクトリにBuildする"
 task "update" => "win_rename_before"do
@@ -36,6 +36,7 @@ task "update" => "win_rename_before"do
             file_remove remove_src_path, remove_dst_path
         end
     }
+    win_rename_after
     p "Update Finish."
 end
 
@@ -63,11 +64,9 @@ task "win_rename_before" do
     }
 end
 
-desc "Windowsの命名規約に変更する"
-task "win_rename_after" do
+def win_rename_after
     return unless Rake::Win32::windows?
     WIN_RENAME.each_pair{|key,value|
-       #FileUtils.rm_rf(HOME + "/" + value)
        FileUtils.mv(HOME + "/" + key, HOME + "/" + value)
     }
 end
