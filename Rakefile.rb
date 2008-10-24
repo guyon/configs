@@ -1,4 +1,4 @@
-# Config Build Rakefile
+# Config Build Rakefile.
 
 require "find"
 require 'rake/packagetask'
