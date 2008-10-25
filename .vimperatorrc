@@ -6,7 +6,7 @@ set complete=sl
 " クイックヒントモードでMigemoを使えるようにする。
 set hintmatching=custom
 " GUI関係の表示（メニュー/ツール/リンク）
-"set guioptions=mTb
+" set guioptions=mTb
 set guioptions=b
 " ビープ音を鳴らさずビジュアルベルを使用
 set visualbell
@@ -15,11 +15,11 @@ set visualbellstyle=display:none;
 " ヒストリー回数
 set history=1000
 
-"Google Suggest
+" Google Suggest
 "set complete=bshf
 "set complete+=g
 
-"" onload時の自動フォーカスを取りやめる。
+" onload時の自動フォーカスを取りやめる。
 set focuscontent
 
 " Mapping: ======================================================== {{{1
@@ -135,19 +135,6 @@ var dictionalyList = [
 ];
 EOM
 
-" ステータスバーにfeedボタンを表示 {{{2
-" http://d.hatena.ne.jp/teramako/20071205/p1
-javascript <<EOM
-(function(){
- var feedPanel = document.createElement('statusbarpanel');
- var feedButton = document.getElementById('feed-button');
- feedPanel.setAttribute('id','feed-panel-clone');
- feedPanel.appendChild(feedButton.cloneNode(true));
- feedButton.parentNode.removeChild(feedButton);
- document.getElementById('status-bar').insertBefore(feedPanel,document.getElementById('security-button'));
-})();
-EOM
-
 " wildoption=auto で余計なmap対策 {{{2
 " http://unsigned.g.hatena.ne.jp/Trapezoid/20080620/1213961754
 javascript <<EOM
@@ -172,10 +159,6 @@ javascript <<EOM
         });
 });
 EOM
-
-" feedSomeKeys_2.jsの設定 {{{2
-" (livedoor reader)
-"autocmd LocationChange reader\\.livedoor\\.com/reader :fmap! j k s a p o v c <Space> <S-Space> z b < >
 
 " Etc: ============================================================ {{{1
 

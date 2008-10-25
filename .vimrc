@@ -236,12 +236,12 @@ nnoremap <silent> ,w :set wrap!<CR>
 
 " 検索時に画面中央にくるようにする
 " nzzを割り当てるとfold時の検索でnを押して次に進んだ場合に自動展開されない
-"nnoremap n nzz
-nnoremap N Nzz
-nnoremap * *zz
-nnoremap # #zz
-nnoremap g* g*zz
-nnoremap g# g#zz
+nnoremap n nzzzv
+nnoremap N Nzzzv
+nnoremap * *zzzv
+nnoremap # #zzzv
+nnoremap g* g*zzzv
+nnoremap g# g#zzzv
 
 " 選択中の文字を検索する
 vnoremap <silent> n :call SelSearch()<CR>
@@ -393,11 +393,12 @@ let g:Tb_MaxSize=3
 "highlight ZenkakuSpace cterm=underline ctermfg=lightblue guibg=white
 "match ZenkakuSpace /　/
 if !has('gui_running')
-	highlight Folded ctermfg=2 ctermbg=2
-	highlight FoldColumn ctermfg=2 ctermbg=2
-    highlight Pmenu ctermfg=1 ctermbg=6  guibg=#606060
-    highlight PmenuSel ctermbg=4 guibg=SlateBlue
-    highlight PmenuSbar ctermbg=1 guibg=#404040
+	set background=dark
+	highlight Folded ctermfg=yellow ctermbg=black 
+	highlight FoldColumn ctermfg=yellow ctermbg=black 
+    highlight Pmenu ctermfg=white ctermbg=darkgray  guibg=#606060
+    highlight PmenuSel ctermbg=darkred guibg=SlateBlue
+    highlight PmenuSbar ctermbg=darkblue guibg=#404040
 endif
 
 " Tags: tags設定 ====================================================== {{{1
