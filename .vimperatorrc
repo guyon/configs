@@ -55,6 +55,35 @@ cnoremap <M-x> <C-v><M-x>
 cnoremap <M-c> <C-v><M-c>
 cnoremap <M-v> <C-v><M-v>
 
+" Windows標準のキーを使えるように
+noremap  <C-c> <C-v><C-c>
+inoremap <C-a> <C-v><C-a>
+inoremap <C-z> <C-v><C-z>
+inoremap <C-x> <C-v><C-x>
+inoremap <C-c> <C-v><C-c>
+inoremap <C-v> <C-v><C-v>
+cnoremap <C-a> <C-v><C-a>
+cnoremap <C-z> <C-v><C-z>
+cnoremap <C-x> <C-v><C-x>
+cnoremap <C-c> <C-v><C-c>
+cnoremap <C-v> <C-v><C-v>
+
+" splitBrowser.js
+noremap wc <C-w>d
+noremap w0 <C-w>0
+noremap w$ <C-w>$
+noremap wac :only<CR>
+noremap ws :split<CR>
+noremap wv :vsplit<CR>
+noremap wml :split -l<CR>
+noremap wmr :split -r<CR>
+noremap wmt :split -t<CR>
+noremap wmb :split -b<CR>
+noremap wj :split -b<CR>
+noremap wk :split -b<CR>
+noremap wl :split -b<CR>
+noremap wh :split -b<CR>
+
 " MacでCtrl+[でESC 
 " Bug 432951の為使用できず
 " http://developer.mozilla.org/ja/Gecko_Keypress_Event
@@ -67,6 +96,7 @@ cnoremap <M-v> <C-v><M-v>
 " direct_bookmark.js
 let g:direct_sbm_use_services_by_tag = "l"
 let g:direct_sbm_use_services_by_post = "l"
+let g:direct_sbm_is_normalize = "false"
 
 " Migemo検索の時にvimperatorをOFFにする {{{2
 javascript <<EOF
