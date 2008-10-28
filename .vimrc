@@ -299,8 +299,38 @@ nnoremap <C-P> :call PhpDocSingle()<CR>
 vnoremap <C-P> :call PhpDocRange()<CR>
 
 " Plugin: プラグイン設定 ============================================== {{{1
+
+" TODO:これってなんのプラグインだったけ？
 let html_use_css = 1              " code2html
-"SourceExplorer
+
+" QuickFix
+noremap mm <Plug>QuickFixNote
+noremap <silent> <F9> :copen<CR>
+noremap ms <Plug>QuickFixSave
+
+" Gauche
+autocmd FileType scheme :let is_gauche=1
+autocmd FileType scheme :setlocal dictionary+=~/.vim/dict/gosh_completions.dict
+" CamelCase Motion -------------------------------------------------------- {{{2
+
+" Replace the default 'w', 'b' and 'e' mappings instead of defining
+" TODO:nnoremapにすると動作しなくなる。後で調べる。
+nmap <silent> w <Plug>CamelCaseMotion_w
+nmap <silent> b <Plug>CamelCaseMotion_b
+nmap <silent> e <Plug>CamelCaseMotion_e
+
+" Replace default 'iw' text-object and define 'ie' and 'ib' motions: 
+omap <silent> iw <Plug>CamelCaseMotion_iw
+vmap <silent> iw <Plug>CamelCaseMotion_iw
+omap <silent> ib <Plug>CamelCaseMotion_ib
+vmap <silent> ib <Plug>CamelCaseMotion_ib
+omap <silent> ie <Plug>CamelCaseMotion_ie
+vmap <silent> ie <Plug>CamelCaseMotion_ie
+" sqlUtil ----------------------------------------------------------------- {{{2
+let g:sqlutil_align_where = 1
+let g:sqlutil_align_comma = 1
+
+" SourceExplorer ---------------------------------------------------------- {{{2
 "自動でプレビューを表示する。TODOうざくなってきたら手動にする。またはソースを追う時だけ自動に変更する
 let g:SrcExpl_RefreshTime   = 1
 "プレビューウインドウの高さ
@@ -309,38 +339,9 @@ let g:SrcExpl_WinHeight     = 9
 let g:SrcExpl_UpdateTags    = 1
 let g:SrcExpl_RefreshMapKey = "<Space>"
 let g:SrcExpl_GoBackMapKey  = "<C-b>"
-nmap <F8> :SrcExplToggle<CR>
+nnoremap <F8> :SrcExplToggle<CR>
 
-"QuickFix
-noremap mm <Plug>QuickFixNote
-noremap <silent> <F9> :copen<CR>
-noremap ms <Plug>QuickFixSave
-
-"CamelCase Motion
-"Replace the default 'w', 'b' and 'e' mappings instead of defining
-"TODO:nnoremapにすると動作しなくなる。後で調べる。
-nmap <silent> w <Plug>CamelCaseMotion_w
-nmap <silent> b <Plug>CamelCaseMotion_b
-nmap <silent> e <Plug>CamelCaseMotion_e
-
-"Replace default 'iw' text-object and define 'ie' and 'ib' motions: 
-omap <silent> iw <Plug>CamelCaseMotion_iw
-vmap <silent> iw <Plug>CamelCaseMotion_iw
-omap <silent> ib <Plug>CamelCaseMotion_ib
-vmap <silent> ib <Plug>CamelCaseMotion_ib
-omap <silent> ie <Plug>CamelCaseMotion_ie
-vmap <silent> ie <Plug>CamelCaseMotion_ie
-
-"Gauche
-autocmd FileType scheme :let is_gauche=1
-autocmd FileType scheme :setlocal dictionary+=~/.vim/dict/gosh_completions.dict
-
-" sqlUtil
-let g:sqlutil_align_where = 1
-let g:sqlutil_align_comma = 1
-
-" PluginMapping: プラグインに関するマッピング ========================= {{{1
-"FuzzyFinder用 ------------------------------------------------------------ {{{2
+"FuzzyFinder用 ----------------------------------------------------------- {{{2
 nnoremap <silent> <Leader>fa :FuzzyFinderAddFavFile<CR>
 nnoremap <silent> <Leader>fb :FuzzyFinderBuffer<CR>
 nnoremap <silent> <Leader>fc :FuzzyFinderMruCmd<CR>
@@ -349,8 +350,29 @@ nnoremap <silent> <Leader>ff :FuzzyFinderFile<CR>
 nnoremap <silent> <Leader>fm :FuzzyFinderMruFile<CR>
 nnoremap <silent> <Leader>fv :FuzzyFinderFavFile<CR>
 nnoremap <silent> <Leader>ft :FuzzyFinderTag<CR>
+
+let g:FuzzyFinderOptions = { 'Base':{}, 'Buffer':{}, 'File':{}, 'Dir':{}, 'MruFile':{}, 'MruCmd':{}, 'FavFile':{}, 'Tag':{}, 'TaggedFile':{}}
+let g:FuzzyFinderOptions.Base.key_open_split  = '<C-s>'
+let g:FuzzyFinderOptions.Base.key_open_vsplit = '<C-v>'
+let g:FuzzyFinderOptions.Base.key_open_tab    = '<C-]>'
+let g:FuzzyFinderOptions.Base.key_next_mode   = '<C-j>'
+let g:FuzzyFinderOptions.Base.key_prev_mode   = '<C-k>'
+let g:FuzzyFinderOptions.Base.key_ignore_case = '<C-t>'
 let g:FuzzyFinder_IgnoreCase = 1
-"speeddating.vim用のマッピング -------------------------------------------- {{{2
+if has('migemo')
+    let g:FuzzyFinderOptions.Base.migemo_support = 1
+endif
+let g:FuzzyFinderOptions.File.excluded_path = '\v\~$|\.git\\|\.git\/|\.svn|\.o$|\.class$|\.exe$|\.bak$|\.back$|\.swo$|\.swp$|((^|[/\\])\.[/\\]$)'
+let g:FuzzyFinderOptions.File.abbrev_map = {
+      \   ":c/" : [
+      \     "~/configs/",
+      \   ],
+      \   ":p/" : [
+      \     "~/.private/",
+      \   ],
+      \ }
+
+"speeddating.vim用のマッピング ------------------------------------------- {{{2
 " システム日付を挿入する
 inoremap <Leader>dF  <C-r>=strftime('%Y-%m-%dT%H:%M:%S+09:00')<Return>
 inoremap <Leader>df  <C-r>=strftime('%Y-%m-%dT%H:%M:%S')<Return>
