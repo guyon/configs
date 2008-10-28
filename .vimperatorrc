@@ -24,23 +24,23 @@ set focuscontent
 
 " Mapping: ======================================================== {{{1
 " タブの移動
-map h <C-p>
-map l <C-n>
-map j 5<C-e>
-map k 5<C-y>
+noremap h <C-p>
+noremap l <C-n>
+noremap j 5<C-e>
+noremap k 5<C-y>
 
 "" 設定ファイルの再読み込み
-map ,s :so .vimperatorrc<CR>
-map ,S :mapc<CR>:cmapc<CR>:imapc<CR>:so .vimperatorrc<CR>
+noremap ,s :so .vimperatorrc<CR>
+noremap ,S :mapc<CR>:cmapc<CR>:imapc<CR>:so .vimperatorrc<CR>
 
 " bookmarkコメントを表示
-map ,c :viewSBMComments -t h<cr>
+noremap ,c :viewSBMComments -t h<cr>
 
 " URLショートカット
-map gG <esc>:t http://www.google.co.jp/webhp?hl=ja&complete=1<cr>
-map gY <esc>:t http://www.yahoo.co.jp/<cr>
-map gB <esc>:t chrome://livedoorclip_incsearch/content/view.html<cr>
-map gR <esc>:t http://reader.livedoor.com/reader/<cr>
+noremap gG <esc>:t http://www.google.co.jp/webhp?hl=ja&complete=1<cr>
+noremap gY <esc>:t http://www.yahoo.co.jp/<cr>
+noremap gB <esc>:t chrome://livedoorclip_incsearch/content/view.html<cr>
+noremap gR <esc>:t http://reader.livedoor.com/reader/<cr>
 
 " Mac標準のキーを使えるように
 noremap  <M-c> <C-v><M-c>

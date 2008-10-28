@@ -311,6 +311,10 @@ noremap ms <Plug>QuickFixSave
 " Gauche
 autocmd FileType scheme :let is_gauche=1
 autocmd FileType scheme :setlocal dictionary+=~/.vim/dict/gosh_completions.dict
+
+" project.vim ------------------------------------------------------------- {{{2
+let g:proj_window_width = 32
+
 " CamelCase Motion -------------------------------------------------------- {{{2
 
 " Replace the default 'w', 'b' and 'e' mappings instead of defining
