@@ -69,7 +69,7 @@ cnoremap <C-c> <C-v><C-c>
 cnoremap <C-v> <C-v><C-v>
 
 " splitBrowser.js
-noremap wc <C-w>d
+noremap wc <C-w>c
 noremap w0 <C-w>0
 noremap w$ <C-w>$
 noremap wac :only<CR>
@@ -80,9 +80,9 @@ noremap wmr :split -r<CR>
 noremap wmt :split -t<CR>
 noremap wmb :split -b<CR>
 noremap wj :split -b<CR>
-noremap wk :split -b<CR>
-noremap wl :split -b<CR>
-noremap wh :split -b<CR>
+noremap wk :split -t<CR>
+noremap wl :split -r<CR>
+noremap wh :split -l<CR>
 
 " MacでCtrl+[でESC 
 " Bug 432951の為使用できず

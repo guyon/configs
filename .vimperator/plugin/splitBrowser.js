@@ -191,7 +191,7 @@ mappings.addUserMap([modes.NORMAL], ['<C-w>'], 'select subbrowser', //{{{
             case 'W':
                 forcusSwitch('-' + (count > 0 ? count : 1));
                 break;
-            case 'd':
+            case 'c':
                 liberator.plugins.splitBrowser.closeSubBrowser();
                 break;
             case '<C-v>':
