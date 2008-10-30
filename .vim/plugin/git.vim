@@ -213,7 +213,12 @@ function! s:OpenGitBuffer(content)
     setlocal buftype=nofile readonly modifiable
     execute 'setlocal bufhidden=' . g:git_bufhidden
 
-    silent put=a:content
+    if has('win32') && has('iconv')
+        let content = iconv(a:content, 'utf-8', &enc)
+    else
+        let content = a:content
+    endif
+    silent put=content
     keepjumps 0d
     setlocal nomodifiable
 
