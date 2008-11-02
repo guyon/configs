@@ -423,7 +423,7 @@ if !has('gui_running')
 	highlight Folded ctermfg=yellow ctermbg=black 
 	highlight FoldColumn ctermfg=yellow ctermbg=black 
     highlight Pmenu ctermfg=white ctermbg=darkgray  guibg=#606060
-    highlight PmenuSel ctermbg=darkred guibg=SlateBlue
+    highlight PmenuSel ctermbg=darkmagenta guibg=SlateBlue
     highlight PmenuSbar ctermbg=darkblue guibg=#404040
 endif
 
