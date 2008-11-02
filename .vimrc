@@ -172,7 +172,7 @@ endif
 
 " Macの場合にLeader設定
 if has('mac') && has('gui_running')
-   let mapleader = "\"
+   let mapleader = '¥'
 endif
 
 "noremap <C-Space> <Esc>
