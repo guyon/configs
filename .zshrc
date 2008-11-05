@@ -232,3 +232,14 @@ alias rm='rm -i'
 #http://mazgi.blog32.fc2.com/
 
 #alias vim="/Applications/vim" 
+
+# gem補完
+alias gem-update-list="gem list -r 2> /dev/null | grep '^[a-zA-Z]' | awk '{print \$1}' > $HOME/.gemlist"
+_gem () {
+    LIMIT=`date -d "1 week ago" +%s`
+    if ! [[ ( -f $HOME/.gemlist ) && ( `date -r "$HOME/.gemlist" +%s` -gt $LIMIT ) ]]; then
+        gem-update-list
+    fi
+    reply=(`cat $HOME/.gemlist`)
+}
+compctl -k "(`gem help commands | grep '^    \w.*' | sed 's/^\s*//' | sed 's/\s\s*.*//'`)" -x 'c[-1,-t]' - 'C[-1,(install)]' -K _gem -- gem
