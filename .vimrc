@@ -367,14 +367,25 @@ if has('migemo')
     let g:FuzzyFinderOptions.Base.migemo_support = 1
 endif
 let g:FuzzyFinderOptions.File.excluded_path = '\v\~$|\.git\\|\.git\/|\.svn|\.o$|\.class$|\.exe$|\.bak$|\.back$|\.swo$|\.swp$|((^|[/\\])\.[/\\]$)'
-let g:FuzzyFinderOptions.File.abbrev_map = {
-      \   ":c/" : [
-      \     "~/configs/",
-      \   ],
-      \   ":p/" : [
-      \     "~/.private/",
-      \   ],
-      \ }
+if has('win32')
+    let g:FuzzyFinderOptions.File.abbrev_map = {
+          \   ":c/" : [
+          \     "/configs/",
+          \   ],
+          \   ":p/" : [
+          \     "~/.private/",
+          \   ],
+          \ }
+else
+    let g:FuzzyFinderOptions.File.abbrev_map = {
+          \   ":c/" : [
+          \     "~/configs/",
+          \   ],
+          \   ":p/" : [
+          \     "~/.private/",
+          \   ],
+          \ }
+endif
 
 "speeddating.vim用のマッピング ------------------------------------------- {{{2
 " システム日付を挿入する
