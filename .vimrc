@@ -166,13 +166,16 @@ else
     set statusline=%<[%n]%m%r%h%w%{'['.(&fenc!=''?&fenc:&enc).':'.&ff.']'}%y\ %(%{GitBranch()}\ %)\ %F%=[%{GetB()}]\ %l,%c%V%8P
 endif
 
+" prg設定
+set grepprg="grep"
+
 
 " }}}1
 " Mapping: マッピング設定 ============================================= {{{1
 
 " Macの場合にLeader設定
 if has('mac') && has('gui_running')
-   let mapleader = '¥'
+   let mapleader = "\"
 endif
 
 "noremap <C-Space> <Esc>
@@ -367,14 +370,25 @@ if has('migemo')
     let g:FuzzyFinderOptions.Base.migemo_support = 1
 endif
 let g:FuzzyFinderOptions.File.excluded_path = '\v\~$|\.git\\|\.git\/|\.svn|\.o$|\.class$|\.exe$|\.bak$|\.back$|\.swo$|\.swp$|((^|[/\\])\.[/\\]$)'
-let g:FuzzyFinderOptions.File.abbrev_map = {
-      \   ":c/" : [
-      \     "~/configs/",
-      \   ],
-      \   ":p/" : [
-      \     "~/.private/",
-      \   ],
-      \ }
+if has('win32')
+    let g:FuzzyFinderOptions.File.abbrev_map = {
+          \   ":c/" : [
+          \     "/configs/",
+          \   ],
+          \   ":p/" : [
+          \     "~/.private/",
+          \   ],
+          \ }
+else
+    let g:FuzzyFinderOptions.File.abbrev_map = {
+          \   ":c/" : [
+          \     "~/configs/",
+          \   ],
+          \   ":p/" : [
+          \     "~/.private/",
+          \   ],
+          \ }
+endif
 
 "speeddating.vim用のマッピング ------------------------------------------- {{{2
 " システム日付を挿入する
@@ -423,7 +437,7 @@ if !has('gui_running')
 	highlight Folded ctermfg=yellow ctermbg=black 
 	highlight FoldColumn ctermfg=yellow ctermbg=black 
     highlight Pmenu ctermfg=white ctermbg=darkgray  guibg=#606060
-    highlight PmenuSel ctermbg=darkmagenta guibg=SlateBlue
+    highlight PmenuSel ctermbg=darkred guibg=SlateBlue
     highlight PmenuSbar ctermbg=darkblue guibg=#404040
 endif
 
