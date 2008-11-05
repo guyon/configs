@@ -1,10 +1,11 @@
-export PATH=/opt/local/bin:/opt/local/sbin:$PATH
+export PATH=/opt/local/bin:/opt/local/sbin:/usr/local/git/bin:$PATH
 export MANPATH=/opt/local/man:$MANPATH
 
 autoload -U compinit; compinit
 
 zstyle ':completion:*:sudo:*' command-path /usr/local/sbin /usr/local/bin \
-                             /usr/sbin /usr/bin /sbin /bin /usr/X11R6/bin
+                             /usr/sbin /usr/bin /sbin /bin /usr/X11R6/bin \
+                             /usr/local/git/bin
 #"エイリアス
 alias -g V='| vim -R -'
 
@@ -232,3 +233,14 @@ alias rm='rm -i'
 #http://mazgi.blog32.fc2.com/
 
 #alias vim="/Applications/vim" 
+
+# gem補完
+alias gem-update-list="gem list -r 2> /dev/null | grep '^[a-zA-Z]' | awk '{print \$1}' > $HOME/.gemlist"
+_gem () {
+    LIMIT=`date -d "1 week ago" +%s`
+    if ! [[ ( -f $HOME/.gemlist ) && ( `date -r "$HOME/.gemlist" +%s` -gt $LIMIT ) ]]; then
+        gem-update-list
+    fi
+    reply=(`cat $HOME/.gemlist`)
+}
+compctl -k "(`gem help commands | grep '^    \w.*' | sed 's/^\s*//' | sed 's/\s\s*.*//'`)" -x 'c[-1,-t]' - 'C[-1,(install)]' -K _gem -- gem
