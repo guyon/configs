@@ -176,7 +176,7 @@ set grepprg="grep"
 " Macの場合にLeader設定
 if has('mac') && has('gui_running')
    "let mapleader = "\"
-   let mapleader = "¥"
+   let mapleader = "\"
 endif
 
 "noremap <C-Space> <Esc>
@@ -316,6 +316,17 @@ noremap ms <Plug>QuickFixSave
 autocmd FileType scheme :let is_gauche=1
 autocmd FileType scheme :setlocal dictionary+=~/.vim/dict/gosh_completions.dict
 
+" git.vim ----------------------------------------------------- {{{2
+noremap <space>ga  :Cd<CR> :GitAdd noremap <space>gaa :GitAdd -a
+noremap <space>gac :Cd<CR> :GitAdd <C-R>=expand("%:t")<CR><CR>
+noremap <space>gd  :Cd<CR> :GitDiff 
+noremap <space>gc  :Cd<CR> :GitCommit 
+noremap <space>gca :Cd<CR> :GitCommit -a<CR>
+noremap <space>gcc :Cd<CR> :GitCommit <C-R>=expand("%:t")<CR><CR>
+noremap <space>gl  :Cd<CR> :GitLog<CR>
+noremap <space>gs  :Cd<CR> :GitStatus<CR>
+
+" }}}2
 " project.vim ------------------------------------------------------------- {{{2
 let g:proj_window_width = 32
 
