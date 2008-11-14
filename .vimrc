@@ -320,7 +320,7 @@ autocmd FileType scheme :let is_gauche=1
 autocmd FileType scheme :setlocal dictionary+=~/.vim/dict/gosh_completions.dict
 
 " git.vim ----------------------------------------------------- {{{2
-noremap <space>ga  :Cd<CR> :GitAdd noremap <space>gaa :GitAdd -a
+noremap <space>ga  :Cd<CR> :GitAdd
 noremap <space>gac :Cd<CR> :GitAdd <C-R>=expand("%:t")<CR><CR>
 noremap <space>gd  :Cd<CR> :GitDiff 
 noremap <space>gc  :Cd<CR> :GitCommit 
