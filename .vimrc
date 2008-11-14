@@ -111,6 +111,9 @@ if has("autocmd")
     " freemaker(Javaテンプレートエンジン) -------------------------------------
     autocmd BufNewFile,BufRead *.ftl setf ftl
 
+    " git.vim コミット後ログを表示する ----------------------------------------
+    "autocmd BufWritePost COMMIT_EDITMSG exe ":bd" | exe ":Cd" | exe ":GitLog"
+
     " 前回終了したカーソル行に移動 --------------------------------------------
     autocmd BufReadPost * if line("'\"") > 0 && line("'\"") <= line("$") | exe "normal g`\"" | endif
 endif
