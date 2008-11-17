@@ -2961,6 +2961,7 @@ $VIMRUNTIME	starting.jax	/*$VIMRUNTIME*
 <PageDown>	scroll.jax	/*<PageDown>*
 <PageUp>	scroll.jax	/*<PageUp>*
 <Plug>	map.jax	/*<Plug>*
+<Plug>qfreplace	qfreplace.jax	/*<Plug>qfreplace*
 <Return>	intro.jax	/*<Return>*
 <Right>	motion.jax	/*<Right>*
 <RightDrag>	term.jax	/*<RightDrag>*
@@ -5282,6 +5283,7 @@ g:gnat.Project_File	ada.jax	/*g:gnat.Project_File*
 g:gnat.Set_Project_File()	ada.jax	/*g:gnat.Set_Project_File()*
 g:gnat.Tags()	ada.jax	/*g:gnat.Tags()*
 g:gnat.Tags_Command	ada.jax	/*g:gnat.Tags_Command*
+g:qfreplace_bufopen_cmd	qfreplace.jax	/*g:qfreplace_bufopen_cmd*
 g:tar_browseoptions	pi_tar.jax	/*g:tar_browseoptions*
 g:tar_cmd	pi_tar.jax	/*g:tar_cmd*
 g:tar_readoptions	pi_tar.jax	/*g:tar_readoptions*
@@ -6234,6 +6236,13 @@ q	repeat.jax	/*q*
 q/	cmdline.jax	/*q\/*
 q:	cmdline.jax	/*q:*
 q?	cmdline.jax	/*q?*
+qfreplace	qfreplace.jax	/*qfreplace*
+qfreplace-changelog	qfreplace.jax	/*qfreplace-changelog*
+qfreplace-introduction	qfreplace.jax	/*qfreplace-introduction*
+qfreplace-key-mappings	qfreplace.jax	/*qfreplace-key-mappings*
+qfreplace-settings	qfreplace.jax	/*qfreplace-settings*
+qfreplace-usage	qfreplace.jax	/*qfreplace-usage*
+qfreplace.txt	qfreplace.jax	/*qfreplace.txt*
 qnx	os_qnx.jax	/*qnx*
 qnx-compiling	os_qnx.jax	/*qnx-compiling*
 qnx-general	os_qnx.jax	/*qnx-general*
