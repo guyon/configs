@@ -448,9 +448,9 @@ let g:Tb_MaxSize=3
 "highlight ZenkakuSpace cterm=underline ctermfg=lightblue guibg=white
 "match ZenkakuSpace /　/
 if !has('gui_running')
-	set background=dark
-	highlight Folded ctermfg=yellow ctermbg=black 
-	highlight FoldColumn ctermfg=yellow ctermbg=black 
+    set background=dark
+    highlight Folded ctermfg=yellow ctermbg=black 
+    highlight FoldColumn ctermfg=yellow ctermbg=black 
     highlight Pmenu ctermfg=white ctermbg=darkgray  guibg=#606060
     highlight PmenuSel ctermbg=darkred guibg=SlateBlue
     highlight PmenuSbar ctermbg=darkblue guibg=#404040
