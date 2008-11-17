@@ -310,6 +310,13 @@ vnoremap <C-P> :call PhpDocRange()<CR>
 " TODO:これってなんのプラグインだったけ？
 let html_use_css = 1              " code2html
 
+" Vimball 
+if has('win32')
+    let g:vimball_home = "C:/configs/.vim/"
+else
+    let g:vimball_home = "~/configs/.vim/"
+endif
+
 " QuickFix
 noremap mm <Plug>QuickFixNote
 noremap <silent> <F9> :copen<CR>
@@ -362,6 +369,11 @@ let g:SrcExpl_UpdateTags    = 1
 let g:SrcExpl_RefreshMapKey = "<Space>"
 let g:SrcExpl_GoBackMapKey  = "<C-b>"
 nnoremap <F8> :SrcExplToggle<CR>
+let g:SrcExpl_pluginList = [
+         \ "__Tag_List__",
+         \ "_NERD_tree_",
+         \ "Source_Explorer"
+     \ ]
 
 "FuzzyFinder用 ----------------------------------------------------------- {{{2
 nnoremap <silent> <Leader>fa :FuzzyFinderAddFavFile<CR>
