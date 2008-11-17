@@ -101,40 +101,110 @@ if ! hasmapto('1') || !hasmapto('<M-1>')
             inoremap <unique> <script> <M-8> <esc>:call <SID>Bf_SwitchTo( 8)<CR>:<BS>a
             inoremap <unique> <script> <M-9> <esc>:call <SID>Bf_SwitchTo( 9)<CR>:<BS>a
             inoremap <unique> <script> <M-0> <esc>:call <SID>Bf_SwitchTo( 10)<CR>:<BS>a
-      else
-            "NORMAL mode bindings for vim( dos32 )
-            noremap <unique> <script> ± :call <SID>Bf_SwitchTo( 1)<CR>:<BS>
-            noremap <unique> <script> ² :call <SID>Bf_SwitchTo( 2)<CR>:<BS>
-            noremap <unique> <script> ³ :call <SID>Bf_SwitchTo( 3)<CR>:<BS>
-            noremap <unique> <script> ´ :call <SID>Bf_SwitchTo( 4)<CR>:<BS>
-            noremap <unique> <script> µ :call <SID>Bf_SwitchTo( 5)<CR>:<BS>
-            noremap <unique> <script> ¶ :call <SID>Bf_SwitchTo( 6)<CR>:<BS>
-            noremap <unique> <script> · :call <SID>Bf_SwitchTo( 7)<CR>:<BS>
-            noremap <unique> <script> ¸ :call <SID>Bf_SwitchTo( 8)<CR>:<BS>
-      "else
-            "NORMAL mode bindings for vim( terminal)
-            noremap <unique> <script> 1 :call <SID>Bf_SwitchTo( 1)<CR>:<BS>
-            noremap <unique> <script> 2 :call <SID>Bf_SwitchTo( 2)<CR>:<BS>
-            noremap <unique> <script> 3 :call <SID>Bf_SwitchTo( 3)<CR>:<BS>
-            noremap <unique> <script> 4 :call <SID>Bf_SwitchTo( 4)<CR>:<BS>
-            noremap <unique> <script> 5 :call <SID>Bf_SwitchTo( 5)<CR>:<BS>
-            noremap <unique> <script> 6 :call <SID>Bf_SwitchTo( 6)<CR>:<BS>
-            noremap <unique> <script> 7 :call <SID>Bf_SwitchTo( 7)<CR>:<BS>
-            noremap <unique> <script> 8 :call <SID>Bf_SwitchTo( 8)<CR>:<BS>
-            noremap <unique> <script> 9 :call <SID>Bf_SwitchTo( 9)<CR>:<BS>
-            noremap <unique> <script> 0 :call <SID>Bf_SwitchTo( 10)<CR>:<BS>
-            "INSERT mode bindings for vim( terminal)
-            inoremap <unique> <script> 1 <esc>:call <SID>Bf_SwitchTo( 1)<CR>:<BS>a
-            inoremap <unique> <script> 2 <esc>:call <SID>Bf_SwitchTo( 2)<CR>:<BS>a
-            inoremap <unique> <script> 3 <esc>:call <SID>Bf_SwitchTo( 3)<CR>:<BS>a
-            inoremap <unique> <script> 4 <esc>:call <SID>Bf_SwitchTo( 4)<CR>:<BS>a
-            inoremap <unique> <script> 5 <esc>:call <SID>Bf_SwitchTo( 5)<CR>:<BS>a
-            inoremap <unique> <script> 6 <esc>:call <SID>Bf_SwitchTo( 6)<CR>:<BS>a
-            inoremap <unique> <script> 7 <esc>:call <SID>Bf_SwitchTo( 7)<CR>:<BS>a
-            inoremap <unique> <script> 8 <esc>:call <SID>Bf_SwitchTo( 8)<CR>:<BS>a
-            inoremap <unique> <script> 9 <esc>:call <SID>Bf_SwitchTo( 9)<CR>:<BS>a
-            inoremap <unique> <script> 0 <esc>:call <SID>Bf_SwitchTo( 10)<CR>:<BS>a
       endif
+
+      "NORMAL mode bindings
+      noremap <unique> <script> <space>1 :call <SID>Bf_SwitchTo(1)<CR>:<BS>
+      noremap <unique> <script> <space>2 :call <SID>Bf_SwitchTo(2)<CR>:<BS>
+      noremap <unique> <script> <space>3 :call <SID>Bf_SwitchTo(3)<CR>:<BS>
+      noremap <unique> <script> <space>4 :call <SID>Bf_SwitchTo(4)<CR>:<BS>
+      noremap <unique> <script> <space>5 :call <SID>Bf_SwitchTo(5)<CR>:<BS>
+      noremap <unique> <script> <space>6 :call <SID>Bf_SwitchTo(6)<CR>:<BS>
+      noremap <unique> <script> <space>7 :call <SID>Bf_SwitchTo(7)<CR>:<BS>
+      noremap <unique> <script> <space>8 :call <SID>Bf_SwitchTo(8)<CR>:<BS>
+      noremap <unique> <script> <space>9 :call <SID>Bf_SwitchTo(9)<CR>:<BS>
+      noremap <unique> <script> <space>10 :call <SID>Bf_SwitchTo(10)<CR>:<BS>
+      noremap <unique> <script> <space>11 :call <SID>Bf_SwitchTo(11)<CR>:<BS>
+      noremap <unique> <script> <space>12 :call <SID>Bf_SwitchTo(12)<CR>:<BS>
+      noremap <unique> <script> <space>13 :call <SID>Bf_SwitchTo(13)<CR>:<BS>
+      noremap <unique> <script> <space>14 :call <SID>Bf_SwitchTo(14)<CR>:<BS>
+      noremap <unique> <script> <space>15 :call <SID>Bf_SwitchTo(15)<CR>:<BS>
+      noremap <unique> <script> <space>16 :call <SID>Bf_SwitchTo(16)<CR>:<BS>
+      noremap <unique> <script> <space>17 :call <SID>Bf_SwitchTo(17)<CR>:<BS>
+      noremap <unique> <script> <space>18 :call <SID>Bf_SwitchTo(18)<CR>:<BS>
+      noremap <unique> <script> <space>19 :call <SID>Bf_SwitchTo(19)<CR>:<BS>
+      noremap <unique> <script> <space>20 :call <SID>Bf_SwitchTo(20)<CR>:<BS>
+      noremap <unique> <script> <space>21 :call <SID>Bf_SwitchTo(21)<CR>:<BS>
+      noremap <unique> <script> <space>22 :call <SID>Bf_SwitchTo(22)<CR>:<BS>
+      noremap <unique> <script> <space>23 :call <SID>Bf_SwitchTo(23)<CR>:<BS>
+      noremap <unique> <script> <space>24 :call <SID>Bf_SwitchTo(24)<CR>:<BS>
+      noremap <unique> <script> <space>25 :call <SID>Bf_SwitchTo(25)<CR>:<BS>
+      noremap <unique> <script> <space>26 :call <SID>Bf_SwitchTo(26)<CR>:<BS>
+      noremap <unique> <script> <space>27 :call <SID>Bf_SwitchTo(27)<CR>:<BS>
+      noremap <unique> <script> <space>28 :call <SID>Bf_SwitchTo(28)<CR>:<BS>
+      noremap <unique> <script> <space>29 :call <SID>Bf_SwitchTo(29)<CR>:<BS>
+      noremap <unique> <script> <space>30 :call <SID>Bf_SwitchTo(30)<CR>:<BS>
+      noremap <unique> <script> <space>31 :call <SID>Bf_SwitchTo(31)<CR>:<BS>
+      noremap <unique> <script> <space>32 :call <SID>Bf_SwitchTo(32)<CR>:<BS>
+      noremap <unique> <script> <space>33 :call <SID>Bf_SwitchTo(33)<CR>:<BS>
+      noremap <unique> <script> <space>34 :call <SID>Bf_SwitchTo(34)<CR>:<BS>
+      noremap <unique> <script> <space>35 :call <SID>Bf_SwitchTo(35)<CR>:<BS>
+      noremap <unique> <script> <space>36 :call <SID>Bf_SwitchTo(36)<CR>:<BS>
+      noremap <unique> <script> <space>37 :call <SID>Bf_SwitchTo(37)<CR>:<BS>
+      noremap <unique> <script> <space>38 :call <SID>Bf_SwitchTo(38)<CR>:<BS>
+      noremap <unique> <script> <space>39 :call <SID>Bf_SwitchTo(39)<CR>:<BS>
+      noremap <unique> <script> <space>40 :call <SID>Bf_SwitchTo(40)<CR>:<BS>
+      noremap <unique> <script> <space>41 :call <SID>Bf_SwitchTo(41)<CR>:<BS>
+      noremap <unique> <script> <space>42 :call <SID>Bf_SwitchTo(42)<CR>:<BS>
+      noremap <unique> <script> <space>43 :call <SID>Bf_SwitchTo(43)<CR>:<BS>
+      noremap <unique> <script> <space>44 :call <SID>Bf_SwitchTo(44)<CR>:<BS>
+      noremap <unique> <script> <space>45 :call <SID>Bf_SwitchTo(45)<CR>:<BS>
+      noremap <unique> <script> <space>46 :call <SID>Bf_SwitchTo(46)<CR>:<BS>
+      noremap <unique> <script> <space>47 :call <SID>Bf_SwitchTo(47)<CR>:<BS>
+      noremap <unique> <script> <space>48 :call <SID>Bf_SwitchTo(48)<CR>:<BS>
+      noremap <unique> <script> <space>49 :call <SID>Bf_SwitchTo(49)<CR>:<BS>
+      noremap <unique> <script> <space>50 :call <SID>Bf_SwitchTo(50)<CR>:<BS>
+      "INSERT mode bindings
+      inoremap <unique> <script> <space>1 <esc>:call <SID>Bf_SwitchTo(1)<CR>:<BS>a
+      inoremap <unique> <script> <space>2 <esc>:call <SID>Bf_SwitchTo(2)<CR>:<BS>a
+      inoremap <unique> <script> <space>3 <esc>:call <SID>Bf_SwitchTo(3)<CR>:<BS>a
+      inoremap <unique> <script> <space>4 <esc>:call <SID>Bf_SwitchTo(4)<CR>:<BS>a
+      inoremap <unique> <script> <space>5 <esc>:call <SID>Bf_SwitchTo(5)<CR>:<BS>a
+      inoremap <unique> <script> <space>6 <esc>:call <SID>Bf_SwitchTo(6)<CR>:<BS>a
+      inoremap <unique> <script> <space>7 <esc>:call <SID>Bf_SwitchTo(7)<CR>:<BS>a
+      inoremap <unique> <script> <space>8 <esc>:call <SID>Bf_SwitchTo(8)<CR>:<BS>a
+      inoremap <unique> <script> <space>9 <esc>:call <SID>Bf_SwitchTo(9)<CR>:<BS>a
+      inoremap <unique> <script> <space>10 <esc>:call <SID>Bf_SwitchTo(10)<CR>:<BS>a
+      inoremap <unique> <script> <space>11 <esc>:call <SID>Bf_SwitchTo(11)<CR>:<BS>a
+      inoremap <unique> <script> <space>12 <esc>:call <SID>Bf_SwitchTo(12)<CR>:<BS>a
+      inoremap <unique> <script> <space>13 <esc>:call <SID>Bf_SwitchTo(13)<CR>:<BS>a
+      inoremap <unique> <script> <space>14 <esc>:call <SID>Bf_SwitchTo(14)<CR>:<BS>a
+      inoremap <unique> <script> <space>15 <esc>:call <SID>Bf_SwitchTo(15)<CR>:<BS>a
+      inoremap <unique> <script> <space>16 <esc>:call <SID>Bf_SwitchTo(16)<CR>:<BS>a
+      inoremap <unique> <script> <space>17 <esc>:call <SID>Bf_SwitchTo(17)<CR>:<BS>a
+      inoremap <unique> <script> <space>18 <esc>:call <SID>Bf_SwitchTo(18)<CR>:<BS>a
+      inoremap <unique> <script> <space>19 <esc>:call <SID>Bf_SwitchTo(19)<CR>:<BS>a
+      inoremap <unique> <script> <space>20 <esc>:call <SID>Bf_SwitchTo(20)<CR>:<BS>a
+      inoremap <unique> <script> <space>21 <esc>:call <SID>Bf_SwitchTo(21)<CR>:<BS>a
+      inoremap <unique> <script> <space>22 <esc>:call <SID>Bf_SwitchTo(22)<CR>:<BS>a
+      inoremap <unique> <script> <space>23 <esc>:call <SID>Bf_SwitchTo(23)<CR>:<BS>a
+      inoremap <unique> <script> <space>24 <esc>:call <SID>Bf_SwitchTo(24)<CR>:<BS>a
+      inoremap <unique> <script> <space>25 <esc>:call <SID>Bf_SwitchTo(25)<CR>:<BS>a
+      inoremap <unique> <script> <space>26 <esc>:call <SID>Bf_SwitchTo(26)<CR>:<BS>a
+      inoremap <unique> <script> <space>27 <esc>:call <SID>Bf_SwitchTo(27)<CR>:<BS>a
+      inoremap <unique> <script> <space>28 <esc>:call <SID>Bf_SwitchTo(28)<CR>:<BS>a
+      inoremap <unique> <script> <space>29 <esc>:call <SID>Bf_SwitchTo(29)<CR>:<BS>a
+      inoremap <unique> <script> <space>30 <esc>:call <SID>Bf_SwitchTo(30)<CR>:<BS>a
+      inoremap <unique> <script> <space>31 <esc>:call <SID>Bf_SwitchTo(31)<CR>:<BS>a
+      inoremap <unique> <script> <space>32 <esc>:call <SID>Bf_SwitchTo(32)<CR>:<BS>a
+      inoremap <unique> <script> <space>33 <esc>:call <SID>Bf_SwitchTo(33)<CR>:<BS>a
+      inoremap <unique> <script> <space>34 <esc>:call <SID>Bf_SwitchTo(34)<CR>:<BS>a
+      inoremap <unique> <script> <space>35 <esc>:call <SID>Bf_SwitchTo(35)<CR>:<BS>a
+      inoremap <unique> <script> <space>36 <esc>:call <SID>Bf_SwitchTo(36)<CR>:<BS>a
+      inoremap <unique> <script> <space>37 <esc>:call <SID>Bf_SwitchTo(37)<CR>:<BS>a
+      inoremap <unique> <script> <space>38 <esc>:call <SID>Bf_SwitchTo(38)<CR>:<BS>a
+      inoremap <unique> <script> <space>39 <esc>:call <SID>Bf_SwitchTo(39)<CR>:<BS>a
+      inoremap <unique> <script> <space>40 <esc>:call <SID>Bf_SwitchTo(40)<CR>:<BS>a
+      inoremap <unique> <script> <space>41 <esc>:call <SID>Bf_SwitchTo(41)<CR>:<BS>a
+      inoremap <unique> <script> <space>42 <esc>:call <SID>Bf_SwitchTo(42)<CR>:<BS>a
+      inoremap <unique> <script> <space>43 <esc>:call <SID>Bf_SwitchTo(43)<CR>:<BS>a
+      inoremap <unique> <script> <space>44 <esc>:call <SID>Bf_SwitchTo(44)<CR>:<BS>a
+      inoremap <unique> <script> <space>45 <esc>:call <SID>Bf_SwitchTo(45)<CR>:<BS>a
+      inoremap <unique> <script> <space>46 <esc>:call <SID>Bf_SwitchTo(46)<CR>:<BS>a
+      inoremap <unique> <script> <space>47 <esc>:call <SID>Bf_SwitchTo(47)<CR>:<BS>a
+      inoremap <unique> <script> <space>48 <esc>:call <SID>Bf_SwitchTo(48)<CR>:<BS>a
+      inoremap <unique> <script> <space>49 <esc>:call <SID>Bf_SwitchTo(49)<CR>:<BS>a
+      inoremap <unique> <script> <space>50 <esc>:call <SID>Bf_SwitchTo(50)<CR>:<BS>a
 endif " %%
 
 
