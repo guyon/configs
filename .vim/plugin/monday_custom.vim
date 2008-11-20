@@ -94,7 +94,7 @@ call <SID>AddPair('october', 'november')
 call <SID>AddPair('november', 'december')
 call <SID>AddPair('december', 'january')
 
-" Asano’Ç‰Á
+" Asanoè¿½åŠ 
 call <SID>AddPair('if', 'unless')
 call <SID>AddPair('unless', 'if')
 

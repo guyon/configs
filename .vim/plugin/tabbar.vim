@@ -590,11 +590,11 @@ endfunction " %%
 " buffer, in which case we will want to close
 " the -TabBar- window.
 function! <SID>Tb_AutoUpdt(delBufNum)
-	" Asano Add Begin: LustyExplorer‚ÅTab‚ðì‚ç‚¹‚È‚¢‚æ‚¤‚É‚·‚é
+	" Asano Add Begin: LustyExplorerã§Tabã‚’ä½œã‚‰ã›ãªã„ã‚ˆã†ã«ã™ã‚‹
 	if (bufname('%') == '[LustyExplorer-Files]')
 		return
     endif
-	" Asano Add End: LustyExplorer‚ÅTab‚ðì‚ç‚¹‚È‚¢‚æ‚¤‚É‚·‚é
+	" Asano Add End: LustyExplorerã§Tabã‚’ä½œã‚‰ã›ãªã„ã‚ˆã†ã«ã™ã‚‹
     if g:Tb_DBG_LVL > 0
         call <SID>DEBUG('ENTER: Tb_AutoUpdt( delBufNum='.a:delBufNum.') : bufnr(%)='.bufnr('%').' : bufname(%)=['.bufname('%') . ']',10)
     endif

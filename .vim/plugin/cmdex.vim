@@ -3,7 +3,7 @@
 " cmdex.vim - Extra coomands
 "
 " Maintainer:	Muraoka Taro <koron@tka.att.ne.jp>
-" Last Change:	06-Feb-2006.
+" Last Change:	19-Nov-2008.
 " Commands:
 "		:MenuLang {language}
 "		    (language: none/ja/zh...etc.)
