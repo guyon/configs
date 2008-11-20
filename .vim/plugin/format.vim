@@ -4,7 +4,7 @@
 "               line anywhere, unless prohibited. (for Vim 7.0)
 "
 " Version:        1.7rc2
-" Last Change:    19-Nov-2008.
+" Last Change:    20-Nov-2008.
 " Maintainer:     MURAOKA Taro <koron@tka.att.ne.jp>
 " Practised By:   Takuhiro Nishioka <takuhiro@super.win.ne.jp>
 " Base Idea:      MURAOKA Taro <koron@tka.att.ne.jp>
@@ -84,15 +84,15 @@ let g:format_no_end = "([{"
 "
 if &encoding =~ '\v\c(cp932|euc-jp|utf-8)'
   let no_b = ''
-  let no_b = no_b . "ï¿ Â°â€™â€â€°â€²â€³â„ƒã€ã€‚ã€…ã€‰ã€‹ã€ã€ã€‘ã€•"
-  let no_b = no_b . "ããƒã…ã‡ã‰ã£ã‚ƒã‚…ã‚‡ã‚ã‚›ã‚œã‚ã‚"
-  let no_b = no_b . "ã‚¡ã‚£ã‚¥ã‚§ã‚©ãƒƒãƒ£ãƒ¥ãƒ§ãƒ®ãƒµãƒ¶"
-  let no_b = no_b . "ãƒ»ãƒ¼ãƒ½ãƒ¾ï¼ï¼…ï¼‰ï¼Œï¼ï¼šï¼›ï¼Ÿï¼½ï½â€¦ï½"
+  let no_b = no_b . "‘‹fhñŒABXrtvxzl"
+  let no_b = no_b . "‚Ÿ‚¡‚£‚¥‚§‚Á‚á‚ã‚å‚ìJKTU"
+  let no_b = no_b . "ƒ@ƒBƒDƒFƒHƒbƒƒƒ…ƒ‡ƒƒ•ƒ–"
+  let no_b = no_b . "E[RSI“jCDFGHnpc`"
   let g:format_no_begin = g:format_no_begin . no_b
   unlet! no_b
 
   let no_e = ''
-  let no_e = no_e . "ï¿¡â€˜â€œã€ˆã€Šã€Œã€ã€ã€”ï¼„ï¼ˆï¼»ï½›ï¿¥"
+  let no_e = no_e . "’egqsuwykimo"
   let g:format_no_end = g:format_no_end . no_e
   unlet! no_e
 endif
@@ -681,8 +681,8 @@ function! s:Feedkeys(string, mode, count)
 endfunction
 
 function! s:GetLinebreakOffset(curr_line, curr_col)
-  " ç¦å‰‡ãƒ«ãƒ¼ãƒ«ã«åŸºã¥ã„ã¦ã€ã‚«ãƒ¼ã‚½ãƒ«ä½ç½®ã®èª¿æ•´ã‚’è¡Œã†
-  " ã¶ã‚‰ä¸‹ãŒã‚Šã¯è€ƒæ…®ã—ãªã„
+  " ‹Ö‘¥ƒ‹[ƒ‹‚ÉŠî‚Ã‚¢‚ÄAƒJ[ƒ\ƒ‹ˆÊ’u‚Ì’²®‚ğs‚¤
+  " ‚Ô‚ç‰º‚ª‚è‚Íl—¶‚µ‚È‚¢
   let back_count = 0
   let no_begin = s:GetOption('format_no_begin')
   let no_end = s:GetOption('format_no_end')
@@ -713,13 +713,13 @@ function! Format_Japanese()
     return 1
   else
     let curcol = col('.')
-    " v:charã‚’å…¥åŠ›ã—ãŸå¾Œã§&textwidthã‚’è¶…ãˆã‚‹å ´åˆã«æ”¹è¡Œä½ç½®ã®è£œæ­£ã‚’è¡Œã†
+    " v:char‚ğ“ü—Í‚µ‚½Œã‚Å&textwidth‚ğ’´‚¦‚éê‡‚É‰üsˆÊ’u‚Ì•â³‚ğs‚¤
     let new_line = getline('.') . v:char
     if curcol + strlen(v:char) > &textwidth
       let back_count = s:GetLinebreakOffset(new_line, curcol)
-      " ã‚«ãƒ¼ã‚½ãƒ«ç§»å‹•ã¨æ”¹è¡Œã®æŒ¿å…¥ã‚’è¡Œã†
+      " ƒJ[ƒ\ƒ‹ˆÚ“®‚Æ‰üs‚Ì‘}“ü‚ğs‚¤
       if back_count > 0
-        " æœ¬é–¢æ•°çµ‚äº†å¾Œã«å…¥åŠ›ã•ã‚Œã‚‹v:charåˆ†ã‚‚è€ƒæ…®ã«å…¥ã‚Œã‚‹
+        " –{ŠÖ”I—¹Œã‚É“ü—Í‚³‚ê‚év:char•ª‚àl—¶‚É“ü‚ê‚é
         let l:count = back_count + 1
         call s:Feedkeys("\<LEFT>", 'n', l:count)
         call feedkeys("\<CR>", 'n')
