@@ -27,6 +27,15 @@ function! s:GetGitDir()
     return b:git_dir
 endfunction
 
+function! s:GetGitRootDir()
+    call <SID>GetGitDir()
+    let b:git_root_dir = b:git_dir
+    if strlen(b:git_root_dir)
+        let b:git_root_dir = substitute( b:git_root_dir, "git.$", "", "g")
+    endif
+    return b:git_root_dir
+endfunction
+
 " Returns current git branch.
 " Call inside 'statusline' or 'titlestring'.
 function! GitBranch()
@@ -89,6 +98,7 @@ function! GitStatus()
     setlocal filetype=git-status
     nnoremap <buffer> <Enter> :GitAdd <cfile><Enter>:call <SID>RefreshGitStatus()<Enter>
     nnoremap <buffer> -       :silent !git reset HEAD -- =expand('<cfile>')<Enter><Enter>:call <SID>RefreshGitStatus()<Enter>
+    nnoremap <buffer> ?       :silent !echo =expand('<cfile>')<Enter>>> =<SID>GetGitRootDir()<Enter>gitignore<Enter>:call <SID>RefreshGitStatus()<Enter>
 endfunction
 
 function! s:RefreshGitStatus()

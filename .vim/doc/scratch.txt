@@ -1,0 +1,199 @@
+*scratch.txt*	Emacs like scratch buffer.
+
+Version 0.1
+Copyright (C) 2007 kana <http://nicht.s8.xrea.com/>
+License: MIT license (see <http://www.opensource.org/licenses/mit-license>)
+$Id: /local/svn-repos/config/trunk/vim/dot.vim/doc/scratch.txt 1166 2007-12-25T17:40:19.519262Z kana  $
+
+
+CONTENTS						*scratch-contents*
+
+Introduction			|scratch-introduction|
+Interfaces			|scratch-interfaces|
+  Commands			  |scratch-commands|
+  Functions			  |scratch-functions|
+  Key Mapings			  |scratch-mappings|
+Customizing			|scratch-customizing|
+  Variables			  |scratch-variables|
+  Autocommands			  |scratch-autocommands|
+Bugs				|scratch-bugs|
+ChangeLog			|scratch-changelog|
+
+
+
+
+==============================================================================
+INTRODUCTION						*scratch-introduction*
+
+Scratch is a Vim plugin to provide Emacs-like scratch buffer.  You can write
+anything in it, and you can also evaluate a part of the buffer as Vim script.
+It is a temporary buffer and it is not related to a real file, so the content
+of the buffer will be discarded when you quit Vim.
+This buffer is useful when you test a bit of script or other use.
+
+Requirements:
+- Vim 7.0 or later.
+
+
+
+
+==============================================================================
+INTERFACES						*scratch-interfaces*
+
+------------------------------------------------------------------------------
+COMMANDS						*scratch-commands*
+
+:ScratchOpen						*:ScratchOpen*
+	``Open'' the scratch buffer, i.e., create the buffer if it does not
+	exist, show if it is not visible, or move the cursor to the window
+	that shows it.
+
+	See |g:scratch_show_command| if you want to change the way to open.
+
+:ScratchClose						*:ScratchClose*
+	Close a window that shows the scratch buffer if able.
+
+:[range]ScratchEvaluate[!]				*:ScratchEvaluate*
+	Evaluate the [range] as a Vim script.
+	The default [range] is the current line.
+	Without [!], the cursor will be moved to the next line of the script
+	after evaluating.  If there is no line to move, new blank line will be
+	appended then the cursor will be moved to the new line.
+	With [!], such adjustment will not be done.
+
+
+------------------------------------------------------------------------------
+FUNCTIONS						*scratch-functions*
+
+scratch#open()						*scratch#open()*
+	Function version of |:ScratchOpen|.
+	The return value is not defined.
+
+scratch#close()						*scratch#close()*
+	Function version of |:ScratchClose|.
+	The return value is not defined.
+
+						  *scratch#evaluate_linewise()*
+scratch#evaluate_linewise({line1}, {line2}, {adjust-cursorp})
+	Function version of |:ScratchEvaluate|.
+	If {adjust-cursorp} is true, the cursor position will be adjusted as
+	same as |:ScratchEvaluate|.  If {adjust-cursorp} is false, such
+	adjustment will not be done.
+	The return value is not defined.
+
+scratch#evaluate({pos1}, {pos2}, {adjust-cursorp})	*scratch#evaluate()*
+	Same as |scratch#evaluate_linewise()|, but this takes the range of the
+	script to be evaluated as {pos1} and {pos2}, which are same as the
+	returning value of |getpos()|.
+	The return value is not defined.
+
+
+------------------------------------------------------------------------------
+KEY MAPPINGS						*scratch-mappings*
+
+GLOBAL MAPPINGS ~
+
+<Plug>(scratch-open)					*<Plug>(scratch-open)*
+	Do |:ScratchOpen|.
+
+<Plug>(scratch-close)					*<Plug>(scratch-close)*
+	Do |:ScratchClose|.
+
+<Plug>(scratch-evaluate)			     *<Plug>(scratch-evaluate)*
+	Do |:ScratchEvaluate| without [!].
+
+<Plug>(scratch-evaluate!)			    *<Plug>(scratch-evaluate!)*
+	Do |:ScratchEvaluate| with [!].
+
+SCRATCH BUFFER-LOCAL MAPPINGS ~
+
+<C-j>	or						*<C-j>*
+<C-m>	or						*<C-m>*
+<CR>							*<CR>*
+	Mapped to |<Plug>scratch-evaluate|.
+	Note that these mappings will not be defined when {lhs} is already
+	mapped to something.
+
+
+
+
+==============================================================================
+CUSTOMIZING						*scratch-customizing*
+
+------------------------------------------------------------------------------
+VARIABLES						*scratch-variables*
+
+							*g:scratch_buffer_name*
+g:scratch_buffer_name		string (default: "*Scratch*")
+	The name of the scratch buffer.
+	Note that this value must be set before this plugin is loaded (for
+	example, in $MYVIMRC).
+
+						      *g:scratch_show_command*
+g:scratch_show_command		string (default: 'topleft split | hide buffer')
+	The command to show the scratch buffer.  When this plugin shows the
+	scratch buffer, it will execute the following script: >
+
+	execute g:scratch_show_command the_buffer_number_of_the_scratch_buffer
+<
+	Examples:
+	'topleft split | hide buffer' (default value)
+		Create new window at the top and show in it.
+	'hide buffer'
+		Show in the active window.
+
+
+------------------------------------------------------------------------------
+AUTOCOMMANDS					*scratch-autocommands*
+
+When the scratch buffer is created, two events will be triggered to initialize
+it.  If you want to add and/or override the default settings, use |autocmd|
+like the following: >
+
+	autocmd User PluginScratchInitializeBefore {any-command}
+	autocmd User PluginScratchInitializeAfter {any-command}
+<
+"User PluginScratchInitializeBefore" is triggered before the default
+initialization.  "User PluginScratchInitializeAfter" is triggered after the
+default initialization.
+
+The default initialization does:
+- set 'filetype' as vim.  (if 'filetype' is not set)
+- put some informative message.  (if 'filetype' is vim)
+- define several buffer-local key mappings.
+
+
+
+
+==============================================================================
+BUGS						*scratch-bugs*
+
+- Don't do |:edit|, |:bunload| or |:bdelete| on the scratch buffer.  The
+  content of the scratch buffer and/or other information (e.g., mappings) will
+  be cleared.
+  If you did it accidentally, do |:bwipeout| then |:ScratchOpen| to recreate
+  the scratch buffer.
+
+- |:ScratchOpen| - To create the scratch buffer, the current buffer will be
+  hidden temporary.  This behavior may cause some problems.
+
+- |:ScratchEvaluate| - Is it useful to evaluate any programming language other
+  than Vim script?
+
+
+
+
+==============================================================================
+CHANGELOG					*scratch-changelog*
+
+0.1	2007-12-25T03:57:18+09:00
+	- Rewrote.
+
+0.0	2007-xx-xx
+	- Initial version.
+
+
+
+
+==============================================================================
+vim:tw=78:ts=8:ft=help:norl:

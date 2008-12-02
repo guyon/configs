@@ -80,7 +80,7 @@ let g:pdv_cfg_Package = ""
 "let g:pdv_cfg_Version = "$id$"
 let g:pdv_cfg_Version = "$id$"
 let g:pdv_cfg_Author = "NTT-AT"
-let g:pdv_cfg_Copyright = "ƒTƒCƒg“àŒŸõƒVƒXƒeƒ€VŠî”Õ®”õ(S0`S1‘Î‰)"
+let g:pdv_cfg_Copyright = "ã‚µã‚¤ãƒˆå†…æ¤œç´¢ã‚·ã‚¹ãƒ†ãƒ æ–°åŸºç›¤æ•´å‚™(S0ï½S1å¯¾å¿œ)"
 "let g:pdv_cfg_License = "PHP Version 3.0 {@link http://www.php.net/license/3_0.txt}"
 let g:pdv_cfg_License = ""
 

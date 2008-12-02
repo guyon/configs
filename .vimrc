@@ -111,6 +111,9 @@ if has("autocmd")
     " freemaker(Javaテンプレートエンジン) -------------------------------------
     autocmd BufNewFile,BufRead *.ftl setf ftl
 
+    " git.vim コミット後ログを表示する ----------------------------------------
+    "autocmd BufWritePost COMMIT_EDITMSG exe ":bd" | exe ":Cd" | exe ":GitLog"
+
     " 前回終了したカーソル行に移動 --------------------------------------------
     autocmd BufReadPost * if line("'\"") > 0 && line("'\"") <= line("$") | exe "normal g`\"" | endif
 endif
@@ -307,6 +310,13 @@ vnoremap <C-P> :call PhpDocRange()<CR>
 " TODO:これってなんのプラグインだったけ？
 let html_use_css = 1              " code2html
 
+" Vimball 
+if has('win32')
+    let g:vimball_home = "C:/configs/.vim/"
+else
+    let g:vimball_home = "~/configs/.vim/"
+endif
+
 " QuickFix
 noremap mm <Plug>QuickFixNote
 noremap <silent> <F9> :copen<CR>
@@ -317,7 +327,7 @@ autocmd FileType scheme :let is_gauche=1
 autocmd FileType scheme :setlocal dictionary+=~/.vim/dict/gosh_completions.dict
 
 " git.vim ----------------------------------------------------- {{{2
-noremap <space>ga  :Cd<CR> :GitAdd noremap <space>gaa :GitAdd -a
+noremap <space>ga  :Cd<CR> :GitAdd
 noremap <space>gac :Cd<CR> :GitAdd <C-R>=expand("%:t")<CR><CR>
 noremap <space>gd  :Cd<CR> :GitDiff 
 noremap <space>gc  :Cd<CR> :GitCommit 
@@ -359,6 +369,11 @@ let g:SrcExpl_UpdateTags    = 1
 let g:SrcExpl_RefreshMapKey = "<Space>"
 let g:SrcExpl_GoBackMapKey  = "<C-b>"
 nnoremap <F8> :SrcExplToggle<CR>
+let g:SrcExpl_pluginList = [
+         \ "__Tag_List__",
+         \ "_NERD_tree_",
+         \ "Source_Explorer"
+     \ ]
 
 "FuzzyFinder用 ----------------------------------------------------------- {{{2
 nnoremap <silent> <Leader>fa :FuzzyFinderAddFavFile<CR>
@@ -438,16 +453,19 @@ let g:surround_64 = "@{\r}"
 
 " tabbar.vim -------------------------------------------------------------- {{{2
 let g:Tb_MaxSize=3
-
+" }}}2
+" scratch.vim  ------------------------------------------------------------ {{{2
+let g:scratch_buffer_name = "Scratch"
+" }}}2
 " Color: 色設定 ======================================================= {{{1
 " 特定の文字を視覚化。この例では全角スペース
 " TODO:listcharsの設定と調整する
 "highlight ZenkakuSpace cterm=underline ctermfg=lightblue guibg=white
 "match ZenkakuSpace /　/
 if !has('gui_running')
-	set background=dark
-	highlight Folded ctermfg=yellow ctermbg=black 
-	highlight FoldColumn ctermfg=yellow ctermbg=black 
+    set background=dark
+    highlight Folded ctermfg=yellow ctermbg=black 
+    highlight FoldColumn ctermfg=yellow ctermbg=black 
     highlight Pmenu ctermfg=white ctermbg=darkgray  guibg=#606060
     highlight PmenuSel ctermbg=darkred guibg=SlateBlue
     highlight PmenuSbar ctermbg=darkblue guibg=#404040

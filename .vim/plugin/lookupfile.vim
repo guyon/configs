@@ -16,7 +16,7 @@ if exists('loaded_lookupfile')
   finish
 endif
 if v:version < 701
-  echomsg 'lookupfile: You need at least Vim 7.1'
+  "echomsg 'lookupfile: You need at least Vim 7.1'
   finish
 endif
 if !exists('loaded_genutils')
