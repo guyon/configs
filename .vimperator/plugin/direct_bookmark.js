@@ -634,7 +634,9 @@
                     user,password,
                     isNormalize ? getNormalizedPermalink(url) : url,title,
                     comment,tags
-                ));
+                )).next(function() {
+                  liberator.echo("[" + services[service].description + "] post completed. => " + title);
+                });
             });
             d.error(function(e){liberator.echoerr("direct_bookmark.js: Exception throwed! " + e);liberator.log(e);});
             setTimeout(function(){first.call();},0);
