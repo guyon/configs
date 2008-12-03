@@ -28,8 +28,8 @@ noremap h <C-p>
 noremap l <C-n>
 noremap j 5<C-e>
 noremap k 5<C-y>
-noremap H g0
-noremap L g$
+noremap gh g0
+noremap gl g$
 
 "" 設定ファイルの再読み込み
 noremap ,s :so .vimperatorrc<CR>
