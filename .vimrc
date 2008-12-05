@@ -179,7 +179,7 @@ set grepprg="grep"
 " Macの場合にLeader設定
 if has('mac') && has('gui_running')
    "let mapleader = "\"
-   let mapleader = "¥"
+   let mapleader = "\"
 endif
 
 "noremap <C-Space> <Esc>
@@ -393,6 +393,8 @@ let g:FuzzyFinderOptions.Base.key_next_mode   = '<C-j>'
 let g:FuzzyFinderOptions.Base.key_prev_mode   = '<C-k>'
 let g:FuzzyFinderOptions.Base.key_ignore_case = '<C-t>'
 let g:FuzzyFinder_IgnoreCase = 1
+" 描画の抑制で速度UP 表示されていなくてもFuzzyFinderの対象にはなる
+let g:FuzzyFinderOptions.Base.enumerating_limit = 25
 if has('migemo')
     let g:FuzzyFinderOptions.Base.migemo_support = 1
 endif
