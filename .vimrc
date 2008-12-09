@@ -376,16 +376,15 @@ let g:SrcExpl_pluginList = [
      \ ]
 
 "FuzzyFinder用 ----------------------------------------------------------- {{{2
-nnoremap <silent> <Leader>fa :FuzzyFinderAddFavFile<CR>
 nnoremap <silent> <Leader>fb :FuzzyFinderBuffer<CR>
 nnoremap <silent> <Leader>fc :FuzzyFinderMruCmd<CR>
 nnoremap <silent> <Leader>fd :FuzzyFinderDir<CR>
 nnoremap <silent> <Leader>ff :FuzzyFinderFile<CR>
 nnoremap <silent> <Leader>fm :FuzzyFinderMruFile<CR>
-nnoremap <silent> <Leader>fv :FuzzyFinderFavFile<CR>
+nnoremap <silent> <Leader>fb :FuzzyFinderBookmark<CR>
 nnoremap <silent> <Leader>ft :FuzzyFinderTag<CR>
 
-let g:FuzzyFinderOptions = { 'Base':{}, 'Buffer':{}, 'File':{}, 'Dir':{}, 'MruFile':{}, 'MruCmd':{}, 'FavFile':{}, 'Tag':{}, 'TaggedFile':{}}
+let g:FuzzyFinderOptions = { 'Base':{}, 'Buffer':{}, 'File':{}, 'Dir':{}, 'MruFile':{}, 'MruCmd':{}, 'Bookmark':{}, 'Tag':{}, 'TaggedFile':{}}
 let g:FuzzyFinderOptions.Base.key_open_split  = '<C-s>'
 let g:FuzzyFinderOptions.Base.key_open_vsplit = '<C-v>'
 let g:FuzzyFinderOptions.Base.key_open_tab    = '<C-]>'
