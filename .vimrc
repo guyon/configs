@@ -382,7 +382,7 @@ nnoremap <silent> <Leader>fc :FuzzyFinderMruCmd<CR>
 nnoremap <silent> <Leader>fd :FuzzyFinderDir<CR>
 nnoremap <silent> <Leader>ff :FuzzyFinderFile<CR>
 nnoremap <silent> <Leader>fm :FuzzyFinderMruFile<CR>
-nnoremap <silent> <Leader>fb :FuzzyFinderBookmark<CR>
+nnoremap <silent> <Leader>fv :FuzzyFinderBookmark<CR>
 nnoremap <silent> <Leader>ft :FuzzyFinderTag<CR>
 
 let g:FuzzyFinderOptions = { 'Base':{}, 'Buffer':{}, 'File':{}, 'Dir':{}, 'MruFile':{}, 'MruCmd':{}, 'Bookmark':{}, 'Tag':{}, 'TaggedFile':{}}
