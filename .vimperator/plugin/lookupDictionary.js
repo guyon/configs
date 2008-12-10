@@ -14,6 +14,11 @@
     shortHelp: 'SPACE ALC (英辞郎 on the Web)',
     xpath: '//*[@id="resultList"]'
 },{
+    names: ['trans[late]'],
+    url: 'http://translate.google.co.jp/translate_a/t?client=t&text=%s&sl=en&tl=ja',
+    shortHelp: 'google翻訳',
+    xpath: '//*'
+},{
     names: ['goo'],
     url: 'http://dictionary.goo.ne.jp/search.php?MT=%s&kind=all&mode=0',
     shortHelp: 'goo 辞書',
