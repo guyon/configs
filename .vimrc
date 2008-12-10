@@ -177,10 +177,11 @@ set grepprg="grep"
 " Mapping: マッピング設定 ============================================= {{{1
 
 " Macの場合にLeader設定
-if has('mac') && has('gui_running')
-   "let mapleader = "\"
-   let mapleader = "\"
-endif
+"if has('mac') && has('gui_running')
+"   "let mapleader = "\"
+"   let mapleader = "\"
+"endif
+let mapleader = " "
 
 "noremap <C-Space> <Esc>
 "cnoremap <C-Space> <Esc>
