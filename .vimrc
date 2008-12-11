@@ -423,11 +423,11 @@ endif
 
 "speeddating.vim用のマッピング ------------------------------------------- {{{2
 " システム日付を挿入する
-inoremap <space>dF  <C-r>=strftime('%Y-%m-%dT%H:%M:%S+09:00')<Return>
-inoremap <space>df  <C-r>=strftime('%Y-%m-%dT%H:%M:%S')<Return>
-inoremap <space>dd  <C-r>=strftime('%Y-%m-%d')<Return>
-inoremap <space>dT  <C-r>=strftime('%H:%M:%S')<Return>
-inoremap <space>dt  <C-r>=strftime('%H:%M')<Return>
+inoremap <leader>dF  <C-r>=strftime('%Y-%m-%dT%H:%M:%S+09:00')<Return>
+inoremap <leader>df  <C-r>=strftime('%Y-%m-%dT%H:%M:%S')<Return>
+inoremap <leader>dd  <C-r>=strftime('%Y-%m-%d')<Return>
+inoremap <leader>dT  <C-r>=strftime('%H:%M:%S')<Return>
+inoremap <leader>dt  <C-r>=strftime('%H:%M')<Return>
 
 " calender.vim ------------------------------------------------------------ {{{2
 "let g:calendar_erafmt = '平成,-1988'
