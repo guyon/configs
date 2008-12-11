@@ -73,6 +73,9 @@ command! ListCharsDispFull set listchars=tab:^-,eol:$,trail:_,nbsp:% list
 command! ListCharsDispTab set listchars=tab:^- list
 command! ListCharsDispEol set listchars=eol:$ list
 
+" カレントディレクトリに移動
+command! CD execute ":lcd " . expand("%:p:h")
+
 " Autocmd: autocmd設定 ================================================ {{{1
 if has("autocmd")
     filetype plugin on
@@ -177,11 +180,10 @@ set grepprg="grep"
 " Mapping: マッピング設定 ============================================= {{{1
 
 " Macの場合にLeader設定
-"if has('mac') && has('gui_running')
-"   "let mapleader = "\"
-"   let mapleader = "\"
-"endif
-let mapleader = " "
+if has('mac') && has('gui_running')
+   "let mapleader = "\"
+   let mapleader = "\"
+endif
 
 "noremap <C-Space> <Esc>
 "cnoremap <C-Space> <Esc>
@@ -328,14 +330,14 @@ autocmd FileType scheme :let is_gauche=1
 autocmd FileType scheme :setlocal dictionary+=~/.vim/dict/gosh_completions.dict
 
 " git.vim ----------------------------------------------------- {{{2
-noremap <space>ga  :Cd<CR> :GitAdd
-noremap <space>gac :Cd<CR> :GitAdd <C-R>=expand("%:t")<CR><CR>
-noremap <space>gd  :Cd<CR> :GitDiff 
-noremap <space>gc  :Cd<CR> :GitCommit 
-noremap <space>gca :Cd<CR> :GitCommit -a<CR>
-noremap <space>gcc :Cd<CR> :GitCommit <C-R>=expand("%:t")<CR><CR>
-noremap <space>gl  :Cd<CR> :GitLog<CR>
-noremap <space>gs  :Cd<CR> :GitStatus<CR>
+noremap <space>ga  :CD<CR> :GitAdd
+noremap <space>gac :CD<CR> :GitAdd <C-R>=expand("%:t")<CR><CR>
+noremap <space>gd  :CD<CR> :GitDiff 
+noremap <space>gc  :CD<CR> :GitCommit 
+noremap <space>gca :CD<CR> :GitCommit -a<CR>
+noremap <space>gcc :CD<CR> :GitCommit <C-R>=expand("%:t")<CR><CR>
+noremap <space>gl  :CD<CR> :GitLog<CR>
+noremap <space>gs  :CD<CR> :GitStatus<CR>
 
 " }}}2
 " project.vim ------------------------------------------------------------- {{{2
@@ -377,13 +379,13 @@ let g:SrcExpl_pluginList = [
      \ ]
 
 "FuzzyFinder用 ----------------------------------------------------------- {{{2
-nnoremap <silent> <Leader>fb :FuzzyFinderBuffer<CR>
-nnoremap <silent> <Leader>fc :FuzzyFinderMruCmd<CR>
-nnoremap <silent> <Leader>fd :FuzzyFinderDir<CR>
-nnoremap <silent> <Leader>ff :FuzzyFinderFile<CR>
-nnoremap <silent> <Leader>fm :FuzzyFinderMruFile<CR>
-nnoremap <silent> <Leader>fv :FuzzyFinderBookmark<CR>
-nnoremap <silent> <Leader>ft :FuzzyFinderTag<CR>
+nnoremap <silent> <space>fb :FuzzyFinderBuffer<CR>
+nnoremap <silent> <space>fc :FuzzyFinderMruCmd<CR>
+nnoremap <silent> <space>fd :FuzzyFinderDir<CR>
+nnoremap <silent> <space>ff :FuzzyFinderFile<CR>
+nnoremap <silent> <space>fm :FuzzyFinderMruFile<CR>
+nnoremap <silent> <space>fv :FuzzyFinderBookmark<CR>
+nnoremap <silent> <space>ft :FuzzyFinderTag<CR>
 
 let g:FuzzyFinderOptions = { 'Base':{}, 'Buffer':{}, 'File':{}, 'Dir':{}, 'MruFile':{}, 'MruCmd':{}, 'Bookmark':{}, 'Tag':{}, 'TaggedFile':{}}
 let g:FuzzyFinderOptions.Base.key_open_split  = '<C-s>'
@@ -421,11 +423,11 @@ endif
 
 "speeddating.vim用のマッピング ------------------------------------------- {{{2
 " システム日付を挿入する
-inoremap <Leader>dF  <C-r>=strftime('%Y-%m-%dT%H:%M:%S+09:00')<Return>
-inoremap <Leader>df  <C-r>=strftime('%Y-%m-%dT%H:%M:%S')<Return>
-inoremap <Leader>dd  <C-r>=strftime('%Y-%m-%d')<Return>
-inoremap <Leader>dT  <C-r>=strftime('%H:%M:%S')<Return>
-inoremap <Leader>dt  <C-r>=strftime('%H:%M')<Return>
+inoremap <space>dF  <C-r>=strftime('%Y-%m-%dT%H:%M:%S+09:00')<Return>
+inoremap <space>df  <C-r>=strftime('%Y-%m-%dT%H:%M:%S')<Return>
+inoremap <space>dd  <C-r>=strftime('%Y-%m-%d')<Return>
+inoremap <space>dT  <C-r>=strftime('%H:%M:%S')<Return>
+inoremap <space>dt  <C-r>=strftime('%H:%M')<Return>
 
 " calender.vim ------------------------------------------------------------ {{{2
 "let g:calendar_erafmt = '平成,-1988'
