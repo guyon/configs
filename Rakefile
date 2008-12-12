@@ -65,6 +65,11 @@ task "win_rename_before" do
     end
 end
 
+desc "戦闘力を測る"
+task "scautar" do
+HOME
+end
+
 def win_rename_after
     if Config::CONFIG['host_os'] =~ /mswin/
         WIN_RENAME.each_pair{|key,value|
