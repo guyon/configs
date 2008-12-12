@@ -74,7 +74,10 @@ command! ListCharsDispTab set listchars=tab:^- list
 command! ListCharsDispEol set listchars=eol:$ list
 
 " カレントディレクトリに移動
-command! CD execute ":lcd " . expand("%:p:h")
+command! -nargs=0 -bar CD execute 'lcd' expand('%:p:h')
+" ":"不要 / 引数間のスペースは自動挿入されるので不要(←好みの問題)。
+"command! CD execute ":lcd " . expand("%:p:h")
+
 
 " Autocmd: autocmd設定 ================================================ {{{1
 if has("autocmd")
@@ -330,14 +333,17 @@ autocmd FileType scheme :let is_gauche=1
 autocmd FileType scheme :setlocal dictionary+=~/.vim/dict/gosh_completions.dict
 
 " git.vim ----------------------------------------------------- {{{2
-noremap <space>ga  :CD<CR> :GitAdd
-noremap <space>gac :CD<CR> :GitAdd <C-R>=expand("%:t")<CR><CR>
-noremap <space>gd  :CD<CR> :GitDiff 
-noremap <space>gc  :CD<CR> :GitCommit 
-noremap <space>gca :CD<CR> :GitCommit -a<CR>
-noremap <space>gcc :CD<CR> :GitCommit <C-R>=expand("%:t")<CR><CR>
-noremap <space>gl  :CD<CR> :GitLog<CR>
-noremap <space>gs  :CD<CR> :GitStatus<CR>
+nnoremap <Space>gs  :CD \| GitStatus<CR>
+nnoremap <Space>ga  :CD \| GitAdd
+nnoremap <Space>gac :CD \| GitAdd <C-r>=expand("%:t")<CR><CR>
+nnoremap <Space>gd  :CD \| GitDiff 
+nnoremap <Space>gc  :CD \| GitCommit 
+nnoremap <Space>gca :CD \| GitCommit -a<CR>
+nnoremap <Space>gcc :CD \| GitCommit <C-r>=expand("%:t")<CR><CR>
+nnoremap <Space>gl  :CD \| GitLog<CR>
+nnoremap <Space>gs  :CD \| GitStatus<CR>
+" ":CD<CR> :GitStatus<CR>"では<Space> (:help <Space>)が実行されてしまう。
+"nnoremap <space>gs  :CD<CR> :GitStatus<CR>
 
 " }}}2
 " project.vim ------------------------------------------------------------- {{{2
