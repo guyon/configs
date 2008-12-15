@@ -74,7 +74,7 @@ command! ListCharsDispTab set listchars=tab:^- list
 command! ListCharsDispEol set listchars=eol:$ list
 
 " カレントディレクトリに移動
-command! -nargs=0 -bar CD execute 'lcd' expand('%:p:h')
+command! -bar CD execute 'lcd' expand('%:p:h')
 " ":"不要 / 引数間のスペースは自動挿入されるので不要(←好みの問題)。
 "command! CD execute ":lcd " . expand("%:p:h")
 
