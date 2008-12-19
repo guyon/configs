@@ -148,29 +148,6 @@ liberator.globalVariables.autoignorekey_pages = uneval([
 ]);
 EOM
 
-" lookupDictionary.jsの設定 {{{2
-javascript <<EOM
-var dictionalyList = [
-    {
-        names: ['eiji[ro]'],
-        url: 'http://eow.alc.co.jp/%s/UTF-8/',
-        shortHelp: '英辞郎',
-        xpath: '//*[@id="resultList"]'
-    },{
-        names: ['trans[late]'],
-        url: 'http://translate.google.co.jp/translate_a/t?client=t&text=test&sl=en&tl=ja',
-        shortHelp: 'google翻訳',
-        xpath: '//*'
-    },{
-        names: ['goo'],
-        url: 'http://dictionary.goo.ne.jp/search.php?MT=%s&kind=all&mode=0',
-        shortHelp: 'goo辞書',
-        encode: 'EUC-JP',
-        xpath: '//div[@id="incontents"]/*[@class="ch04" or @class="fs14" or contains(@class,"diclst")]',
-        multi: true
-    }
-];
-EOM
 
 " wildoption=auto で余計なmap対策 {{{2
 " http://unsigned.g.hatena.ne.jp/Trapezoid/20080620/1213961754

@@ -16,7 +16,12 @@
 },{
     names: ['trans[late]'],
     url: 'http://translate.google.co.jp/translate_a/t?client=t&text=%s&sl=en&tl=ja',
-    shortHelp: 'google翻訳',
+    shortHelp: 'google翻訳（英和）',
+    xpath: '//*'
+},{
+    names: ['translatereverse'],
+    url: 'http://translate.google.co.jp/translate_a/t?client=t&text=%s&sl=ja&tl=en',
+    shortHelp: 'google翻訳（和英）',
     xpath: '//*'
 },{
     names: ['goo'],
