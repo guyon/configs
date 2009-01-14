@@ -256,7 +256,12 @@ nnoremap g* g*zzzv
 nnoremap g# g#zzzv
 
 " 選択中の文字を検索する
-vnoremap <silent> n :call SelSearch()<CR>
+"vnoremap <silent> n :call SelSearch()<CR>
+vnoremap <silent> n :call SearchTheSelectedTextLiteraly()<CR>
+
+" 選択中の文字をURLエスケープする（1:エンコード 2:デコード）
+vnoremap <silent> <space>ue :call UrlEscapeTheSelectedTextLiteraly(1)<CR>
+vnoremap <silent> <space>ud :call UrlEscapeTheSelectedTextLiteraly(2)<CR>
 
 " migemo検索用(incsearchの設定を行う)
 nnoremap g/ :set incsearch<CR>g/
@@ -611,20 +616,32 @@ endfunction
 "------------------------------------------------
 "選択中の文字列を検索する
 "------------------------------------------------
-function! SelSearch()
-    "最後のヤンクを保管しておく
-    let tmp = @"
-    "現在選択中のテキストを取得する
-    normal! gv"ty 
-    "取得した結果を変数に格納する
-    let seltext=@t
-    silent! exe ":/" . seltext
-    "最後のヤンクを書き戻す
-    let @" = tmp
-    let @/ = seltext
-    "二回の移動を組み合わせることで、次の検索したい文字列へジャンプする
-    normal! N
-    normal! n
+"function! SelSearch()
+"    "最後のヤンクを保管しておく
+"    let tmp = @"
+"    "現在選択中のテキストを取得する
+"    normal! gv"ty 
+"    "取得した結果を変数に格納する
+"    let seltext=@t
+"    silent! exe ":/" . seltext
+"    "最後のヤンクを書き戻す
+"    let @" = tmp
+"    let @/ = seltext
+"    "二回の移動を組み合わせることで、次の検索したい文字列へジャンプする
+"    normal! N
+"    normal! n
+"endfunction
+function! SearchTheSelectedTextLiteraly()
+  let reg_0 = [@0, getregtype('0')]
+  let reg_u = [@", getregtype('"')]
+
+  normal! gvy
+  let @/ = @0
+  call histadd('/', '\V' . escape(@0, '\'))
+  normal! n
+
+  call setreg('0', reg_0[0], reg_0[1])
+  call setreg('"', reg_u[0], reg_u[1])
 endfunction
 
 "------------------------------------------------
@@ -728,6 +745,38 @@ EOF
     else
         return '0'
     endif
+endfunction
+
+"------------------------------------------------
+" 選択したテキストのURLEscapeを行う関数
+"------------------------------------------------
+function! UrlEscapeTheSelectedTextLiteraly(escape_flag)
+    if !has('ruby')
+        echoerr "実行にはRubyインターフェースが必要です"
+        return
+    end
+    let reg_0 = [@0, getregtype('0')]
+    let reg_u = [@", getregtype('"')]
+    normal! gvy
+    let @0 = UrlEscape(a:escape_flag)
+    normal! gvp
+    call setreg('0', reg_0[0], reg_0[1])
+    call setreg('"', reg_u[0], reg_u[1])
+endfunction
+function! UrlEscape(escape_flag)
+ruby << EOF
+    require 'cgi'
+    convert_text = ""
+    escape_flag = {:escape => "1", :unescape => "2"}
+    selected_text = VIM::evaluate('@0')
+    escape_flag_param = VIM::evaluate('a:escape_flag')
+    if escape_flag_param == escape_flag[:escape]
+        convert_text = CGI.escape(selected_text)
+    elsif escape_flag_param == escape_flag[:unescape]
+        convert_text = CGI.unescape(selected_text)
+    end
+    VIM::command("return '#{convert_text}'")
+EOF
 endfunction
 
 " Tmp: 一時な設定 ===================================================== {{{1
