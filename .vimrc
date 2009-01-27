@@ -6,14 +6,6 @@ set runtimepath+=$HOME/.vim
 "ヘルプファイルをパスを指定する
 helptags $HOME/.vim/doc/
 
-" Envroiments: 環境固有設定 =========================================== {{{1
-
-"Screenの場合にvimを使用した時にスクリーンタブ名を書き換える
-if &term =~ "screen"
-	autocmd VimLeave * call SetScreenTabName('shell')
-	autocmd BufEnter * if bufname("") !~ "^\[A-Za-z0-9\]*://" | call SetScreenTabName("%") | endif
-endif
-
 " Encodings: 文字コード設定 =========================================== {{{1
 " from ずんWiki http://www.kawaz.jp/pukiwiki/?vim#content_1_7
 if &encoding !=# 'utf-8'
@@ -75,9 +67,6 @@ command! ListCharsDispEol set listchars=eol:$ list
 
 " カレントディレクトリに移動
 command! -bar CD execute 'lcd' expand('%:p:h')
-" ":"不要 / 引数間のスペースは自動挿入されるので不要(←好みの問題)。
-"command! CD execute ":lcd " . expand("%:p:h")
-
 
 " Autocmd: autocmd設定 ================================================ {{{1
 if has("autocmd")
@@ -191,7 +180,7 @@ endif
 "cnoremap <C-Space> <Esc>
 "inoremap <C-Space> <Esc>
 
-" command mode 時 zsh風のキーバインドに
+" command mode 時 Emacs風のキーバインドに
 cnoremap <C-B> <Left>
 cnoremap <C-F> <Right>
 cnoremap <C-A> <Home>
@@ -211,11 +200,6 @@ inoremap <C-H> <BS>
 " そのコマンドを実行
 nnoremap ,e :execute '!' &ft ' %'<CR>
 
-" encoding
-nnoremap ,U :set encoding=utf-8<CR>
-nnoremap ,E :set encoding=euc-jp<CR>
-nnoremap ,S :set encoding=cp932<CR>
-
 "インデントを考慮して貼り付け
 nnoremap p p=']
 
@@ -224,6 +208,18 @@ nnoremap j gj
 nnoremap k gk
 vnoremap j gj
 vnoremap k gk
+
+"単語の移動
+noremap E e
+noremap W w
+noremap B b
+
+" 標準の単語選択
+vnoremap <space>iw iw
+vnoremap <space>ie ie
+
+" 選択時にペーストしたときに最後のレジスタを上書きする
+vnoremap <silent> p p:call SelectPasteTextOverWriteRegister()<cr>
 
 "クリップボードを使ったコピペ
 vnoremap <M-c> "+y
@@ -243,8 +239,17 @@ nnoremap viM $?\%(.*#.*module\)\@!module<CR>%kVnj
 ".vimrcの再読み込み
 nnoremap ,vr :source $HOME/.vimrc<CR>:source $HOME/.gvimrc<CR>
 
-"自動改行表示を切り替える
-nnoremap <silent> ,w :set wrap!<CR>
+" 設定をトグルする {{{2
+nnoremap <silent> <space>tw :set wrap!<CR>
+" }}}2
+
+" 設定を有効にする {{{2
+nnoremap <silent> <space>ea :AutoComplPopEnable<CR>
+" }}}2
+
+" 設定を無効にする {{{2
+nnoremap <silent> <space>da :AutoComplPopDisable<CR>
+" }}}2
 
 " 検索時に画面中央にくるようにする
 " nzzを割り当てるとfold時の検索でnを押して次に進んだ場合に自動展開されない
@@ -284,10 +289,10 @@ noremap <C-z> <C-t>
 vnoremap <silent> ,hc :call SelectCsvH()<CR>
 
 if has("win32")
-    "文字の大きさ変更キーマップ
-    noremap <silent> <F2> :simalt ~x<CR>
-    noremap <silent> <F2> :simalt ~r<CR>
     " 画面の最大化と元のサイズをキーに割り当て
+    noremap <silent> <F2> :simalt ~x<CR>
+    noremap <silent> <F3> :simalt ~r<CR>
+    "文字の大きさ変更キーマップ
     noremap _w :simalt ~r<CR>:set guifont=MS_Gothic:h12:cSHIFTJIS<CR>:set columns=110<CR>:set lines=30<CR>
     noremap _1 :simalt ~r<CR>:set columns=110 lines=30<CR>
     noremap _2 :simalt ~x<CR>:let &guifont=substitute(&guifont, ":h\\d\\+:", ":h16:", "")<CR>
@@ -298,7 +303,7 @@ if has("win32")
     noremap _7 :simalt ~x<CR>:let &guifont=substitute(&guifont, ":h\\d\\+:", ":h48:", "")<CR>
 endif
 
-" 別バッファへコピー（yanktmp.vim用）
+" 異なるプロセスvim間でコピー（yanktmp.vim用）
 noremap <silent> sy :call YanktmpYank()<CR>
 noremap <silent> sp :call YanktmpPaste_p()<CR>
 noremap <silent> sP :call YanktmpPaste_P()<CR>
@@ -311,14 +316,11 @@ nnoremap <C-h> zh
 inoremap <silent> <c-d> \<c-r>=repeat('', setline('.', ''))<cr>
 
 " phpdocumenter.php
-inoremap <C-P> <ESC>:call PhpDocSingle()<CR>i
-nnoremap <C-P> :call PhpDocSingle()<CR>
-vnoremap <C-P> :call PhpDocRange()<CR>
+inoremap <space>ppd <ESC>:call PhpDocSingle()<CR>i
+nnoremap <space>ppd :call PhpDocSingle()<CR>
+vnoremap <space>ppd :call PhpDocRange()<CR>
 
 " Plugin: プラグイン設定 ============================================== {{{1
-
-" TODO:これってなんのプラグインだったけ？
-let html_use_css = 1              " code2html
 
 " Vimball 
 if has('win32')
@@ -352,11 +354,10 @@ nnoremap <Space>gs  :CD \| GitStatus<CR>
 " }}}2
 " project.vim ------------------------------------------------------------- {{{2
 let g:proj_window_width = 32
-
+ 
 " CamelCase Motion -------------------------------------------------------- {{{2
 
 " Replace the default 'w', 'b' and 'e' mappings instead of defining
-" TODO:nnoremapにすると動作しなくなる。後で調べる。
 nmap <silent> w <Plug>CamelCaseMotion_w
 nmap <silent> b <Plug>CamelCaseMotion_b
 nmap <silent> e <Plug>CamelCaseMotion_e
@@ -457,13 +458,13 @@ let g:netrw_http_cmd="wget -q -O" " netrw-http
 " surround.vim ------------------------------------------------------------ {{{2
 "surroundに定義を追加する【ASCIIコードを調べるには:echo char2nr("-")】
 "タグ系
-let g:surround_33 = "<!-- \r -->"
-let g:surround_37 = "<% \r %>"
-let g:surround_45 = "<!-- \r -->"
+let g:surround_{char2nr('!')} = "<!-- \r -->"
+let g:surround_{char2nr('%')} = "<% \r %>"
+let g:surround_{char2nr('-')} = "<!-- \r -->"
 "変数展開系
-let g:surround_35 = "#{\r}"
-let g:surround_36 = "${\r}"
-let g:surround_64 = "@{\r}"
+let g:surround_{char2nr('#')} = "#{\r}"
+let g:surround_{char2nr('$')} = "${\r}"
+let g:surround_{char2nr('@')} = "@{\r}"
 
 " tabbar.vim -------------------------------------------------------------- {{{2
 let g:Tb_MaxSize=3
@@ -490,7 +491,8 @@ if has("autochdir")
 	set autochdir
 	set tags=tags;
 else
-	set tags=$HOME/.vim/tags,./tags,./../tags,./*/tags,./../../tags,./../../../tags,./../../../../tags,./../../../../../tags
+	"set tags=$HOME/.vim/tags,./tags,./../tags,./*/tags,./../../tags,./../../../tags,./../../../../tags,./../../../../../tags
+	set tags+=./tags
 endif
 command! -nargs=? Ctags call <SID>Ctags(<q-args>)
 
@@ -570,13 +572,13 @@ command! -nargs=1 Csv :call CSVH(<args>)
 "-----------------------------
 function! CsvCol2Index(colName)
 ruby << EOF
-colName = VIM::evaluate("a:colName")
-columns = eval("[" + VIM::Buffer.current.line + "]")
-colIndex = columns.index(colName)
-colIndex = -1 unless colIndex 
-VIM::command("return '" + colIndex.to_s + "'")
+    colName = VIM::evaluate("a:colName")
+    columns = eval("[#{VIM::Buffer.current.line}]")
+    colIndex = columns.index(colName) || -1
+    VIM::command("return '#{colIndex.to_s#}'")
 EOF
 endfunction
+
 
 "------------------------------------------------
 "選択中のCSVカラムをハイライトする
@@ -683,36 +685,7 @@ function! x:selected_text()
   return _
 endfunction
 
-" Ruby評価 関数
-function! RubyEval(param)
-ruby << EOF
-	# 引数の文字列をevalで評価し、文字列として返す。配列とかは考慮していない。
-	VIM::command("return '" + (eval VIM::evaluate("a:param")).to_s + "'")
-EOF
-endfunc
-
-" Ruby評価 関数
-function! Ruby()
-ruby << EOF
-VIM::Buffer.current.line = ""
-EOF
-endfunc
-
-
-
-"" 色の切替えスクリプト
-""一時的にテスト
-"let s:colors = ['snow', '#ff4444', '#44dd44', '#ffaa44']
-"let s:i = 0
-"command! TDDToggle call s:ToggleBgcolor()
-"nmap ,t :TDDToggle<CR>
-"function! s:ToggleBgcolor()
-"  let color = s:colors[s:i]
-"  exe 'highlight Normal guibg=' . color
-"  exe 'highlight NonText guibg=' . color
-"  let s:i = (s:i + 1) % len(s:colors)
-"endfunction
-
+" :argdoと同等
 function! Allargs(command)
     let i = 0
     while i < argc()
@@ -729,18 +702,18 @@ command! -nargs=+ -complete=command Allargs call Allargs(<q-args>)
 function! ImeStatus()
     if has('win32') && has('ruby')
 ruby << EOF
-require 'Win32API'
+    require 'Win32API'
 
-# 最前面のウィンドウハンドルを取得（操作中のvimウインドウ）
-wndObj = Win32API.new('user32.dll', 'GetForegroundWindow', 'v', 'n')
-hWnd = wndObj.call
-# IMEのコンテキストを取得
-imcObj = Win32API.new('imm32','ImmGetContext','l','l')
-himc = imcObj.call(hWnd)
-# IMEの状態を取得
-imeOpenObj = Win32API.new('imm32','ImmGetOpenStatus',%w(l),'l')
-p imeOpenObj.call(himc).to_s
-VIM::command("return '" + imeOpenObj.call(himc).to_s + "'")
+    # 最前面のウィンドウハンドルを取得（操作中のvimウインドウ）
+    wndObj = Win32API.new('user32.dll', 'GetForegroundWindow', 'v', 'n')
+    hWnd = wndObj.call
+    # IMEのコンテキストを取得
+    imcObj = Win32API.new('imm32','ImmGetContext','l','l')
+    himc = imcObj.call(hWnd)
+    # IMEの状態を取得
+    imeOpenObj = Win32API.new('imm32','ImmGetOpenStatus',%w(l),'l')
+    p imeOpenObj.call(himc).to_s
+    VIM::command("return '" + imeOpenObj.call(himc).to_s + "'")
 EOF
     else
         return '0'
@@ -779,11 +752,24 @@ ruby << EOF
 EOF
 endfunction
 
-" Tmp: 一時な設定 ===================================================== {{{1
-" Load private information
-if findfile("$HOME/.private/.vimrc_private") != ""
+function SelectPasteTextOverWriteRegister()
+    let @" = @0
+endfunction
+
+" Envroiments: 環境固有設定 =========================================== {{{1
+
+"Screenの場合にvimを使用した時にスクリーンタブ名を書き換える
+if &term =~ "screen"
+	autocmd VimLeave * call SetScreenTabName('shell')
+	autocmd BufEnter * if bufname("") !~ "^\[A-Za-z0-9\]*://" | call SetScreenTabName("%") | endif
+endif
+
+" 公開できない設定やローカルマシンごとの固有設定を読み込む
+if filereadable("$HOME/.private/.vimrc_private")
     source $HOME/.private/.vimrc_private
 endif
+
+" Tmp: 一時な設定 ===================================================== {{{1
 
 " Etc: その他 ========================================================= {{{1
 
