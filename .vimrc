@@ -316,7 +316,6 @@ nnoremap <C-h> zh
 inoremap <silent> <c-d> \<c-r>=repeat('', setline('.', ''))<cr>
 
 " phpdocumenter.php
-inoremap <space>ppd <ESC>:call PhpDocSingle()<CR>i
 nnoremap <space>ppd :call PhpDocSingle()<CR>
 vnoremap <space>ppd :call PhpDocRange()<CR>
 
