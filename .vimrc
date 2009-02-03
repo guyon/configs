@@ -221,10 +221,19 @@ vnoremap <space>ie ie
 " 選択時にペーストしたときに最後のレジスタを上書きする
 vnoremap <silent> p p:call SelectPasteTextOverWriteRegister()<cr>
 
+" マウス操作でスクロールした時に誤操作で意図しないペーストをしない
+noremap <MiddleMouse> <Nop>
+inoremap <MiddleMouse> <Nop>
+
 "クリップボードを使ったコピペ
 vnoremap <M-c> "+y
-inoremap <M-v> <C-r>+
-nnoremap <M-v> <C-r>+
+inoremap <M-v> <MiddleMouse>
+nnoremap <M-v> i<MiddleMouse><esc>
+
+" 全て選択
+nnoremap <space>V ggVG
+" 改行を含まない1行選択
+nnoremap <space>v 0v$h
 
 "rubyのメソッドやクラスをまとめて選択する(b:block用、m:def用、c:class用、M:module用)
 nnoremap vab 0/end<CR>%Vn
