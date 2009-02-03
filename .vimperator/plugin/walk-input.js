@@ -1,7 +1,7 @@
 // Vimperator plugin: 'Walk Input'
-// Last Change: 2008-05-22.
+// Last Change: 2009-01-25
 // License: BSD
-// Version: 1.0
+// Version: 1.1
 // Maintainer: Takayama Fumihiko <tekezo@pqrs.org>
 
 // ------------------------------------------------------------
@@ -9,55 +9,63 @@
 // If you type M-i first, the focus moves to "<input name='search' />".
 // Then if you type M-i once more, the focus moves to "<input name='name' />".
 //
-// <html><body>
+// <html>
 //     <input name="search" />
 //     <a href="xxx">xxx</a>
 //     <a href="yyy">yyy</a>
 //     <a href="zzz">zzz</a>
 //     <input name="name" />
-//     <textarea name="comment" />
-//  </body></html>
+//     <textarea name="comment"></textarea>
+// </html>
 
+(function () {
 
-var walkinput = function(forward) {
-    var win = document.commandDispatcher.focusedWindow;
-    var d = win.document;
-    var xpath = '//input[@type="text" or @type="password" or @type="search" or not(@type)] | //textarea';
-    var list = d.evaluate(xpath, d, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
-    if (list.snapshotLength == 0) return;
+var xpath = '//input[@type="text" or @type="password" or @type="search" or not(@type)] | //textarea';
 
+var walkinput = function (forward) {
     var focused = document.commandDispatcher.focusedElement;
     var current = null;
     var next = null;
     var prev = null;
-    for (var i = 0; i < list.snapshotLength; ++i) {
-        var e = list.snapshotItem(i);
-        if (e == focused) {
-            current = e;
-        } else if (current && next == null) {
-            next = e;
-        } else if (current == null) {
-            prev = e;
+    var list = [];
+
+    (function (frame) {
+      var doc = frame.document;
+      if (doc.body.localName.toLowerCase() == 'body') {
+        let r = doc.evaluate(xpath, doc, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
+        for (let i = 0, l = r.snapshotLength; i < l; ++i) {
+            let e = r.snapshotItem(i);
+            if (/^none$/i.test(getComputedStyle(e, '').display))
+              continue;
+            let ef = {element: e, frame: frame};
+            list.push(ef);
+            if (e == focused) {
+                current = ef;
+            } else if (current && !next) {
+                next = ef;
+            } else if (!current) {
+                prev = ef;
+            }
         }
-    }
-    if (forward == true && next) {
-        next.focus();
-    } else if (forward == false && prev) {
-        prev.focus();
-    } else {
-        if (forward == true) {
-            list.snapshotItem(0).focus();
-        } else {
-            list.snapshotItem(list.snapshotLength - 1).focus();
-        }
-    }
+      }
+      for (let i = 0; i < frame.frames.length; i++)
+        arguments.callee(frame.frames[i]);
+    })(content);
+
+    if (list.length <= 0)
+      return;
+
+    var elem = forward ? (next || list[0])
+                       : (prev || list[list.length - 1]);
+
+    if (!current || current.frame != elem.frame)
+      elem.frame.focus();
+    elem.element.focus();
 };
 
-liberator.mappings.add([liberator.modes.NORMAL], ['<M-i>'], 'Walk Input Fields', function() { walkinput(true); });
-liberator.mappings.add([liberator.modes.INSERT], ['<M-i>'], 'Walk Input Fields', function() { walkinput(true); });
-liberator.mappings.add([liberator.modes.NORMAL], ['<A-i>'], 'Walk Input Fields', function() { walkinput(true); });
-liberator.mappings.add([liberator.modes.INSERT], ['<A-i>'], 'Walk Input Fields', function() { walkinput(true); });
-liberator.mappings.add([liberator.modes.NORMAL], ['<M-I>'], 'Walk Input Fields', function() { walkinput(false); });
-liberator.mappings.add([liberator.modes.INSERT], ['<M-I>'], 'Walk Input Fields', function() { walkinput(false); });
-liberator.mappings.add([liberator.modes.NORMAL], ['<A-I>'], 'Walk Input Fields', function() { walkinput(false); });
-liberator.mappings.add([liberator.modes.INSERT], ['<A-I>'], 'Walk Input Fields', function() { walkinput(false); });
+mappings.addUserMap([modes.NORMAL, modes.INSERT], ['<M-i>', '<A-i>'],
+                    'Walk Input Fields (Forward)', function () walkinput(true));
+mappings.addUserMap([modes.NORMAL, modes.INSERT], ['<M-I>', '<A-I>'],
+                    'Walk Input Fields (Backward)', function () walkinput(false));
+
+})();
