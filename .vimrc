@@ -248,6 +248,15 @@ nnoremap viM $?\%(.*#.*module\)\@!module<CR>%kVnj
 ".vimrcの再読み込み
 nnoremap ,vr :source $HOME/.vimrc<CR>:source $HOME/.gvimrc<CR>
 
+" YankRingっぽいレジスタ履歴Yank
+vnoremap <silent> y <ESC>:call NumberedRegisterRotation()<CR>gvy
+vnoremap <silent> x <ESC>:call NumberedRegisterRotation()<CR>gvx
+vnoremap <silent> d <ESC>:call NumberedRegisterRotation()<CR>gvd
+nnoremap <silent> yy :call NumberedRegisterRotation()<CR>yy
+nnoremap <silent> dd :call NumberedRegisterRotation()<CR>dd
+inoremap <C-Space><C-n> <C-R>=RegistersComplete()<CR>
+nnoremap <C-Space><C-n> i<C-R>=RegistersComplete()<CR>
+
 " 設定をトグルする {{{2
 nnoremap <silent> <space>tw :set wrap!<CR>
 " }}}2
@@ -764,6 +773,24 @@ function SelectPasteTextOverWriteRegister()
     let @" = @0
 endfunction
 
+" YankRingっぽいローテーションペーストを行う
+" TODO:複数行の対応とレジスタ汚染などの問題
+function! NumberedRegisterRotation()
+    let @9 = @8
+    let @8 = @7
+    let @7 = @6
+    let @6 = @5
+    let @5 = @4
+    let @4 = @3
+    let @3 = @2
+    let @2 = @1
+    let @1 = @"
+endfunction
+function! RegistersComplete()
+    call complete(col('.'), [@",@1,@2,@3,@4,@5,@6,@7,@8,@9])
+    return ''
+endfunction
+
 " Envroiments: 環境固有設定 =========================================== {{{1
 
 "Screenの場合にvimを使用した時にスクリーンタブ名を書き換える
@@ -780,4 +807,3 @@ endif
 " Tmp: 一時な設定 ===================================================== {{{1
 
 " Etc: その他 ========================================================= {{{1
-
