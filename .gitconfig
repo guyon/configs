@@ -21,6 +21,6 @@
 	color = auto
 [github]
   user = guyon
-# httpにプロキシ設定を使う場合は設定する 
+#httpにプロキシ設定を使う場合は設定する 
 ;[http]
 ;	proxy = hostname:portnum
