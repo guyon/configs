@@ -21,3 +21,6 @@
 	color = auto
 [github]
   user = guyon
+; proxy setting test
+;[http]
+;    proxy = hostname:port
