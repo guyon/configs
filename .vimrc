@@ -67,6 +67,8 @@ command! ListCharsDispEol set listchars=eol:$ list
 
 " カレントディレクトリに移動
 command! -bar CD execute 'lcd' expand('%:p:h')
+" .gitのあるディレクトリに移動
+command! -bar CDGit call CdDotGitDir()
 
 " Autocmd: autocmd設定 ================================================ {{{1
 if has("autocmd")
@@ -201,7 +203,7 @@ inoremap <C-H> <BS>
 nnoremap ,e :execute '!' &ft ' %'<CR>
 
 "インデントを考慮して貼り付け
-nnoremap p p=']
+"nnoremap p p=']
 
 "表示行単位で行移動する
 nnoremap j gj
@@ -248,7 +250,7 @@ nnoremap viM $?\%(.*#.*module\)\@!module<CR>%kVnj
 ".vimrcの再読み込み
 nnoremap ,vr :source $HOME/.vimrc<CR>:source $HOME/.gvimrc<CR>
 
-" YankRingっぽいレジスタ履歴Yank
+" YankRingっぽいレジスタ履歴Yank&Paste
 vnoremap <silent> y <ESC>:call NumberedRegisterRotation()<CR>gvy
 vnoremap <silent> x <ESC>:call NumberedRegisterRotation()<CR>gvx
 vnoremap <silent> d <ESC>:call NumberedRegisterRotation()<CR>gvd
@@ -360,9 +362,10 @@ nnoremap <Space>gs  :CD \| GitStatus<CR>
 nnoremap <Space>ga  :CD \| GitAdd
 nnoremap <Space>gac :CD \| GitAdd <C-r>=expand("%:t")<CR><CR>
 nnoremap <Space>gd  :CD \| GitDiff 
-nnoremap <Space>gc  :CD \| GitCommit 
-nnoremap <Space>gca :CD \| GitCommit -a<CR>
-nnoremap <Space>gcc :CD \| GitCommit <C-r>=expand("%:t")<CR><CR>
+nnoremap <Space>gc  :CDGit \| GitCommit<CR>
+nnoremap <Space>gcs :CDGit \| GitCommit 
+nnoremap <Space>gca :CDGit \| GitCommit -a<CR>
+nnoremap <Space>gcc :CDGit \| GitCommit <C-r>=expand("%:t")<CR><CR>
 nnoremap <Space>gl  :CD \| GitLog<CR>
 nnoremap <Space>gs  :CD \| GitStatus<CR>
 " ":CD<CR> :GitStatus<CR>"では<Space> (:help <Space>)が実行されてしまう。
@@ -791,6 +794,28 @@ function! RegistersComplete()
     return ''
 endfunction
 
+" .gitのあるディレクトリに移動する
+function! CdDotGitDir()
+    let l:current_path = getcwd()
+    lcd %:p:h
+    if finddir('.git','.;') !~ ".git$"
+        echo 'Not found dotgit directory.'
+        exec "lcd " . l:current_path
+        return ''
+    endif
+    let l:dotgit_path = SearchDotGitPath('')
+    exec "lcd " . l:dotgit_path
+endfunction
+function! SearchDotGitPath(search_path)
+    if finddir('.git', a:search_path) =~ ".git$"
+        return a:search_path
+    else
+        let l:search_path = a:search_path . '../'
+        let l:search_result_path = SearchDotGitPath(l:search_path)
+        return l:search_result_path
+    endif
+endfunction
+
 " Envroiments: 環境固有設定 =========================================== {{{1
 
 "Screenの場合にvimを使用した時にスクリーンタブ名を書き換える
@@ -807,3 +832,6 @@ endif
 " Tmp: 一時な設定 ===================================================== {{{1
 
 " Etc: その他 ========================================================= {{{1
+
+" ^@を削除するテスト
+inoremap <C-space><C-d> <ESC>:%s/<C-@>$//ge<CR>:%s/<C-@>/\r/ge<CR>A
