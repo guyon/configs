@@ -2,16 +2,16 @@
 " exモード時の補完候補がTabキーを押さなくても自動的に表示されて、キー入力するたびに更新される
 set wildoptions=auto
 " AwesomeBarの補完候補をopenやtabopenの時に使う事が出来る
-set complete=sl
+set complete=S
 " クイックヒントモードでMigemoを使えるようにする。
 set hintmatching=custom
 " GUI関係の表示（メニュー/ツール/リンク）
 " set guioptions=mTb
-set guioptions=b
+set guioptions=B
 " ビープ音を鳴らさずビジュアルベルを使用
-set visualbell
+"set visualbell
 " ビジュアルベルを無効化
-set visualbellstyle=display:none;
+"set visualbellstyle=display:none;
 " ヒストリー回数
 set history=1000
 
@@ -36,7 +36,7 @@ noremap ,s :so .vimperatorrc<CR>
 noremap ,S :mapc<CR>:cmapc<CR>:imapc<CR>:so .vimperatorrc<CR>
 
 " bookmarkコメントを表示
-noremap ,c :viewSBMComments -t h<cr>
+noremap ,c :viewSBMComments<CR>
 
 " URLショートカット
 noremap gG <esc>:t http://www.google.co.jp/webhp?hl=ja&complete=1<cr>
@@ -98,84 +98,47 @@ noremap wh :split -l<CR>
 " direct_bookmark.js
 let g:direct_sbm_use_services_by_tag = "l"
 let g:direct_sbm_use_services_by_post = "l"
+let g:direct_sbm_is_use_migemo = "true"
 let g:direct_sbm_is_normalize = "false"
 
-" Migemo検索の時にvimperatorをOFFにする {{{2
-javascript <<EOF
-vimperator.mappings.add(new Map(vimperator.modes.NORMAL,
-	['\\'],\
-	function() {
-		vimperator.addMode(null,vimperator.modes.ESCAPE_ALL_KEYS);
-		var orgFunc = XMigemoUI.timerCallback;
-		XMigemoUI.timerCallback = function(aThis){
-			orgFunc(aThis);
-			vimperator.events.onEscape();
-			XMigemoUI.timerCallback = orgFunc;
-		}
-		XMigemoUI.start();
-  },{
-    shortHelp: 'Start Migemo/XUL',
-    help: 'Start Migemo/XUL'
-  }
-));
-EOF
+" feedsome_keys2.js
+autocmd LocationChange .* :fmapc
+autocmd LocationChange reader\\.livedoor\\.com/reader :fmap j k s a r p o v c g <Space> <S-Space> < > T
+autocmd LocationChange mail\\.google\\.com/mail :fmap -depth 4 c / j k n p o u e x s r a # [ ] z ? gi gs gt gd ga gc
 
-" 選択時の<C-c>を制御 {{{2
-vimperator.mappings.add(new vimperator.Map(
-    [vimperator.modes.NORMAL,vimperator.modes.VISUAL],
-    ['<C-c>'],
-    function() {
-        var sel = window.content.document.getSelection();
-        if (sel) {
-            vimperator.copyToClipboard(sel, true);
-        } else {
-            BrowserStop();
-            vimperator.echo('Stopped loading !');
-        }
-    },{
-        shortHelp: 'Copy selected text or ',
-        help: 'The currently selected text is copied to the system clipboard.<br/>' +
-              'If selected text is none, stops loading the current web page.'
-    }
-));
-
-" autoIgnoreKey.jsの設定 {{{2
-javascript <<EOM
-liberator.globalVariables.autoignorekey_pages = uneval([
-  /^https?:\/\/mail\.google\.com\//,
-  /^https?:\/\/fastladder\.com\//,
-  /^https?:\/\/reader\.livedoor\.com\/reader/,
-]);
-EOM
-
-
-" wildoption=auto で余計なmap対策 {{{2
-" http://unsigned.g.hatena.ne.jp/Trapezoid/20080620/1213961754
-javascript <<EOM
-[
-    ['<C-r>',':restart'],
-    ['<C-h>',':tabmove! -1'],
-    ['<C-l>',':tabmove! +1'],
-    ['!',':set invum'],
-    ['b',':viewSBMComments'],
-    ['B',':bentry'],
-    ['a',':sbm'],
-    [',a',':btags'],
-    ['q',':toggleldrc'],
-    ['M',':qmarks'],
-].forEach(function([key,command]){
-    liberator.mappings.addUserMap([liberator.modes.NORMAL], [key],
-        "User defined mapping",
-        function () { liberator.execute(command); },
-        {
-            rhs: key,
-            noremap: true
-        });
-});
-EOM
+" SBM Comments Viewer
+let g:def_sbms = "h"
 
 " Etc: ============================================================ {{{1
 
 " }}}1
-"source! ~/.vimperatorrc
+"" Firefoxのエラーコンソールにechoやechoerrのログを出力する {{{1
+javascript <<EOM
+// for liberator.echo()
+let (echo_old = liberator.echo) {
+    liberator.echo = function(str, flags) {
+        liberator.log("echo: " + str, 0);
+        return echo_old(str, flags);
+    }
+}
+
+// for liberator.echoerr()
+let (echoerr_old = liberator.echoerr) {
+    liberator.echoerr = function(str, flags) {
+        liberator.log("echoerr: " + str, 0);
+        return echoerr_old(str, flags);
+    }
+}
+
+// for liberator.echomsg() (only for Vimperator 2.0pre or later)
+let (echomsg_old = liberator.echomsg) {
+    liberator.echomsg = function(str, flags) {
+        liberator.log("echomsg: " + str, 0);
+        return echomsg_old(str, flags);
+    }
+}
+EOM
+" 1}}}
+
+""source! ~/.vimperatorrc
 " vim: set ft=vimperator:

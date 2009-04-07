@@ -1,50 +1,78 @@
-// Vimperator plugin: 'Direct Post to Social Bookmarks'
-// Version: 0.12
-// Last Change: 27-Aug-2008. Jan 2008
-// License: Creative Commons
-// Maintainer: Trapezoid <trapezoid.g@gmail.com> - http://unsigned.g.hatena.ne.jp/Trapezoid
-// Parts:
-//      http://d.hatena.ne.jp/fls/20080309/p1
-//      Pagerization (c) id:ofk
-//      AutoPagerize (c) id:swdyh
-//      direct_delb.js id:mattn
-//      JSDeferred id:cho45
-//
-// Social Bookmark direct add script for Vimperator 0.6.*
-// for Migemo search: require XUL/Migemo Extension
-//
-// Variables:
-//  'g:direct_sbm_use_services_by_tag'
-//      Use social bookmark services to extract tags
-//          'h': Hatena Bookmark
-//          'd': del.icio.us
-//          'l': livedoor clip
-//          'p': Places (Firefox bookmarks)
-//      Usage: let g:direct_sbm_use_services_by_tag = "hdl"
-//  'g:direct_sbm_use_services_by_post'
-//      Use social bookmark services to post
-//          'h': Hatena Bookmark
-//          'd': del.icio.us
-//          'l': livedoor clip
-//          'g': Google Bookmarks
-//          'p': Places (Firefox bookmarks)
-//      Usage: let g:direct_sbm_use_services_by_post = "hdl"
-//  'g:direct_sbm_is_normalize'
-//      Use normalize permalink
-//  'g:direct_sbm_is_use_migemo'
-//      Use Migemo completion
-// Commands:
-//  ':btags'
-//      Extract tags from social bookmarks for completion
-//  ':sbm'
-//      Post a current page to social bookmarks
-//      Arguments
-//          -s,-service: default:"hdl"
-//              Specify target SBM services to post
-//  ':bentry'
-//      Goto Bookmark Entry Page
-//  ':bicon'
-//      Show Bookmark Count as Icon
+// Last Change: 09-Jan-2009. Jan 2008
+var PLUGIN_INFO =
+<VimperatorPlugin>
+    <name>{NAME}</name>
+    <description>Direct Post to Social Bookmarks</description>
+    <author mail="trapezoid.g@gmail.com" homepage="http://unsigned.g.hatena.ne.jp/Trapezoid">Trapezoid</author>
+    <version>0.13</version>
+    <license>Creative Commons</license>
+    <minVersion>2.0pre</minVersion>
+    <maxVersion>2.0pre</maxVersion>
+    <updateURL>http://svn.coderepos.org/share/lang/javascript/vimperator-plugins/trunk/direct_bookmark.js</updateURL>
+    <detail><![CDATA[
+Social Bookmark direct add script for Vimperator 0.6.*.
+for Migemo search: require XUL/Migemo Extension
+
+== Parts ==
+- http://d.hatena.ne.jp/fls/20080309/p1
+- Pagerization (c) id:ofk
+- AutoPagerize (c) id:swdyh
+- direct_delb.js id:mattn
+- JSDeferred id:cho45
+
+
+== Variables ==
+=== g:direct_sbm_use_services_by_tag ===
+>||
+      Use social bookmark services to extract tags
+          'h': Hatena Bookmark
+          'd': del.icio.us
+          'l': livedoor clip
+          'p': Places (Firefox bookmarks)
+      Usage: let g:direct_sbm_use_services_by_tag = "hdl"
+||<
+=== g:direct_sbm_use_services_by_post ===
+>||
+      Use social bookmark services to post
+          'h': Hatena Bookmark
+          'd': del.icio.us
+          'l': livedoor clip
+          'g': Google Bookmarks
+          'p': Places (Firefox bookmarks)
+      Usage: let g:direct_sbm_use_services_by_post = "hdl"
+||<
+=== g:direct_sbm_is_normalize ===
+>||
+      Use normalize permalink
+||<
+=== g:direct_sbm_is_use_migemo ===
+>||
+      Use Migemo completion
+||<
+
+== Commands ==
+=== :btags ===
+>||
+      Extract tags from social bookmarks for completion
+||<
+=== :sbm ===
+>||
+      Post a current page to social bookmarks
+      Arguments
+          -s,-service: default:"hdl"
+              Specify target SBM services to post
+||<
+=== :bentry ===
+>||
+      Goto Bookmark Entry Page
+||<
+=== :bicon ===
+>||
+      Show Bookmark Count as Icon
+||<
+   ]]></detail>
+</VimperatorPlugin>;
+
 (function(){
     var evalFunc = window.eval;
     try {
@@ -348,7 +376,8 @@
                 var xhr = new XMLHttpRequest();
                 var hatena_tags = [];
 
-                xhr.open("GET","http://b.hatena.ne.jp/my",false);
+                //xhr.open("GET","http://b.hatena.ne.jp/my",false);
+                xhr.open("GET","http://b.hatena.ne.jp/"+user,false);
                 xhr.send(null);
 
                 var mypage_html = parseHTML(xhr.responseText, ['img', 'script']);
@@ -357,7 +386,6 @@
                 tags.forEach(function(tag){
                     hatena_tags.push(tag.innerHTML);
                 });
-                liberator.echo("Hatena Bookmark: Tag parsing is finished. Taglist length: " + tags.length);
                 return hatena_tags;
             },
             icon:function(url){
@@ -392,11 +420,10 @@
                 var tags = evalFunc("(" + xhr.responseText + ")");
                 for(var tag in tags)
                     returnValue.push(tag);
-                liberator.echo("del.icio.us: Tag parsing is finished. Taglist length: " + returnValue.length);
                 return returnValue;
             },
             icon:function(url){
-                var url = liberator.buffer.URL;
+                var url = liberator.modules.buffer.URL;
                 var cryptoHash = Cc["@mozilla.org/security/hash;1"].createInstance(Ci.nsICryptoHash);
                 cryptoHash.init(Ci.nsICryptoHash.MD5);
                 var inputStream = Cc["@mozilla.org/io/string-input-stream;1"].createInstance(Ci.nsIStringInputStream);
@@ -418,10 +445,9 @@
             loginPrompt:{ user:'', password:'apikey', description:'Enter username and apikey.\nyou can get "api-key" from\n\thttp://clip.livedoor.com/config/api' },
             entryPage:'http://clip.livedoor.com/page/%URL%',
             poster:function(user,password,url,title,comment,tags){
-                //id:guyon Add -Rate Support-
-                var rate = 0;
-                var starFullRate = 5;
-                if (comment.match(/\*+$/)){
+                var rate=0;
+                var starFullRate=5;
+                if(comment.match(/\*+$/)){
                     comment = RegExp.leftContext;
                     rate = (RegExp.lastMatch.length > starFullRate)? starFullRate : RegExp.lastMatch.length;
                 }
@@ -434,7 +460,7 @@
                     user: user,
                     password: password,
                 }).next(function(xhr){
-                    if(xhr.status != 200) throw "livedoor clip: faild" + " HTTP Status:" + xhr.status;
+                    if(xhr.status != 200) throw "livedoor clip: faild";
                 });
             },
             tags:function(user,password){
@@ -445,14 +471,12 @@
                 xhr.send(null);
 
                 var mypage_html = parseHTML(xhr.responseText, ['img', 'script']);
-
                 //var tags = getElementsByXPath("id(\"tag_list\")/span",mypage_html);
                 var tags = getElementsByXPath("id(\"tag_list\")/div/span",mypage_html);
 
                 tags.forEach(function(tag){
                     ldc_tags.push(tag.textContent);
                 });
-                liberator.echo("livedoor clip: Tag parsing is finished. Taglist length: " + tags.length);
                 return ldc_tags;
             },
             icon:function(url){
@@ -510,7 +534,6 @@
                 var tags = xhr.responseXML.getElementsByTagName('tag');
                 for(var n = 0; n < tags.length; n++)
                     returnValue.push(tags[n].getAttribute('tag'));
-                liberator.echo("foves: Tag parsing is finished. Taglist length: " + returnValue.length);
                 return returnValue;
             },
         },
@@ -536,34 +559,48 @@
     };
     liberator.plugins.direct_bookmark = { services: services, tags: [] };
 
-    function getTags(arg){
+    function getTagsAsync(arg){
         var d,first;
         d = first = Deferred();
 
         useServicesByTag.split(/\s*/).forEach(function(service){
             var user, password, currentService = services[service] || null;
             [user,password] = currentService.account ? getUserAccount.apply(currentService,currentService.account) : ["", ""];
-            d = d.next(function(t) t.concat(currentService.tags(user,password)));
+            d = d.next(function(t) {
+                var tags = currentService.tags(user,password);
+                liberator.echo(currentService.description + ": Tag parsing is finished. Taglist length: " + tags.length);
+                return t.concat(tags);
+            });
         });
         d.next(function(tags){liberator.plugins.direct_bookmark.tags = tags.filter(function(e,i,a) a.indexOf(e) == i).sort()})
          .error(function(e){liberator.echoerr("direct_bookmark.js: Exception throwed! " + e)});
         return first;
     }
-    liberator.commands.addUserCommand(['btags'],"Update Social Bookmark Tags",
-        function(arg){setTimeout(function(){getTags().call([])},0)}, {});
-    liberator.commands.addUserCommand(['bentry'],"Goto Bookmark Entry Page",
+    function getTags(arg){
+        var user,password;
+        var tags = [];
+        useServicesByTag.split(/\s*/).forEach(function(service){
+            var currentService = services[service] || null;
+            [user,password] = currentService.account ? getUserAccount.apply(currentService,currentService.account) : [null, null];
+            tags = tags.concat(currentService.tags(user,password));
+        });
+        liberator.plugins.direct_bookmark.tags = tags.filter(function(e,i,a) a.indexOf(e) == i).sort();
+    }
+    liberator.modules.commands.addUserCommand(['btags'],"Update Social Bookmark Tags",
+        function(arg){setTimeout(function(){getTagsAsync().call([])},0)}, {});
+    liberator.modules.commands.addUserCommand(['bentry'],"Goto Bookmark Entry Page",
         function(service, special){
-            service = service || useServicesByPost.split(/\s*/)[0];
+            service = service.string || useServicesByPost.split(/\s*/)[0];
             var currentService = services[service] || null;
             if(!currentService || !currentService.entryPage) {
                 return;
             }
             liberator.open(currentService.entryPage
                 .replace(/%URL(?:::(ESC|MD5))?%/g, function(x, t){
-                    if(!t) return liberator.buffer.URL.replace(/#/, '%23');
-                    if(t == "ESC") return encodeURIComponent(liberator.buffer.URL);
+                    if(!t) return liberator.modules.buffer.URL.replace(/#/, '%23');
+                    if(t == "ESC") return encodeURIComponent(liberator.modules.buffer.URL);
                     if(t == "MD5"){
-                        var url = liberator.buffer.URL;
+                        var url = liberator.modules.buffer.URL;
                         var cryptoHash = Cc["@mozilla.org/security/hash;1"].createInstance(Ci.nsICryptoHash);
                         cryptoHash.init(Ci.nsICryptoHash.MD5);
                         var inputStream = Cc["@mozilla.org/io/string-input-stream;1"].createInstance(Ci.nsIStringInputStream);
@@ -578,15 +615,15 @@
                         }
                         return ascii.join('').toLowerCase();
                     }
-                }), special ? liberator.NEW_TAB : CURRENT_TAB);
+                }), special ? liberator.NEW_TAB : liberator.CURRENT_TAB);
         },{
             completer: function(filter)
                 [0, useServicesByPost.split(/\s*/).map(function(p) [p, services[p].description])]
         }
     );
-    liberator.commands.addUserCommand(['bicon'],"Show Bookmark Count as Icon",
+    liberator.modules.commands.addUserCommand(['bicon'],"Show Bookmark Count as Icon",
         function(arg){
-            var url = getNormalizedPermalink(liberator.buffer.URL);
+            var url = getNormalizedPermalink(liberator.modules.buffer.URL);
             var html = useServicesByTag.split(/\s*/).map(function(service){
                 var currentService = services[service] || null;
                 return (currentService && typeof currentService.icon === 'function') ?
@@ -594,20 +631,13 @@
             }).join('<br />');
             liberator.echo(html, true);
         }, {});
-    liberator.commands.addUserCommand(['sbm'],"Post to Social Bookmark",
+    liberator.modules.commands.addUserCommand(['sbm'],"Post to Social Bookmark",
         function(arg){
             var comment = "";
             var targetServices = useServicesByPost;
 
-            for(var opt in arg){
-                switch(opt){
-                    case '-s':
-                        if (arg[opt]) targetServices = arg[opt];
-                        break;
-                    case 'arguments':
-                        if(arg[opt].length > 0) comment = arg[opt].join(" ");
-                }
-            }
+            if (arg["-s"]) targetServices = arg["-s"];
+            if (arg.length > 0) comment = arg.join(" ");
 
             var tags = [];
             var re = /\[([^\]]+)\]([^\[].*)?/g;
@@ -624,8 +654,8 @@
                 comment = text || '';
             }
 
-            var url = liberator.buffer.URL;
-            var title = liberator.buffer.title;
+            var url = liberator.modules.buffer.URL;
+            var title = liberator.modules.buffer.title;
 
             targetServices.split(/\s*/).forEach(function(service){
                 var user, password, currentService = services[service] || null;
@@ -634,25 +664,29 @@
                     user,password,
                     isNormalize ? getNormalizedPermalink(url) : url,title,
                     comment,tags
-                )).next(function() {
-                  liberator.echo("[" + services[service].description + "] post completed. => " + title);
+                //));
+                )).next(function(){
+                    liberator.echo("[" + services[service].description + "] post completed.");
                 });
             });
             d.error(function(e){liberator.echoerr("direct_bookmark.js: Exception throwed! " + e);liberator.log(e);});
             setTimeout(function(){first.call();},0);
         },{
-            completer: function(filter){
+            completer: function(context, arg, special){
+                let filter = context.filter;
                 var match_result = filter.match(/((?:\[[^\]]*\])*)\[?(.*)/); //[all, commited, now inputting]
                 var m = new RegExp(XMigemoCore && isUseMigemo ? "^(" + XMigemoCore.getRegExp(match_result[2]) + ")" : "^" + match_result[2],'i');
                 var completionList = [];
+                // XXX: completer works asynchronous. thus we shouldn't call getTagsAsync().
                 if(liberator.plugins.direct_bookmark.tags.length == 0)
                     getTags().call([]);
-                liberator.log(typeof match_result[1]);
-                return [0, [[match_result[1] + "[" + tag + "]","Tag"]
-                            for each (tag in liberator.plugins.direct_bookmark.tags) if (m.test(tag) && match_result[1].indexOf('[' + tag + ']') < 0)]];
+                context.title = ['Tag','Description'];
+                context.advance( match_result[1].length );
+                context.completions = [["[" + tag + "]","Tag"]
+                            for each (tag in liberator.plugins.direct_bookmark.tags) if (m.test(tag) && match_result[1].indexOf('[' + tag + ']') < 0)];
             },
             options: [
-                [['-s','-service'], liberator.commands.OPTION_STRING],
+                [['-s','-service'], liberator.modules.commands.OPTION_STRING],
             ]
         }
     );

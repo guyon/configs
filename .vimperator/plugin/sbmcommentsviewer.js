@@ -1,45 +1,53 @@
-/**
- * ==VimperatorPlugin==
- * @name           SBM Comments Viewer
- * @description    List show Social BookMark Comments
- * @description-ja ソーシャル・ブックマーク・コメントを表示します
- * @version        0.1b
- * ==/VimperatorPlugin==
- *
- * Usage:
- *
- * viewSBMComments [url] [options]
- *  url             : 省略時は現在のURL
- *  options:
- *      -f, -format : 出力時のフォーマット(`,'区切りのリスト)
- *                    (default: id,timestamp,tags,comment)
- *                    let g:def_sbm_format = ... で指定可能
- *      -t, -type   : 出力するSBMタイプ
- *                    (default: hdl)
- *                    let g:def_sbms = ... で指定可能
- *      -c, -count  : ブックマーク件数のみ出力
- *      -b, -browser: バッファ・ウィンドウではなくブラウザに開く
- *                    TODO:まだ出来てない
- *
- * 指定可能フォーマット:
- *  id, timpstamp, tags, comment, tagsAndComment
- *
- * SBMタイプ:
- *  h : hatena bookmark
- *  d : del.icio.us bookmark
- *  l : livedoor clip
- *  z : Buzzurl
- *  XXX:今後増やしていきたい
- *
- *  例:
- *   :viewSBMComments http://d.hatena.ne.jp/teramako/ -t hdl -f id,comment -c
- *
- *  備考:
- *   * 一度取得したものは(30分ほど)キャッシュに貯めてますので何度も見直すことが可能です。
- *   * 粋なコマンド名募集中
- */
+var PLUGIN_INFO =
+<VimperatorPlugin>
+    <name>SBM Comments Viewer</name>
+    <description>List show Social Bookmark Comments</description>
+    <description lang="ja">ソーシャル・ブックマーク・コメントを表示します</description>
+    <version>0.1c</version>
+    <minVersion>2.0pre</minVersion>
+    <maxVersion>2.0pre</maxVersion>
+    <updateURL>http://svn.coderepos.org/share/lang/javascript/vimperator-plugins/trunk/sbmcommentsviewer.js</updateURL>
+    <detail><![CDATA[
+== Usage ==
+>||
+viewSBMComments [url] [options]
+ url             : 省略時は現在のURL
+ options:
+     -f, -format : 出力時のフォーマット(`,'区切りのリスト)
+                   (default: id,timestamp,tags,comment)
+                   let g:def_sbm_format = ... で指定可能
+     -t, -type   : 出力するSBMタイプ
+                   (default: hdl)
+                   let g:def_sbms = ... で指定可能
+     -c, -count  : ブックマーク件数のみ出力
+     -b, -browser: バッファ・ウィンドウではなくブラウザに開く
+                   TODO:まだ出来てない
+||<
 
+== 指定可能フォーマット ==
+  id, timpstamp, tags, comment, tagsAndComment
+
+== SBMタイプ ==
+- h : hatena bookmark
+- d : Delicious
+- l : livedoor clip
+- z : Buzzurl
+- XXX:今後増やしていきたい
+
+>||
+e.g.)
+  :viewSBMComments http://d.hatena.ne.jp/teramako/ -t hdl -f id,comment -c
+||<
+
+== 備考 ==
+ 一度取得したものは(30分ほど)キャッシュに貯めてますので何度も見直すことが可能です。
+ 粋なコマンド名募集中
+     ]]></detail>
+</VimperatorPlugin>;
 liberator.plugins.sbmCommentsViewer = (function(){
+
+var isFilterNoComments = liberator.globalVariables.sbm_comments_viewer_filter_nocomments || false;
+
 /**
  * SBMEntry Container {{{
  * @param {String} type
@@ -65,26 +73,30 @@ SBMContainer.prototype = { //{{{
             id, timestamp, comment, tags, extra
         ));
     },
-    toHTMLString: function(format, countOnly){
-        var label = (this.faviconURL ? '<img src="' + this.faviconURL + '" width="16" height="16"/>' : '') +
-                    manager.type[this.type] + ' ' + this.count + '(' + this.entries.length + ')' +
-                    (this.pageURL ? ' <a href="' + this.pageURL + '">' + this.pageURL + '</a>' : '');
+    toHTML: function(format, countOnly){
+        var label = <>
+            {this.faviconURL ? <img src={this.faviconURL} width="16" height="16"/> : <></>}
+            {manager.type[this.type] + ' ' + this.count + '(' + this.entries.length + ')'}
+            {this.pageURL ? <a href="#">{this.pageURL}</a> : <></>}
+        </>;
         if (countOnly){
             return label;
         } else {
-            var str = [
-                '<table id="liberator-sbmcommentsviewer"><caption style="text-align:left;" class="hl-Title">' + label + '</caption><tr>'
-            ];
-            format.forEach(function(colum){
-                var name = manager.format[colum] || '-';
-                str.push('<th>' + name + '</th>');
-            });
-            str.push('</tr>');
-            this.entries.forEach(function(e){
-                str.push(e.toHTMLString(format));
-            });
-            str.push('</table>');
-            return str.join('');
+            let xml = <table id="liberator-sbmcommentsviewer">
+                <caption style="text-align:left" class="hl-Title">{label}</caption>
+            </table>;
+            let self = this;
+            xml.* += (function(){
+                var thead = <tr/>;
+                format.forEach(function(colum){ thead.* += <th>{manager.format[colum] || '-'}</th>; });
+                var tbody = <></>;
+                self.entries.forEach(function(e){
+                    if (isFilterNoComments && !e.comment) return;
+                    tbody += e.toHTML(format);
+                });
+                return thead + tbody;
+            })();
+            return xml;
         }
     }
 }; //}}}
@@ -112,32 +124,31 @@ function SBMEntry(id, timestamp, comment, tags, extra){ //{{{
     }
 } //}}}
 SBMEntry.prototype = { //{{{
-    toHTMLString: function(format){
-    // E4X で書く手もあるけど、liberator.echoを使って出力すると
-    // toString後に"\n"が<br/>に変換されてしまうのでStringで
-        var str = ['<tr>'];
+    toHTML: function(format){
+        var xml = <tr/>;
         var self = this;
         format.forEach(function(colum){
             switch(colum){
                 case 'id':
-                    str.push('<td class="liberator-sbmcommentsviewer-id">' + (self.userIcon ? '<p style="display:table-cell;vertical-align:middle;padding-right:3px;"><img src="'+self.userIcon +'" width="16" height="16"/></p>' : '') +
-                             '<p style="display:table-cell;vertical-align:middle;">' + self.id + '</p></td>');
+                    xml.* += <td class="liberator-sbmcommentsviewer-id">
+                                {self.userIcon ? <><img src={self.userIcon} width="16" height="16"/> {self.id}</> : <span>{self.id}</span>}
+                             </td>;
                     break;
                 case 'timestamp':
-                    str.push('<td class="liberator-sbmcommentsviewer-timestamp">' + self.formatDate() + '</td>'); break;
+                    xml.* += <td class="liberator-sbmcommentsviewer-timestamp">{self.formatDate()}</td>; break;
                 case 'tags':
-                    str.push('<td class="liberator-sbmcommentsviewer-tags">' + self.tags.join(',') + '</td>'); break;
+                    xml.* += <td class="liberator-sbmcommentsviewer-tags">{self.tags.join(',')}</td>; break;
                 case 'comment':
-                    str.push('<td class="liberator-sbmcommentsviewer-comment" style="white-space:normal;">' + self.comment + '</td>'); break;
+                    xml.* += <td class="liberator-sbmcommentsviewer-comment" style="white-space:normal;">{self.comment}</td>; break;
                 case 'tagsAndComment':
-                    tagString = self.tags.length ? '[' + self.tags.join('][') + ']':'';
-                    str.push('<td class="liberator-sbmcommentsviewer-tagsAndComment" style="white-space:normal;">' + tagString + ' ' + self.comment + '</td>'); break;
+                    var tagString = self.tags.length ? '[' + self.tags.join('][') + ']':'';
+                    xml.* += <td class="liberator-sbmcommentsviewer-tagsAndComment" style="white-space:normal;">{tagString + ' '+self.comment}</td>;
+                    break;
                 default:
-                    str.push('<td>-</td>');
+                    xml.* += <td>-</td>;
             }
         });
-        str.push('</tr>');
-        return str.join('');
+        return xml;
     },
     formatDate: function(){
         if (!this.timeStamp) return '';
@@ -176,18 +187,18 @@ function openSBM(url, type, format, countOnly, openToBrowser){
     xhr.onreadystatechange = function(){
         if (xhr.readyState == 4){
             if (xhr.status == 200){
-                var sbmContainer = SBM[sbmLabel].parser.call(this, xhr);
+                let sbmContainer = SBM[sbmLabel].parser.call(this, xhr);
                 if (!sbmContainer) return;
                 cacheManager.add(sbmContainer, url, type);
                 if (openToBrowser)
-                    manager.open(sbmContainer.toHTMLString(format,false));
+                    manager.open(sbmContainer.toHTML(format,false));
                 else
-                    liberator.echo(sbmContainer.toHTMLString(format,countOnly), true);
+                    liberator.echo(sbmContainer.toHTML(format,countOnly), true);
             } else {
                 liberator.echoerr(sbmURL + ' ' + xhr.status, true);
             }
         }
-    }
+    };
     xhr.send(null);
 } //}}}
 /**
@@ -226,24 +237,25 @@ var SBM = { //{{{
         parser: function(xhr){
             var rss = xhr.responseXML;
             if (!rss){
-                liberator.echoerr('del.icio.us feed is none',true);
+                liberator.echoerr('Delicious feed is none',true);
                 return;
             }
+            var pageURL, items;
             try {
-            var pageURL = evaluateXPath(rss, '//rss:channel/rss:link')[0].textContent;
-            var items = evaluateXPath(rss, '//rss:item');
+                pageURL = evaluateXPath(rss, '//rss:channel/rss:link')[0].textContent;
+                items = evaluateXPath(rss, '//rss:item');
             } catch(e){
                 liberator.log(e);
             }
             var c = new SBMContainer('d', items.length, {
-                faviconURL: 'http://del.icio.us/favicon.ico',
+                faviconURL: 'http://delicious.com/favicon.ico',
                 pageURL:    pageURL
             });
             items.forEach(function(item){
                 var children = item.childNodes;
                 var [id,date,tags,comment,link] = ['','',[],'',''];
-                for (var i=0; i<children.length; i++){
-                    var node = children[i];
+                for (let i=0; i<children.length; i++){
+                    let node = children[i];
                     if (node.nodeType == 1){
                         switch (node.localName){
                             case 'creator': id = node.textContent; break;
@@ -271,16 +283,16 @@ var SBM = { //{{{
             var json = Components.classes['@mozilla.org/dom/json;1'].
                        getService(Components.interfaces.nsIJSON).
                        decode(xhr.responseText);
-            */
-            var json = jsonDecode(xhr.reponseText);
+        */
+            var json = jsonDecode(xhr.responseText);
             if (json && json.isSuccess){
-                var c = new SBMContainer('l', json.total_clip_count, {
+                let c = new SBMContainer('l', json.total_clip_count, {
                     faviconURL: 'http://clip.livedoor.com/favicon.ico',
                     pageURL:    'http://clip.livedoor.com/page/' + json.link
                 });
                 json.Comments.forEach(function(clip){
                     c.add( clip.livedoor_id, new Date(clip.created_on * 1000),
-                           clip.notes ? clip.notes.replace(/</g,'&lt;').replace(/>/g,'&gt;') : '',
+                           clip.notes ? clip.notes : '',
                            clip.tags,
                            {
                             userIcon: 'http://image.clip.livedoor.com/profile/' +
@@ -292,7 +304,7 @@ var SBM = { //{{{
                 });
                 return c;
             } else {
-                liverator.log('Faild: LivedoorClip');
+                liberator.log('Faild: LivedoorClip');
             }
         }
     }, //}}}
@@ -305,7 +317,7 @@ var SBM = { //{{{
             var url = 'http://buzzurl.jp/user/';
             var json = jsonDecode(xhr.responseText);
             if (json && json[0] && json[0].user_num){
-                var c = new SBMContainer('buzzurl', json[0].user_num, {
+                let c = new SBMContainer('buzzurl', json[0].user_num, {
                     faviconURL: 'http://buzzurl.jp/favicon.ico',
                     pageURL:    'http://buzzurl.jp/entry/' + json[0].url
                 });
@@ -320,12 +332,11 @@ var SBM = { //{{{
                 });
                 return c;
             } else {
-                liverator.log('Faild: Buzzurl');
+                liberator.log('Faild: Buzzurl');
             }
         }
-    }, //}}}
+    } //}}}
 }; //}}}
-
 
 /**
  * jsonDecode {{{
@@ -435,26 +446,30 @@ var manager = {
     }
 }; //}}}
 
+var options = [
+    [['-type','-t'], commands.OPTION_STRING, function(str) (new RegExp('^['+[t for(t in manager.type)].join('') + ']+$')).test(str)],
+    [['-format','-f'], commands.OPTION_LIST,null, [[f,manager.format[f]] for (f in manager.format)]],
+    [['-count','-c'], commands.OPTION_NOARG],
+    [['-browser','-b'],commands.OPTION_NORARG]
+];
 commands.addUserCommand(['viewSBMComments'], 'SBM Comments Viewer', //{{{
     function(arg){ //{{{
         var types =  liberator.globalVariables.def_sbms || 'hdlz';
-        var format = (liberator.globalVariables.def_sbm_format ||  'id,timestamp,tags,comment').split(',');
+        var format = (liberator.globalVariables.def_sbm_format || 'id,timestamp,tags,comment').split(',');
         var countOnly = false, openToBrowser = false;
         var url = buffer.URL;
-        for (var opt in arg){
+        for (let opt in arg){
             switch(opt){
-                case '-c':
                 case '-count':
                     countOnly = true;
                     break;
-                case '-b':
                 case '-browser':
                     openToBrowser = true;
                     break;
-                case '-t':
+                case '-type':
                     if (arg[opt]) types = arg[opt];
                     break;
-                case '-f':
+                case '-format':
                     if (arg[opt]) format = arg[opt];
                     break;
                 case "arguments":
@@ -463,16 +478,16 @@ commands.addUserCommand(['viewSBMComments'], 'SBM Comments Viewer', //{{{
             }
         }
 
-        for (var i=0; i<types.length; i++){
-            var type = types.charAt(i);
+        for (let i=0; i<types.length; i++){
+            let type = types.charAt(i);
             if ( manager.type[type] ){
                 if ( cacheManager.isAvailable(url, type) ){
                     liberator.log('cache avairable');
                     if (openToBrowser)
                         // TODO
-                        manager.open(cacheManager.get(url,type).toHTMLString(format,false), liberator.forceNewTab);
+                        manager.open(cacheManager.get(url,type).toHTML(format,false), liberator.forceNewTab);
                     else
-                        liberator.echo(cacheManager.get(url, type).toHTMLString(format,countOnly), true);
+                        liberator.echo(cacheManager.get(url, type).toHTML(format,countOnly), true);
                 } else {
                     try {
                         openSBM(url, type, format, countOnly, openToBrowser);
@@ -484,15 +499,15 @@ commands.addUserCommand(['viewSBMComments'], 'SBM Comments Viewer', //{{{
         }
     }, //}}}
     {
-        options: [
-            [['-t','-type'], liberator.commands.OPTION_STRING],
-            [['-f','-format'], liberator.commands.OPTION_LIST],
-            [['-c','-count'], liberator.commands.OPTION_NOARG],
-            [['-b','-browser'],liberator.commands.OPTION_NORARG]
-        ]
+        argCount:"*",
+        options: options,
+        completer: function(context) completion.url(context, 'l')
     }
 ); //}}}
 
+/**
+ * cacheManager {{{
+ */
 var cacheManager = (function(){
     var cache = {};
     //             min  sec   millisec
@@ -522,8 +537,8 @@ var cacheManager = (function(){
         },
         garbage: function(){
             var date = new Date();
-            for (var url in cache){
-                for (var type in cache[url]){
+            for (let url in cache){
+                for (let type in cache[url]){
                     if (date - cache[url][type][0] > threshold) delete cache[url][type];
                 }
             }
@@ -537,6 +552,7 @@ var cacheManager = (function(){
     };
     return c_manager;
 })();
+//}}}
 
 return manager;
 })();
