@@ -2,14 +2,16 @@
 " exモード時の補完候補がTabキーを押さなくても自動的に表示されて、キー入力するたびに更新される
 set wildoptions=auto
 " AwesomeBarの補完候補をopenやtabopenの時に使う事が出来る
-set complete=S
+set complete=Sl
 " クイックヒントモードでMigemoを使えるようにする。
 set hintmatching=custom
 " GUI関係の表示（メニュー/ツール/リンク）
 " set guioptions=mTb
 set guioptions=B
 " ビープ音を鳴らさずビジュアルベルを使用
-"set visualbell
+set visualbell
+highlight Bell display:none
+
 " ビジュアルベルを無効化
 "set visualbellstyle=display:none;
 " ヒストリー回数
