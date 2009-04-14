@@ -5,9 +5,8 @@ set wildoptions=auto
 set complete=Sl
 " クイックヒントモードでMigemoを使えるようにする。
 set hintmatching=custom
-" GUI関係の表示（メニュー/ツール/リンク）
-" set guioptions=mTb
-set guioptions=B
+" GUI関係の表示（ブックマークとスクロールバー）
+set guioptions=Br
 " ビープ音を鳴らさずビジュアルベルを使用
 set visualbell
 highlight Bell display:none
@@ -33,9 +32,9 @@ noremap k 5<C-y>
 noremap gh g0
 noremap gl g$
 
-"" 設定ファイルの再読み込み
-noremap ,s :so .vimperatorrc<CR>
-noremap ,S :mapc<CR>:cmapc<CR>:imapc<CR>:so .vimperatorrc<CR>
+" 補完リストの選択をC-n,C-pで
+cnoremap <C-n> <TAB>
+cnoremap <C-p> <S-TAB>
 
 " bookmarkコメントを表示
 noremap ,c :viewSBMComments<CR>
@@ -88,6 +87,10 @@ noremap wk :split -t<CR>
 noremap wl :split -r<CR>
 noremap wh :split -l<CR>
 
+" .vimperatorrcを再読み込み(:restartしなくてもいい)
+noremap <silent> <space>rrc :mapc<CR>:cmapc<CR>:imapc<CR>:so ~/.vimperatorrc<CR>
+noremap <silent> <space>rfi :mapc<CR>:cmapc<CR>:imapc<CR>:so ~/
+
 " MacでCtrl+[でESC 
 " Bug 432951の為使用できず
 " http://developer.mozilla.org/ja/Gecko_Keypress_Event
@@ -112,6 +115,20 @@ autocmd LocationChange mail\\.google\\.com/mail :fmap -depth 4 c / j k n p o u e
 let g:def_sbms = "h"
 
 " Etc: ============================================================ {{{1
+"" フィードボタンをステータスラインに移動
+"javascript <<EOM
+"(function () {
+" var feedButton = document.getElementById('feed-button');
+" feedButton.parentNode.removeChild(feedButton);
+" var feedPanel  = document.createElement('statusbarpanel');
+" feedPanel.setAttribute('id', 'feed-panel-clone');
+" feedPanel.appendChild(feedButton.cloneNode(true));
+" document.getElementById('status-bar').insertBefore(
+"     feedPanel,
+"     document.getElementById('security-button')
+"     );
+" })();
+"EOM
 
 " }}}1
 "" Firefoxのエラーコンソールにechoやechoerrのログを出力する {{{1
