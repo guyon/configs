@@ -2,7 +2,7 @@
 " exモード時の補完候補がTabキーを押さなくても自動的に表示されて、キー入力するたびに更新される
 set wildoptions=auto
 " AwesomeBarの補完候補をopenやtabopenの時に使う事が出来る
-set complete=Sl
+set complete=l
 " クイックヒントモードでMigemoを使えるようにする。
 set hintmatching=custom
 " GUI関係の表示（ブックマークとスクロールバー）
@@ -97,6 +97,10 @@ noremap <silent> <space>rfi :mapc<CR>:cmapc<CR>:imapc<CR>:so ~/
 " noremap  <Ctrl-[> <esc>
 " inoremap  <Ctrl-[> <esc>
 " cnoremap  <Ctrl-[> <esc>
+
+inoremap <C-p> <UP>
+inoremap <C-n> <DOWN>
+
 
 " Plugins ========================================================={{{1
 
