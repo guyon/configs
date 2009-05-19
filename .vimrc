@@ -452,6 +452,11 @@ else
           \ }
 endif
 
+"ku.vim用のマッピング ------------------------------------------- {{{2
+nnoremap <Space>kb  :<C-u>Ku buffer<Return>
+nnoremap <Space>kf  :<C-u>Ku file<Return>
+nnoremap <Space>kh  :<C-u>Ku history<Return>
+
 "speeddating.vim用のマッピング ------------------------------------------- {{{2
 " システム日付を挿入する
 inoremap <leader>dF  <C-r>=strftime('%Y-%m-%dT%H:%M:%S+09:00')<Return>
