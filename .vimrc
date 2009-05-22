@@ -452,10 +452,19 @@ else
           \ }
 endif
 
-"ku.vim用のマッピング ------------------------------------------- {{{2
+"ku.vim用 ------------------------------------------- {{{2
 nnoremap <Space>kb  :<C-u>Ku buffer<Return>
 nnoremap <Space>kf  :<C-u>Ku file<Return>
 nnoremap <Space>kh  :<C-u>Ku history<Return>
+call ku#custom_prefix('common', '~', $HOME)
+
+if has('win32')
+    call ku#custom_prefix('common', ':c', 'C:\configs')
+    call ku#custom_prefix('common', ':p', $HOME . '/.private')
+else
+    call ku#custom_prefix('common', ':c', $HOME . '/configs')
+    call ku#custom_prefix('common', ':p', $HOME . '/.private')
+endif
 
 "speeddating.vim用のマッピング ------------------------------------------- {{{2
 " システム日付を挿入する
