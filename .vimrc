@@ -456,6 +456,10 @@ endif
 nnoremap <Space>kb  :<C-u>Ku buffer<Return>
 nnoremap <Space>kf  :<C-u>Ku file<Return>
 nnoremap <Space>kh  :<C-u>Ku history<Return>
+nnoremap <Space>km  :<C-u>Ku file_mru<Return>
+nnoremap <Space>kcc  :<C-u>Ku cmd_mru/cmd<Return>
+nnoremap <Space>kcs  :<C-u>Ku cmd_mru/search<Return>
+
 call ku#custom_prefix('common', '~', $HOME)
 
 if has('win32')
