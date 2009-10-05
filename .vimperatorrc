@@ -18,6 +18,7 @@ set history=1000
 
 " Google Suggest
 "set complete=bshf
+set complete=S
 "set complete+=g
 
 " onload時の自動フォーカスを取りやめる。
@@ -40,7 +41,7 @@ cnoremap <C-p> <S-TAB>
 noremap ,c :viewSBMComments<CR>
 
 " URLショートカット
-noremap gG <esc>:t http://www.google.co.jp/webhp?hl=ja&complete=1<cr>
+noremap gG <esc>:gsearch! 
 noremap gY <esc>:t http://www.yahoo.co.jp/<cr>
 noremap gB <esc>:t chrome://livedoorclip_incsearch/content/view.html<cr>
 noremap gR <esc>:t http://reader.livedoor.com/reader/<cr>
@@ -101,6 +102,10 @@ noremap <silent> <space>rfi :mapc<CR>:cmapc<CR>:imapc<CR>:so ~/
 inoremap <C-p> <UP>
 inoremap <C-n> <DOWN>
 
+" oの時は履歴から検索してtの時はgoogleから検索する
+noremap t :set complete=S<CR>t
+noremap <C-T> :set complete=lb<CR>t
+noremap o :set complete=lb<CR>o
 
 " Plugins ========================================================={{{1
 
@@ -113,6 +118,7 @@ let g:direct_sbm_is_normalize = "false"
 " feedsome_keys2.js
 autocmd LocationChange .* :fmapc
 autocmd LocationChange reader\\.livedoor\\.com/reader :fmap j k s a r p o v c g <Space> <S-Space> < > T
+autocmd LocationChange localhost\\:3000/reader :fmap j k s a r p o v c g <Space> <S-Space> < > T
 autocmd LocationChange mail\\.google\\.com/mail :fmap -depth 4 c / j k n p o u e x s r a # [ ] z ? gi gs gt gd ga gc
 
 " SBM Comments Viewer
