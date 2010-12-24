@@ -1,0 +1,62 @@
+*markdown-cheat-sheet.jax* Markdown カンニングペーパー
+
+    作者: Kyo Nagashima <kyo@hail2u.net>
+    バージョン: 0.04
+    説明: Markdown 記法のカンニングペーパーです。
+
+1. 記法の例 |markdown-cheat-sheet-examples|
+   1.1 段落 |markdown-cheat-sheet-paragraph|
+   1.2 改行 |markdown-cheat-sheet-linebreak|
+   1.3 テキスト㮟現するため
+に複数の記法が利用できる場合も多い。詳細は full Markdown syntax を参照せよ:
+
+http://daringfireball.net/projects/markdown/syntax
+
+Markdown が書式化コマンドとして解釈する文字は、バックスラッシュを加えることに
+よって、その文字そのて Markdown はいかなる変換も行わないので、
+XHTML のリらない: >
+これは段落です。2つの文があります。
+
+これは別の段落です。ここにも2つの文があります。
+<
+
+
+1.2 改行 *markdown-cheat-sheet-linebreak*
+
+テキストに挿入された改行は最終的な結果から取り除かれる。画面の大きさに応じて改
+行を行うåat-sheet-lists*
+
+>
+* 順序無しリストのアイテム
+* 順序無しリストの別のアイテム
+* 順序無しリストのさらに別のアイテム
+
+1. 順序付きリストのアイテム
+2. 順序付きリストの別のアイテム
+3. 順序付きリストのさらに別のアイテム
+<
+
+
+1.6 見出ãRL "リンクのタイトル")
+<
+
+
+1.9 画像 *markdown-cheat-sheet-images*
+
+>
+![代替テキスト](画像のURL "画像のタイトル")
+<
+
+
+1.10 水平線 *markdown-cheat-sheet-hr*
+
+1 行の中に、3 つ以上のハイフンやアスタリスク・アンダースコアだけを並べると水平
+線が作られブ・コモンズ 表示-継承ライセンスの下で利用可能です。
+ライセンスについての詳細は以下の URL を参照してください:
+
+http://creativecommons.org/licenses/by-sa/3.0/
+
+
+==============================================================================
+
+ vim:tw=78:ts=8:ft=help:norl:
