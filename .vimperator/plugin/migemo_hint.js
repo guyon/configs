@@ -8,6 +8,7 @@
 //
 // Usage:
 //  :set hintmatching = custom
+//liberator.plugins.customHintMatcher(inputString){
 liberator.plugins.customHintMatcher = function(inputString){
     var XMigemoCore, XMigemoTextUtils;
     try{

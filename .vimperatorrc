@@ -1,25 +1,37 @@
+noremap I <C-z>
+
+noremap <S-Left> :tabmove! -1<CR>
+noremap <S-Right> :tabmove! +1<CR>
+
+" autocmd VimperatorEnter .* source ~/_vimperator-after.vimp
+
+style -name commandline-ime chrome://* #liberator-commandline-command input {ime-mode: inactive;}
+
+cabbrev -javascript TITLE buffer.title
+cabbrev -javascript URI buffer.URI
+cabbrev -javascript bitly userContext.bitly()
+
+" source ~/_vimperator-sub.js
+
 " Options: ======================================================== {{{1
-" exモード時の補完候補がTabキーを押さなくても自動的に表示されて、キー入力するたびに更新される
-set wildoptions=auto
-" AwesomeBarの補完候補をopenやtabopenの時に使う事が出来る
-set complete=l
+set hintchars=hjklgfdsa
+set hintinputs+=name
+set hlsearch
+set showstatuslinks=0
+set status-=location
+set smartcase
+set nextpattern+='次','\bolder\b'
+set previouspattern+='前','\bnerwer\b'
+set complete=slf
+
 " クイックヒントモードでMigemoを使えるようにする。
 set hintmatching=custom
-" GUI関係の表示（ブックマークとスクロールバー）
-set guioptions=Br
 " ビープ音を鳴らさずビジュアルベルを使用
 set visualbell
 highlight Bell display:none
 
-" ビジュアルベルを無効化
-"set visualbellstyle=display:none;
 " ヒストリー回数
 set history=1000
-
-" Google Suggest
-"set complete=bshf
-set complete=S
-"set complete+=g
 
 " onload時の自動フォーカスを取りやめる。
 set focuscontent
@@ -72,33 +84,6 @@ cnoremap <C-x> <C-v><C-x>
 cnoremap <C-c> <C-v><C-c>
 cnoremap <C-v> <C-v><C-v>
 
-" splitBrowser.js
-noremap wc <C-w>c
-noremap w0 <C-w>0
-noremap w$ <C-w>$
-noremap wac :only<CR>
-noremap ws :split<CR>
-noremap wv :vsplit<CR>
-noremap wml :split -l<CR>
-noremap wmr :split -r<CR>
-noremap wmt :split -t<CR>
-noremap wmb :split -b<CR>
-noremap wj :split -b<CR>
-noremap wk :split -t<CR>
-noremap wl :split -r<CR>
-noremap wh :split -l<CR>
-
-" .vimperatorrcを再読み込み(:restartしなくてもいい)
-noremap <silent> <space>rrc :mapc<CR>:cmapc<CR>:imapc<CR>:so ~/.vimperatorrc<CR>
-noremap <silent> <space>rfi :mapc<CR>:cmapc<CR>:imapc<CR>:so ~/
-
-" MacでCtrl+[でESC 
-" Bug 432951の為使用できず
-" http://developer.mozilla.org/ja/Gecko_Keypress_Event
-" noremap  <Ctrl-[> <esc>
-" inoremap  <Ctrl-[> <esc>
-" cnoremap  <Ctrl-[> <esc>
-
 inoremap <C-p> <UP>
 inoremap <C-n> <DOWN>
 
@@ -125,50 +110,6 @@ autocmd LocationChange mail\\.google\\.com/mail :fmap -depth 4 c / j k n p o u e
 " SBM Comments Viewer
 let g:def_sbms = "h"
 
-" Etc: ============================================================ {{{1
-"" フィードボタンをステータスラインに移動
-"javascript <<EOM
-"(function () {
-" var feedButton = document.getElementById('feed-button');
-" feedButton.parentNode.removeChild(feedButton);
-" var feedPanel  = document.createElement('statusbarpanel');
-" feedPanel.setAttribute('id', 'feed-panel-clone');
-" feedPanel.appendChild(feedButton.cloneNode(true));
-" document.getElementById('status-bar').insertBefore(
-"     feedPanel,
-"     document.getElementById('security-button')
-"     );
-" })();
-"EOM
-
-" }}}1
-"" Firefoxのエラーコンソールにechoやechoerrのログを出力する {{{1
-javascript <<EOM
-// for liberator.echo()
-let (echo_old = liberator.echo) {
-    liberator.echo = function(str, flags) {
-        liberator.log("echo: " + str, 0);
-        return echo_old(str, flags);
-    }
-}
-
-// for liberator.echoerr()
-let (echoerr_old = liberator.echoerr) {
-    liberator.echoerr = function(str, flags) {
-        liberator.log("echoerr: " + str, 0);
-        return echoerr_old(str, flags);
-    }
-}
-
-// for liberator.echomsg() (only for Vimperator 2.0pre or later)
-let (echomsg_old = liberator.echomsg) {
-    liberator.echomsg = function(str, flags) {
-        liberator.log("echomsg: " + str, 0);
-        return echomsg_old(str, flags);
-    }
-}
-EOM
-" 1}}}
 
 ""source! ~/.vimperatorrc
 " vim: set ft=vimperator:
