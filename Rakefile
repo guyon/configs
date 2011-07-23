@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Config Build Rakefile.
 
 require "find"
