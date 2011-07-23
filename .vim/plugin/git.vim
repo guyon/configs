@@ -1,4 +1,6 @@
-" UTF-8の文字を入れておく
+" Author:  motemen <motemen@gmail.com>
+" License: The MIT License
+" URL:     http://github.com/motemen/git-vim/
 
 if !exists('g:git_command_edit')
     let g:git_command_edit = 'new'
@@ -8,32 +10,38 @@ if !exists('g:git_bufhidden')
     let g:git_bufhidden = ''
 endif
 
-nnoremap <Leader>gd :GitDiff<Enter>
-nnoremap <Leader>gD :GitDiff --cached<Enter>
-nnoremap <Leader>gs :GitStatus<Enter>
-nnoremap <Leader>gl :GitLog<Enter>
-nnoremap <Leader>ga :GitAdd<Enter>
-nnoremap <Leader>gA :GitAdd <cfile><Enter>
-nnoremap <Leader>gc :GitCommit<Enter>
+if !exists('g:git_bin')
+    let g:git_bin = 'git'
+endif
+
+if !exists('g:git_author_highlight')
+    let g:git_author_highlight = { }
+endif
+
+if !exists('g:git_highlight_blame')
+    let g:git_highlight_blame = 0
+endif
+
+if !exists('g:git_no_map_default') || !g:git_no_map_default
+    nnoremap <Leader>gd :GitDiff<Enter>
+    nnoremap <Leader>gD :GitDiff --cached<Enter>
+    nnoremap <Leader>gs :GitStatus<Enter>
+    nnoremap <Leader>gl :GitLog<Enter>
+    nnoremap <Leader>ga :GitAdd<Enter>
+    nnoremap <Leader>gA :GitAdd <cfile><Enter>
+    nnoremap <Leader>gc :GitCommit<Enter>
+    nnoremap <Leader>gp :GitPullRebase<Enter>
+endif
 
 " Ensure b:git_dir exists.
 function! s:GetGitDir()
     if !exists('b:git_dir')
-        let b:git_dir = finddir('.git', expand('%:p:h') . ';/')
-        if strlen(b:git_dir)
-            let b:git_dir = fnamemodify(b:git_dir, ':p')
+        let b:git_dir = s:SystemGit('rev-parse --git-dir')
+        if !v:shell_error
+            let b:git_dir = fnamemodify(split(b:git_dir, "\n")[0], ':p') . '/'
         endif
     endif
     return b:git_dir
-endfunction
-
-function! s:GetGitRootDir()
-    call <SID>GetGitDir()
-    let b:git_root_dir = b:git_dir
-    if strlen(b:git_root_dir)
-        let b:git_root_dir = substitute( b:git_root_dir, "git.$", "", "g")
-    endif
-    return b:git_root_dir
 endfunction
 
 " Returns current git branch.
@@ -41,9 +49,13 @@ endfunction
 function! GitBranch()
     let git_dir = <SID>GetGitDir()
 
-    if strlen(git_dir) && filereadable(git_dir . 'HEAD')
-        let lines = readfile(git_dir . 'HEAD')
-        return len(lines) ? matchstr(lines[0], '[^/]*$') : ''
+    if strlen(git_dir) && filereadable(git_dir . '/HEAD')
+        let lines = readfile(git_dir . '/HEAD')
+        if !len(lines)
+            return ''
+        else
+            return matchstr(lines[0], 'refs/heads/\zs.\+$')
+        endif
     else
         return ''
     endif
@@ -51,7 +63,7 @@ endfunction
 
 " List all git local branches.
 function! ListGitBranches(arg_lead, cmd_line, cursor_pos)
-    let branches = split(system('git branch'), '\n')
+    let branches = split(s:SystemGit('branch'), '\n')
     if v:shell_error
         return []
     endif
@@ -61,7 +73,7 @@ endfunction
 
 " List all git commits.
 function! ListGitCommits(arg_lead, cmd_line, cursor_pos)
-    let commits = split(system('git log --pretty=format:%h'))
+    let commits = split(s:SystemGit('log --pretty=format:%h'))
     if v:shell_error
         return []
     endif
@@ -81,7 +93,7 @@ endfunction
 
 " Show diff.
 function! GitDiff(args)
-    let git_output = system('git diff ' . a:args . ' -- ' . s:Expand('%'))
+    let git_output = s:SystemGit('diff ' . a:args . ' -- ' . s:Expand('%'))
     if !strlen(git_output)
         echo "No output from git command"
         return
@@ -93,12 +105,11 @@ endfunction
 
 " Show Status.
 function! GitStatus()
-    let git_output = system('git status')
+    let git_output = s:SystemGit('status')
     call <SID>OpenGitBuffer(git_output)
     setlocal filetype=git-status
     nnoremap <buffer> <Enter> :GitAdd <cfile><Enter>:call <SID>RefreshGitStatus()<Enter>
     nnoremap <buffer> -       :silent !git reset HEAD -- =expand('<cfile>')<Enter><Enter>:call <SID>RefreshGitStatus()<Enter>
-    nnoremap <buffer> ?       :silent !echo =expand('<cfile>')<Enter>>> =<SID>GetGitRootDir()<Enter>gitignore<Enter>:call <SID>RefreshGitStatus()<Enter>
 endfunction
 
 function! s:RefreshGitStatus()
@@ -109,7 +120,7 @@ endfunction
 
 " Show Log.
 function! GitLog(args)
-    let git_output = system('git log ' . a:args . ' -- ' . s:Expand('%'))
+    let git_output = s:SystemGit('log ' . a:args . ' -- ' . s:Expand('%'))
     call <SID>OpenGitBuffer(git_output)
     setlocal filetype=git-log
 endfunction
@@ -125,17 +136,27 @@ endfunction
 function! GitCommit(args)
     let git_dir = <SID>GetGitDir()
 
+    let args = a:args
+
+    if args !~ '\v\k@<!(-a|--all)>' && s:SystemGit('diff --cached --stat') =~ '^\(\s\|\n\)*$'
+        let args .= ' -a'
+    endif
+
     " Create COMMIT_EDITMSG file
     let editor_save = $EDITOR
     let $EDITOR = ''
-    call system('git commit ' . a:args)
+    let git_output = s:SystemGit('commit ' . args)
     let $EDITOR = editor_save
 
+    let cur_dir = getcwd()
     execute printf('%s %sCOMMIT_EDITMSG', g:git_command_edit, git_dir)
+    execute printf("lcd %s", cur_dir)
+
     setlocal filetype=git-status bufhidden=wipe
     augroup GitCommit
         autocmd BufWritePre  <buffer> g/^#\|^\s*$/d | setlocal fileencoding=utf-8
-        execute printf("autocmd BufWritePost <buffer> call GitDoCommand('commit %s -F ' . expand('%%')) | autocmd! GitCommit * <buffer>", a:args)
+        execute printf("autocmd BufEnter <buffer> lcd %s", cur_dir)
+        execute printf("autocmd BufWritePost <buffer> call GitDoCommand('commit %s -F ' . expand('%%')) | autocmd! GitCommit * <buffer>", args)
     augroup END
 endfunction
 
@@ -144,11 +165,28 @@ function! GitCheckout(args)
     call GitDoCommand('checkout ' . a:args)
 endfunction
 
+" Push.
+function! GitPush(args)
+"   call GitDoCommand('push ' . a:args)
+    " Wanna see progress...
+    let args = a:args
+    if args =~ '^\s*$'
+        let args = 'origin ' . GitBranch()
+    endif
+    execute '!' g:git_bin 'push' args
+endfunction
+
+" Pull.
+function! GitPull(args)
+"   call GitDoCommand('pull ' . a:args)
+    " Wanna see progress...
+    execute '!' g:git_bin 'pull' a:args
+endfunction
+
 " Show commit, tree, blobs.
 function! GitCatFile(file)
     let file = s:Expand(a:file)
-    "let file_type  = system('git cat-file -t ' . file)
-    let git_output = system('git cat-file -p ' . file)
+    let git_output = s:SystemGit('cat-file -p ' . file)
     if !strlen(git_output)
         echo "No output from git command"
         return
@@ -157,8 +195,78 @@ function! GitCatFile(file)
     call <SID>OpenGitBuffer(git_output)
 endfunction
 
+" Show revision and author for each line.
+function! GitBlame(...)
+    let l:git_blame_width = 20
+    let git_output = s:SystemGit('blame -- ' . expand('%'))
+    if !strlen(git_output)
+        echo "No output from git command"
+        return
+    endif
+
+    if strlen(a:1)
+        let l:git_blame_width = a:1
+    endif
+
+    setlocal noscrollbind
+
+    " :/
+    let git_command_edit_save = g:git_command_edit
+    let g:git_command_edit = 'leftabove vnew'
+    call <SID>OpenGitBuffer(git_output)
+    let g:git_command_edit = git_command_edit_save
+
+    setlocal modifiable
+    silent %s/\d\d\d\d\zs \+\d\+).*//
+    exe 'vertical resize ' . git_blame_width
+    setlocal nomodifiable
+    setlocal nowrap scrollbind
+
+    if g:git_highlight_blame
+        call s:DoHighlightGitBlame()
+    endif
+
+    wincmd p
+    setlocal nowrap scrollbind
+
+    syncbind
+endfunction
+
+
+
+
+" Experimental
+function! s:DoHighlightGitBlame()
+    for l in range(1, line('$'))
+        let line = getline(l)
+        let [commit, author] = matchlist(line, '\(\x\+\) (\(.\{-}\)\s* \d\d\d\d-\d\d-\d\d')[1:2]
+        call s:LoadSyntaxRuleFor({ 'author': author })
+    endfor
+endfunction
+
+function! s:LoadSyntaxRuleFor(params)
+    let author = a:params.author
+    let name = 'gitBlameAuthor_' . substitute(author, '\s', '_', 'g')
+    if (!hlID(name))
+        if has_key(g:git_author_highlight, author)
+            execute 'highlight' name g:git_author_highlight[author]
+        else
+            let [n1, n2] = [0, 1]
+            for c in split(author, '\zs')
+                let n1 = (n1 + char2nr(c))     % 8
+                let n2 = (n2 + char2nr(c) * 3) % 8
+            endfor
+            if n1 == n2
+                let n1 = (n2 + 1) % 8
+            endif
+            execute 'highlight' name printf('ctermfg=%d ctermbg=%d', n1, n2)
+        endif
+        execute 'syntax match' name '"\V\^\x\+ (' . escape(author, '\') . '\.\*"'
+    endif
+endfunction
+
 function! GitDoCommand(args)
-    let git_output = system('git ' . a:args)
+    let git_output = s:SystemGit(a:args)
     let git_output = substitute(git_output, '\n*$', '', '')
     if v:shell_error
         echohl Error
@@ -166,6 +274,16 @@ function! GitDoCommand(args)
         echohl None
     else
         echo git_output
+    endif
+endfunction
+
+function! s:SystemGit(args)
+    " workardound for MacVim, on which shell does not inherit environment
+    " variables
+    if has('mac') && &shell =~ 'sh$'
+        return system('EDITOR="" '. g:git_bin . ' ' . a:args)
+    else
+        return system(g:git_bin . ' ' . a:args)
     endif
 endfunction
 
@@ -223,12 +341,7 @@ function! s:OpenGitBuffer(content)
     setlocal buftype=nofile readonly modifiable
     execute 'setlocal bufhidden=' . g:git_bufhidden
 
-    if has('win32') && has('iconv')
-        let content = iconv(a:content, 'utf-8', &enc)
-    else
-        let content = a:content
-    endif
-    silent put=content
+    silent put=a:content
     keepjumps 0d
     setlocal nomodifiable
 
@@ -250,6 +363,10 @@ command! -nargs=? GitAdd              call GitAdd(<q-args>)
 command! -nargs=* GitLog              call GitLog(<q-args>)
 command! -nargs=* GitCommit           call GitCommit(<q-args>)
 command! -nargs=1 GitCatFile          call GitCatFile(<q-args>)
+command! -nargs=? GitBlame            call GitBlame(<q-args>)
 command! -nargs=+ Git                 call GitDoCommand(<q-args>)
 command!          GitVimDiffMerge     call GitVimDiffMerge()
 command!          GitVimDiffMergeDone call GitVimDiffMergeDone()
+command! -nargs=* GitPull             call GitPull(<q-args>)
+command!          GitPullRebase       call GitPull('--rebase')
+command! -nargs=* GitPush             call GitPush(<q-args>)

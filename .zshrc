@@ -204,7 +204,7 @@ if [ "$TERM" = "screen" ]; then
   RPROMPT='['$LIGHTBLUE'%~ %(!.$RED.$GREEN)%D{%Y/%m/%d %H:%M:%S}'$DEFAULT_COLOR']' 
   #RPROMPT='['$LIGHTBLUE'%~ %(!.$RED.$GREEN)%D{%Y/%m/%d}$DEFAULT_COLOR($TODAY_COLOR%D{%a}$DEFAULT_COLOR)%*'$DEFAULT_COLOR']' 
   RPROMPT2='< %*]' 
-  PROMPT=$'[%n@%m %2~%{\ek\e\\%}]$ '
+  PROMPT=$'[%n@%m %2~%{\ek\e\\%}%{fugitive#statusline()}]$ '
 fi
 
 # HISTORYファイルの設定
@@ -228,11 +228,12 @@ alias ls='ls -FGv'
 alias ll='ls -l' 
 alias la='ls -a' 
 alias rm='rm -i' 
+alias o='open' 
 
 #参考
 #http://mazgi.blog32.fc2.com/
 
-#alias vim="/Applications/vim" 
+[ -f /Applications/MacVim.app/Contents/MacOS/vim ] && alias vim='/Applications/MacVim.app/Contents/MacOS/vim'
 
 # gem補完
 alias gem-update-list="gem list -r 2> /dev/null | grep '^[a-zA-Z]' | awk '{print \$1}' > $HOME/.gemlist"
@@ -244,3 +245,8 @@ _gem () {
     reply=(`cat $HOME/.gemlist`)
 }
 compctl -k "(`gem help commands | grep '^    \w.*' | sed 's/^\s*//' | sed 's/\s\s*.*//'`)" -x 'c[-1,-t]' - 'C[-1,(install)]' -K _gem -- gem
+
+#-----------------------------------------------------------------
+## ローカル設定の読み込み
+##-----------------------------------------------------------------
+[ -f ~/.zshrc.local ] && source ~/.zshrc.local
