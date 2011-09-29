@@ -1,7 +1,7 @@
 "=============================================================================
 " FILE: register.vim
 " AUTHOR:  Shougo Matsushita <Shougo.Matsu@gmail.com>
-" Last Modified: 03 Jun 2011.
+" Last Modified: 19 Sep 2011.
 " License: MIT license  {{{
 "     Permission is hereby granted, free of charge, to any person obtaining
 "     a copy of this software and associated documentation files (the
@@ -34,42 +34,80 @@ endfunction"}}}
 let s:source = {
       \ 'name' : 'register',
       \ 'description' : 'candidates from register',
+      \ 'action_table' : {},
       \}
 
 function! s:source.gather_candidates(args, context)"{{{
-  let l:candidates = []
+  let candidates = []
 
-  let l:max_width = winwidth(0) - 5
-  let l:registers = [['"', @"],
-        \ ['0', @0], ['1', @1], ['2', @2], ['3', @3], ['4', @4],
-        \ ['5', @5], ['6', @6], ['7', @7], ['8', @8], ['9', @9],
-        \ ['a', @a], ['b', @b], ['c', @c], ['d', @d], ['e', @e],
-        \ ['f', @f], ['g', @g], ['h', @h], ['i', @i], ['j', @j],
-        \ ['k', @k], ['l', @l], ['m', @m], ['n', @n], ['o', @o],
-        \ ['p', @p], ['q', @q], ['r', @r], ['s', @s], ['t', @t],
-        \ ['u', @u], ['v', @v], ['w', @w], ['x', @x], ['y', @y], ['z', @z],
-        \ ['-', @-], ['*', @*], ['+', @+], ['.', @.], [':', @:],
-        \ ['%', @%], ['#', @#], ['/', @/], ['=', @=],
+  let max_width = winwidth(0) - 5
+  let registers = [
+        \ '"',
+        \ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+        \ 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j',
+        \ 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't',
+        \ 'u', 'v', 'w', 'x', 'y', 'z',
+        \ '-', '*', '+', '.', ':', '#', '%', '/', '=',
         \ ]
   if exists('g:yanktmp_file') && filereadable(g:yanktmp_file)
-    call add(l:registers, ['yanktmp', join(readfile(g:yanktmp_file, "b"), "\n")])
+    call add(registers, 'yanktmp')
   endif
 
-  for [l:reg, l:register] in l:registers
-    if l:register != ''
-      let l:abbr = substitute(l:register[ : l:max_width], '\t', '>---', 'g')
-      let l:abbr = substitute(l:abbr, '\r\?\n', '\\n', 'g')
+  for reg in registers
+    let register = (reg ==# 'yanktmp') ?
+          \ join(readfile(g:yanktmp_file, "b"), "\n") :
+          \ getreg(reg, 1)
+    if register != ''
+      let abbr = substitute(register[ : max_width], '\t', '>---', 'g')
+      let abbr = substitute(abbr, '\r\?\n', '\\n', 'g')
 
-      call add(l:candidates, {
-            \ 'word' : l:register,
-            \ 'abbr' : printf('%-7s - %s', l:reg, l:abbr),
+      call add(candidates, {
+            \ 'word' : register,
+            \ 'abbr' : printf('%-7s - %s', reg, abbr),
             \ 'kind' : 'word',
+            \ 'action__register' : reg,
             \ })
     endif
   endfor
 
-  return l:candidates
+  return candidates
 endfunction"}}}
+
+" Actions"{{{
+let s:source.action_table.delete = {
+      \ 'description' : 'delete registers',
+      \ 'is_invalidate_cache' : 1,
+      \ 'is_quit' : 0,
+      \ 'is_selectable' : 1,
+      \ }
+function! s:source.action_table.delete.func(candidates)"{{{
+  for candidate in a:candidates
+    if candidate.action__register ==# 'yanktmp'
+      call delete(g:yanktmp_file)
+    else
+      silent! call setreg(candidate.action__register, '')
+    endif
+  endfor
+endfunction"}}}
+
+let s:source.action_table.edit = {
+      \ 'description' : 'change register value',
+      \ 'is_invalidate_cache' : 1,
+      \ 'is_quit' : 0,
+      \ }
+function! s:source.action_table.edit.func(candidate)"{{{
+  let register = (a:candidate.action__register ==# 'yanktmp') ?
+        \ join(readfile(g:yanktmp_file, "b"), "\n") :
+        \ getreg(a:candidate.action__register, 1)
+  let register = substitute(register, '\r\?\n', '\\n', 'g')
+  let new_value = substitute(input('', register), '\\n', '\n', 'g')
+  if a:candidate.action__register ==# 'yanktmp'
+    call writefile(split(new_value, "\n", 1), g:yanktmp_file)
+  else
+    silent! call setreg(a:candidate.action__register, new_value)
+  endif
+endfunction"}}}
+"}}}
 
 let &cpo = s:save_cpo
 unlet s:save_cpo

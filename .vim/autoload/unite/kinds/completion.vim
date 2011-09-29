@@ -1,7 +1,7 @@
 "=============================================================================
 " FILE: completion.vim
 " AUTHOR:  Shougo Matsushita <Shougo.Matsu@gmail.com>
-" Last Modified: 27 Apr 2011.
+" Last Modified: 19 Sep 2011.
 " License: MIT license  {{{
 "     Permission is hereby granted, free of charge, to any person obtaining
 "     a copy of this software and associated documentation files (the
@@ -42,22 +42,19 @@ let s:kind.action_table.insert = {
       \ 'description' : 'insert word',
       \ }
 function! s:kind.action_table.insert.func(candidate)"{{{
-  let l:col = a:candidate.action__complete_pos
-  let l:cur_text = matchstr(getline('.'), '^.*\%' . l:col . 'c.')
-  let l:word = a:candidate.action__complete_word
+  let col = a:candidate.action__complete_pos
+  let cur_text = matchstr(getline('.'), '^.*\%' . col . 'c.')
+  let word = a:candidate.action__complete_word
 
   " Insert word.
-  let l:context_col = unite#get_current_unite().context.col
-  let l:next_line = l:context_col < col('$') ?
-        \ getline('.')[l:context_col-1 :] : ''
-  let l:next_line = getline('.')[l:context_col :]
-  call setline(line('.'), split(l:cur_text . l:word . l:next_line, '\n\|\r\n'))
-  let l:pos = getpos('.')
-  let l:pos[2] = len(l:cur_text)+len(l:word)+1
-  call setpos('.', l:pos)
-  let l:next_col = len(l:cur_text)+len(l:word)+1
+  let context_col = unite#get_current_unite().context.col
+  let next_line = getline('.')[context_col :]
+  call setline(line('.'),
+        \ split(cur_text . word . next_line, '\n\|\r\n'))
+  let next_col = len(cur_text)+len(word)+1
+  call cursor('', next_col)
 
-  if l:next_col < col('$')
+  if next_col < col('$')
     startinsert
   else
     startinsert!
@@ -72,8 +69,14 @@ function! s:kind.action_table.preview.func(candidate)"{{{
   echo ''
   redraw
 
-  if has_key(a:candidate, 'action__complete_info')
-    echo join(split(a:candidate.action__complete_info, '\n\|\r\n')[: &cmdheight-1], '\n')
+  let complete_info = has_key(a:candidate, 'action__complete_info') ?
+        \ a:candidate.action__complete_info :
+        \ has_key(a:candidate, 'action__complete_info_lazy') ?
+        \ a:candidate.action__complete_info_lazy() :
+        \ ''
+  if complete_info != ''
+    let S = vital#of('unite').import('Data.String')
+    echo join(S.wrap(complete_info)[: &cmdheight-1], "\n")
   endif
 endfunction"}}}
 "}}}

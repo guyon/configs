@@ -1,7 +1,7 @@
 "=============================================================================
 " FILE: matcher_glob.vim
 " AUTHOR:  Shougo Matsushita <Shougo.Matsu@gmail.com>
-" Last Modified: 26 Jun 2011.
+" Last Modified: 19 Sep 2011.
 " License: MIT license  {{{
 "     Permission is hereby granted, free of charge, to any person obtaining
 "     a copy of this software and associated documentation files (the
@@ -41,30 +41,33 @@ function! s:matcher.filter(candidates, context)"{{{
     return a:candidates
   endif
 
-  let l:candidates = copy(a:candidates)
+  let candidates = a:candidates
+  for input in split(a:context.input, '\\\@<! ')
+    let input = substitute(input, '\\ ', ' ', 'g')
 
-  for l:input in split(a:context.input, '\\\@<! ')
-    let l:input = substitute(l:input, '\\ ', ' ', 'g')
+    if input =~ '^!'
+      if input == '!'
+        continue
+      endif
 
-    if l:input =~ '^!'
       " Exclusion.
-      let l:input = unite#escape_match(l:input)
-      let l:expr = 'v:val.word !~ ' . string(l:input[1:])
-    elseif l:input =~ '\\\@<!\*'
+      let input = unite#escape_match(input)
+      let expr = 'v:val.word !~ ' . string(input[1:])
+    elseif input =~ '\\\@<!\*'
       " Wildcard.
-      let l:input = unite#escape_match(l:input)
-      let l:expr = 'v:val.word =~ ' . string(l:input)
+      let input = unite#escape_match(input)
+      let expr = 'v:val.word =~ ' . string(input)
     else
-      let l:input = substitute(l:input, '\\\(.\)', '\1', 'g')
-      let l:expr = &ignorecase ?
-            \ printf('stridx(tolower(v:val.word), %s) != -1', string(tolower(l:input))) :
-            \ printf('stridx(v:val.word, %s) != -1', string(l:input))
+      let input = substitute(input, '\\\(.\)', '\1', 'g')
+      let expr = &ignorecase ?
+            \ printf('stridx(tolower(v:val.word), %s) != -1', string(tolower(input))) :
+            \ printf('stridx(v:val.word, %s) != -1', string(input))
     endif
 
-    call filter(l:candidates, l:expr)
+    let candidates = filter(copy(candidates), expr)
   endfor
 
-  return l:candidates
+  return candidates
 endfunction"}}}
 
 let &cpo = s:save_cpo

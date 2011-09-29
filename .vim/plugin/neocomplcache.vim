@@ -1,7 +1,7 @@
 "=============================================================================
 " FILE: neocomplcache.vim
 " AUTHOR:  Shougo Matsushita <Shougo.Matsu@gmail.com>
-" Last Modified: 01 Jun 2011.
+" Last Modified: 16 Sep 2011.
 " License: MIT license  {{{
 "     Permission is hereby granted, free of charge, to any person obtaining
 "     a copy of this software and associated documentation files (the
@@ -22,7 +22,7 @@
 "     TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 "     SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 " }}}
-" Version: 6.1, for Vim 7.0
+" Version: 6.2, for Vim 7.0
 " GetLatestVimScripts: 2620 1 :AutoInstall: neocomplcache
 "=============================================================================
 
@@ -41,6 +41,8 @@ command! -nargs=0 NeoComplCacheDisable call neocomplcache#disable()
 command! -nargs=0 NeoComplCacheLock call neocomplcache#lock()
 command! -nargs=0 NeoComplCacheUnlock call neocomplcache#unlock()
 command! -nargs=0 NeoComplCacheToggle call neocomplcache#toggle_lock()
+command! -nargs=1 NeoComplCacheLockPlugin call neocomplcache#lock_plugin(<q-args>)
+command! -nargs=1 NeoComplCacheUnlockPlugin call neocomplcache#unlock_plugin(<q-args>)
 
 " Obsolute options check."{{{
 if exists('g:NeoComplCache_EnableAtStartup')
@@ -59,8 +61,11 @@ if exists('g:neocomplcache_disable_caching_buffer_name_pattern')
   echoerr 'g:neocomplcache_disable_caching_buffer_name_pattern option does not work this version of neocomplcache.'
   echoerr 'Please use g:neocomplcache_disable_caching_file_path_pattern option instead.'
 endif
-
+if exists('g:neocomplcache_enable_quick_match')
+  echoerr 'g:neocomplcache_enable_quick_match option does not work this version of neocomplcache.'
+endif
 "}}}
+
 " Global options definition."{{{
 if !exists('g:neocomplcache_max_list')
   let g:neocomplcache_max_list = 100
@@ -91,9 +96,6 @@ if !exists('g:neocomplcache_disable_auto_complete')
 endif
 if !exists('g:neocomplcache_enable_wildcard')
   let g:neocomplcache_enable_wildcard = 1
-endif
-if !exists('g:neocomplcache_enable_quick_match')
-  let g:neocomplcache_enable_quick_match = 0
 endif
 if !exists('g:neocomplcache_enable_camel_case_completion')
   let g:neocomplcache_enable_camel_case_completion = 0
@@ -131,6 +133,9 @@ endif
 if !exists('g:neocomplcache_disable_auto_select_buffer_name_pattern')
   let g:neocomplcache_disable_auto_select_buffer_name_pattern = ''
 endif
+if !exists('g:neocomplcache_compare_function')
+  let g:neocomplcache_compare_function = 'neocomplcache#compare_rank'
+endif
 if !exists('g:neocomplcache_ctags_program')
   let g:neocomplcache_ctags_program = 'ctags'
 endif
@@ -150,11 +155,14 @@ let g:neocomplcache_temporary_dir = expand(g:neocomplcache_temporary_dir)
 if !isdirectory(g:neocomplcache_temporary_dir)
   call mkdir(g:neocomplcache_temporary_dir, 'p')
 endif
-if !exists('g:neocomplcache_quick_match_table')
-  let g:neocomplcache_quick_match_table = {
-        \'a' : 0, 's' : 1, 'd' : 2, 'f' : 3, 'g' : 4, 'h' : 5, 'j' : 6, 'k' : 7, 'l' : 8, ';' : 9,
-        \'q' : 10, 'w' : 11, 'e' : 12, 'r' : 13, 't' : 14, 'y' : 15, 'u' : 16, 'i' : 17, 'o' : 18, 'p' : 19, 
-        \}
+if !exists('g:neocomplcache_force_overwrite_completefunc')
+  let g:neocomplcache_force_overwrite_completefunc = 0
+endif
+if !exists('g:neocomplcache_enable_prefetch')
+  let g:neocomplcache_enable_prefetch = 0
+endif
+if !exists('g:neocomplcache_enable_debug')
+  let g:neocomplcache_enable_debug = 0
 endif
 if exists('g:neocomplcache_enable_at_startup') && g:neocomplcache_enable_at_startup
   augroup neocomplcache

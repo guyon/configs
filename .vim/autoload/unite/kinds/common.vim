@@ -1,7 +1,7 @@
 "=============================================================================
 " FILE: common.vim
 " AUTHOR:  Shougo Matsushita <Shougo.Matsu@gmail.com>
-" Last Modified: 22 Apr 2011.
+" Last Modified: 19 Sep 2011.
 " License: MIT license  {{{
 "     Permission is hereby granted, free of charge, to any person obtaining
 "     a copy of this software and associated documentation files (the
@@ -76,11 +76,33 @@ let s:kind.action_table.insert = {
       \ 'description' : 'insert word',
       \ }
 function! s:kind.action_table.insert.func(candidate)"{{{
-  " Paste.
-  let l:old_reg = @"
-  let @" = a:candidate.word
-  normal! ""p
-  let @" = l:old_reg
+  let context = unite#get_current_unite().context
+
+  if !context.complete
+    " Paste.
+    let old_reg = @"
+    let @" = a:candidate.word
+    normal! ""p
+    let @" = old_reg
+
+    return
+  endif
+
+  let cur_text = matchstr(getline('.'), '^.*\%'
+        \ . (context.col-1) . 'c.')
+
+  let next_line = getline('.')[context.col :]
+  call setline(line('.'),
+        \ split(cur_text . a:candidate.word . next_line,
+        \            '\n\|\r\n'))
+  let next_col = len(cur_text)+len(a:candidate.word)+1
+  call cursor('', next_col)
+
+  if next_col < col('$')
+    startinsert
+  else
+    startinsert!
+  endif
 endfunction"}}}
 "}}}
 
