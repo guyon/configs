@@ -1,7 +1,7 @@
 "=============================================================================
 " FILE: async_cache.vim
 " AUTHOR: Shougo Matsushita <Shougo.Matsu@gmail.com>
-" Last Modified: 10 Jun 2011.
+" Last Modified: 19 Sep 2011.
 " License: MIT license  {{{
 "     Permission is hereby granted, free of charge, to any person obtaining
 "     a copy of this software and associated documentation files (the
@@ -28,139 +28,182 @@ let s:save_cpo = &cpo
 set cpo&vim
 
 function! s:main(argv)"{{{
-  " args: outputname filename pattern_file_name mark minlen maxfilename
-  let [l:outputname, l:filename, l:pattern_file_name, l:mark, l:minlen, l:maxfilename, l:fileencoding]
+  " args: funcname, outputname filename pattern_file_name mark minlen maxfilename
+  let [funcname, outputname, filename, pattern_file_name, mark, minlen, maxfilename, fileencoding]
         \ = a:argv
 
-  let l:pattern = get(readfile(l:pattern_file_name), 0, '\h\w*')
-  let l:keyword_list = s:load_from_file(l:filename, l:pattern, l:mark, l:minlen, l:maxfilename, l:fileencoding)
+  if funcname ==# 'load_from_file'
+    let keyword_list = s:load_from_file(filename, pattern_file_name, mark, minlen, maxfilename, fileencoding)
+  else
+    let keyword_list = s:load_from_tags(filename, pattern_file_name, mark, minlen, maxfilename, fileencoding)
+  endif
 
   " Create dictionary key.
-  for keyword in l:keyword_list
+  for keyword in keyword_list
+    if !has_key(keyword, 'abbr')
+      let keyword.abbr = keyword.word
+    endif
     if !has_key(keyword, 'kind')
       let keyword.kind = ''
     endif
-    if !has_key(keyword, 'class')
-      let keyword.class = ''
-    endif
-    if !has_key(keyword, 'abbr')
-      let keyword.abbr = keyword.word
+    if !has_key(keyword, 'menu')
+      let keyword.menu = ''
     endif
   endfor
 
   " Output cache.
-  let l:word_list = []
-  for keyword in l:keyword_list
-    call add(l:word_list, printf('%s|||%s|||%s|||%s|||%s',
-          \keyword.word, keyword.abbr, keyword.menu, keyword.kind, keyword.class))
+  let word_list = []
+  for keyword in keyword_list
+    call add(word_list, printf('%s|||%s|||%s|||%s',
+          \keyword.word, keyword.abbr, keyword.menu, keyword.kind))
   endfor
 
-  if !empty(l:word_list)
-    call writefile(l:word_list, l:outputname)
-  endif
+  call writefile(word_list, outputname)
 endfunction"}}}
 
-function! s:load_from_file(filename, pattern, mark, minlen, maxfilename, fileencoding)"{{{
+function! s:load_from_file(filename, pattern_file_name, mark, minlen, maxfilename, fileencoding)"{{{
   if filereadable(a:filename)
-    let l:lines = map(readfile(a:filename), 'iconv(v:val, a:fileencoding, &encoding)')
+    let lines = map(readfile(a:filename), 'iconv(v:val, a:fileencoding, &encoding)')
   else
     " File not found.
     return []
   endif
 
-  let l:max_lines = len(l:lines)
-  let l:menu = '[' . a:mark . '] ' . s:strwidthpart(
+  let pattern = get(readfile(a:pattern_file_name), 0, '\h\w*')
+
+  let max_lines = len(lines)
+  let menu = '[' . a:mark . '] ' . s:strwidthpart(
         \ fnamemodify(a:filename, ':t'), a:maxfilename)
 
-  let l:keyword_list = []
-  let l:dup_check = {}
-  let l:keyword_pattern2 = '^\%('.a:pattern.'\m\)'
+  let keyword_list = []
+  let dup_check = {}
+  let keyword_pattern2 = '^\%('.pattern.'\m\)'
 
-  for l:line in l:lines"{{{
-    let l:match = match(l:line, a:pattern)
-    while l:match >= 0"{{{
-      let l:match_str = matchstr(l:line, l:keyword_pattern2, l:match)
+  for line in lines"{{{
+    let match = match(line, pattern)
+    while match >= 0"{{{
+      let match_str = matchstr(line, keyword_pattern2, match)
 
-      if !has_key(l:dup_check, l:match_str) && len(l:match_str) >= a:minlen
+      if !has_key(dup_check, match_str) && len(match_str) >= a:minlen
         " Append list.
-        call add(l:keyword_list, { 'word' : l:match_str, 'menu' : l:menu })
+        call add(keyword_list, { 'word' : match_str, 'menu' : menu })
 
-        let l:dup_check[l:match_str] = 1
+        let dup_check[match_str] = 1
       endif
 
-      let l:match = match(l:line, a:pattern, l:match + len(l:match_str))
+      let match = match(line, pattern, match + len(match_str))
     endwhile"}}}
   endfor"}}}
 
-  return l:keyword_list
+  return keyword_list
 endfunction"}}}
 
-function! s:load_from_tags(filename, tags_list, mark, filetype, minlen, maxfilename)"{{{
-  let l:menu_pattern = printf('[%s] %%.%ds %%.%ds', a:mark, a:maxfilename, a:maxfilename)
-  let l:keyword_lists = []
-  let l:dup_check = {}
-  let l:line_num = 1
+function! s:load_from_tags(filename, pattern_file_name, mark, minlen, maxfilename, fileencoding)"{{{
+  let menu = '[' . a:mark . ']'
+  let menu_pattern = menu . printf(' %%.%ds', a:maxfilename)
+  let keyword_lists = []
+  let dup_check = {}
+  let line_num = 1
 
-  for l:line in a:tags_list"{{{
-    let l:tag = split(substitute(l:line, "\<CR>", '', 'g'), '\t', 1)
-    " Add keywords.
-    if l:line !~ '^!' && len(l:tag) >= 3 && len(l:tag[0]) >= a:minlen
-          \&& !has_key(l:dup_check, l:tag[0])
-      let l:option = {
-            \ 'cmd' : substitute(substitute(l:tag[2], '^\%([/?]\^\)\?\s*\|\%(\$\?[/?]\)\?;"$', '', 'g'), '\\\\', '\\', 'g'), 
-            \ 'kind' : ''
-            \}
-      if l:option.cmd =~ '\d\+'
-        let l:option.cmd = l:tag[0]
+  let [pattern, tags_file_name, filter_pattern, filetype] =
+        \ readfile(a:pattern_file_name)[: 4]
+  if tags_file_name !=# '$dummy$'
+    " Check output.
+    let tags_list = []
+
+    let i = 0
+    while i < 2
+      if filereadable(tags_file_name)
+        " Use filename.
+        let tags_list = map(readfile(tags_file_name),
+              \ 'iconv(v:val, a:fileencoding, &encoding)')
+        break
       endif
 
-      for l:opt in l:tag[3:]
-        let l:key = matchstr(l:opt, '^\h\w*\ze:')
-        if l:key == ''
-          let l:option['kind'] = l:opt
+      sleep 500m
+      let i += 1
+    endwhile
+  else
+    " Use filename.
+    let tags_list = map(readfile(a:filename),
+          \ 'iconv(v:val, a:fileencoding, &encoding)')
+  endif
+
+  if empty(tags_list)
+    " File caching.
+    return s:load_from_file(a:filename, a:pattern_file_name,
+          \ a:mark, a:minlen, a:maxfilename, a:fileencoding)
+  endif
+
+  for line in tags_list"{{{
+    let tag = split(substitute(line, "\<CR>", '', 'g'), '\t', 1)
+    let opt = join(tag[2:], "\<TAB>")
+    let cmd = matchstr(opt, '.*/;"')
+
+    " Add keywords.
+    if line !~ '^!' && len(tag) >= 3 && len(tag[0]) >= a:minlen
+          \&& !has_key(dup_check, tag[0])
+      let option = {
+            \ 'cmd' : substitute(substitute(substitute(cmd,
+            \'^\%([/?]\^\?\)\?\s*\|\%(\$\?[/?]\)\?;"$', '', 'g'),
+            \ '\\\\', '\\', 'g'), '\\/', '/', 'g'),
+            \ 'kind' : ''
+            \}
+      if option.cmd =~ '\d\+'
+        let option.cmd = tag[0]
+      endif
+
+      for opt in split(opt[len(cmd):], '\t', 1)
+        let key = matchstr(opt, '^\h\w*\ze:')
+        if key == ''
+          let option['kind'] = opt
         else
-          let l:option[l:key] = matchstr(l:opt, '^\h\w*:\zs.*')
+          let option[key] = matchstr(opt, '^\h\w*:\zs.*')
         endif
       endfor
 
-      if has_key(l:option, 'file') || (has_key(l:option, 'access') && l:option.access != 'public')
-        let l:line_num += 1
+      if has_key(option, 'file') || (has_key(option, 'access') && option.access != 'public')
+        let line_num += 1
         continue
       endif
 
-      let l:abbr = has_key(l:option, 'signature')? l:tag[0] . l:option.signature : (l:option['kind'] == 'd' || l:option['cmd'] == '')?  l:tag[0] : l:option['cmd']
-      let l:keyword = {
-            \ 'word' : l:tag[0], 'abbr' : l:abbr, 'kind' : l:option['kind'], 'dup' : 1,
-            \}
-      if has_key(l:option, 'struct')
-        let keyword.menu = printf(l:menu_pattern, fnamemodify(l:tag[1], ':t'), l:option.struct)
-        let keyword.class = l:option.struct
-      elseif has_key(l:option, 'class')
-        let keyword.menu = printf(l:menu_pattern, fnamemodify(l:tag[1], ':t'), l:option.class)
-        let keyword.class = l:option.class
-      elseif has_key(l:option, 'enum')
-        let keyword.menu = printf(l:menu_pattern, fnamemodify(l:tag[1], ':t'), l:option.enum)
-        let keyword.class = l:option.enum
-      elseif has_key(l:option, 'union')
-        let keyword.menu = printf(l:menu_pattern, fnamemodify(l:tag[1], ':t'), l:option.union)
-        let keyword.class = l:option.union
+      let abbr = has_key(option, 'signature')? tag[0] . option.signature :
+            \ (option['kind'] == 'd' || option['cmd'] == '') ?
+            \ tag[0] : option['cmd']
+      let abbr = substitute(abbr, '\s\+', ' ', 'g')
+      " Substitute "namespace foobar" to "foobar <namespace>".
+      let abbr = substitute(abbr,
+            \'^\(namespace\|class\|struct\|enum\|union\)\s\+\(.*\)$', '\2 <\1>', '')
+      " Substitute typedef.
+      let abbr = substitute(abbr, '^typedef\s\+\(.*\)\s\+\(\h\w*\%(::\w*\)*\);\?$', '\2 <typedef \1>', 'g')
+
+      let keyword = {
+            \ 'word' : tag[0], 'abbr' : abbr, 'kind' : option['kind'], 'dup' : 1,
+            \ }
+      if has_key(option, 'struct')
+        let keyword.menu = printf(menu_pattern, option.struct)
+      elseif has_key(option, 'class')
+        let keyword.menu = printf(menu_pattern, option.class)
+      elseif has_key(option, 'enum')
+        let keyword.menu = printf(menu_pattern, option.enum)
+      elseif has_key(option, 'union')
+        let keyword.menu = printf(menu_pattern, option.union)
       else
-        let keyword.menu = printf(l:menu_pattern, fnamemodify(l:tag[1], ':t'), '')
-        let keyword.class = ''
+        let keyword.menu = menu
       endif
 
-      call add(l:keyword_lists, l:keyword)
-      let l:dup_check[l:tag[0]] = 1
+      call add(keyword_lists, keyword)
+      let dup_check[tag[0]] = 1
     endif
 
-    let l:line_num += 1
+    let line_num += 1
   endfor"}}}
 
-  if a:filetype != '' && has_key(g:neocomplcache_tags_filter_patterns, a:filetype)
-    call filter(l:keyword_lists, g:neocomplcache_tags_filter_patterns[a:filetype])
+  if filter_pattern != ''
+    call filter(keyword_lists, filter_pattern)
   endif
 
-  return l:keyword_lists
+  return keyword_lists
 endfunction"}}}
 
 function! s:truncate(str, width)"{{{
@@ -264,18 +307,20 @@ else
   endfunction"}}}
 endif
 
-function! neocomplcache#async_cache#main(argv)"{{{
-  call s:main(a:argv)
-endfunction"}}}
-
-if argc() == 7
+if argc() == 8 &&
+      \ (argv(0) ==# 'load_from_file' || argv(0) ==# 'load_from_tags')
   try
     call s:main(argv())
   catch
-    call writefile([v:exception], expand('~/async_error_log'))
+    call writefile([v:throwpoint, v:exception],
+          \     expand('~/async_error_log'))
   endtry
 
   qall!
+else
+  function! neocomplcache#async_cache#main(argv)"{{{
+    call s:main(a:argv)
+  endfunction"}}}
 endif
 
 " vim: foldmethod=marker

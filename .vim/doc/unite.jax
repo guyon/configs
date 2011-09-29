@@ -1,6 +1,6 @@
 *unite.txt*	すべてのsourceを統合する
 
-Version: 2.0
+Version: 3.0
 Author : Shougo <Shougo.Matsu@gmail.com>
 Japanese Documentation Author: naoina
 License: MIT license  {{{
@@ -38,13 +38,11 @@ License: MIT license  {{{
   kind			  |unite-kinds|
   アクション		  |unite-actions|
   filter		  |unite-filters|
-設定例			|unite-examples|
 sourceの作成		|unite-create-source|
 kindの作成		|unite-create-kind|
 filterの作成		|unite-create-filter|
+設定例			|unite-examples|
 ユーザーのsource	|unite-user-sources|
-ToDo			|unite-todo|
-既知のバグ			|unite-bugs|
 更新履歴		|unite-changelog|
 
 ==============================================================================
@@ -140,16 +138,22 @@ http://www.ustream.tv/recorded/11240673
 		絞込みテキストは空。{sources} はスペースで区切って複数指定でき
 		る。また、{sources} の指定順序がsourceの候補の表示順序となる。
 		sourceについては|unite-source|を参照。
+		このコマンドは前回の位置を保存する。
 
 		現在uniteバッファに居る場合、絞り込みテキストは保存される。
 
 		source名の後ろに:で区切った文字列のリストを引数として渡すことが
-		できる。引数に含まれる:と\は\でエスケープしなければならない。引
-		数がどう解釈されるかは、sourceによって異なる。
+		できる。引数に含まれる:と\は\でエスケープしなければならな
+		い。::は引数の省略を表す。引数がどう解釈されるかは、sourceに
+		よって異なる。
 
 		例：
-		"file:hoge:piyo": source fileに与える引数は[hoge, piyo]である。
-		"file:hoge\:piyo": source fileに与える引数は[hoge:piyo]である。
+		"file:hoge:piyo": source fileに与える引数は
+		                  ["hoge", "piyo"]である。
+		"file:hoge\:piyo": source fileに与える引数は
+		                  ["hoge:piyo"]である。
+		"file:hoge::piyo": source fileに与える引数は
+		                  ["hoge", "", "piyo"]である。
 
 						*unite-options*
 		{options}とはuniteバッファに与えるオプションである。
@@ -169,7 +173,7 @@ http://www.ustream.tv/recorded/11240673
 
 						*unite-options-prompt*
 		-prompt={prompt-text}
-		プロンプトを指定する。指定しないと、'>'が使われる。
+		プロンプトを指定する。指定しないと、'> 'が使われる。
 
 						*unite-options-default-action*
 		-default-action={default-action}
@@ -206,7 +210,8 @@ http://www.ustream.tv/recorded/11240673
 						*unite-options-immediately*
 		-immediately
 		候補が一つしかないとき、即座にアクションを実行する。候補がな
-		いときにはuniteバッファを開かない。
+		いときにはuniteバッファを開かない。絞り込み時のときも、候補
+		が一つになったら即座に実行される。
 
 						*unite-options-auto-preview*
 		-auto-preview
@@ -225,6 +230,10 @@ http://www.ustream.tv/recorded/11240673
 		-vertical
 		uniteバッファを垂直分割する。
 
+						*unite-options-auto-resize*
+		-auto-resize
+		候補数に応じて、uniteバッファを自動的にリサイズする。
+
 						*unite-options-horizontal*
 		-horizontal
 		uniteバッファを水平分割する。
@@ -238,9 +247,17 @@ http://www.ustream.tv/recorded/11240673
 		uniteバッファの分割方法を指定する。デフォルト値は
 		|g:unite_split_rule|と同じである。
 
+						*unite-options-no-split*
+		-no-split
+		uniteバッファを分割しない。ウインドウサイズも変更しない。
+
 						*unite-options-verbose*
 		-verbose
 		冗長な警告メッセージを出すようにする。
+
+						*unite-options-toggle*
+		-toggle
+		同一バッファ名のuniteウインドウが表示されている場合は、閉じる。
 
 :UniteWithCurrentDir [{options}] {sources}	*:UniteWithCurrentDir*
 		初期の絞込みテキストが現在のディレクトリである他は|:Unite|と同
@@ -263,10 +280,11 @@ http://www.ustream.tv/recorded/11240673
 		|:UniteWithInput|と同じであるが、入力する文字列はデイレクトリと
 		みなされ、自動的に変換される。
 
-:UniteResume [{buffer-name}]			*:UniteResume*
+:UniteResume [{options}] [{buffer-name}]		*:UniteResume*
 		以前開いた{buffer-name}という名前のuniteバッファを再利用する。
 		{buffer-name}を省略すると、以前使用したバッファを再利用する。
 		絞込みテキストや候補はそのままの状態となる。
+		{options}を与えると、context情報を上書きする。
 
 sourceのコマンド				*unite-sources-commands*
 
@@ -281,7 +299,7 @@ g:unite_update_time				*g:unite_update_time*
 		絞込みテキストを入力するごとに表示される候補の更新間隔を制御す
 		る。単位はミリ秒。
 		
-		初期値は200である。
+		初期値は500である。
 
 g:unite_enable_start_insert			*g:unite_enable_start_insert*
 		uniteを実行したあとすぐに、絞込みテキストの入力モードにするかを
@@ -312,13 +330,13 @@ g:unite_winwidth				*g:unite_winwidth*
 		
 		初期値は90である。
 
-g:unite_cd_command				*g:unite_cd_command*
+g:unite_kind_openable_cd_command		*g:unite_kind_openable_cd_command*
 		cdアクションで実行されるVimのコマンドを指定する。
 		|`=|を解釈するコマンドでなければならない。
 		
 		初期値は"cd"である。
 
-g:unite_lcd_command				*g:unite_lcd_command*
+g:unite_kind_openable_lcd_command		*g:unite_kind_openable_lcd_command*
 		lcdアクションで実行されるVimのコマンドを指定する。
 		|`=|を解釈するコマンドでなければならない。
 		
@@ -332,7 +350,7 @@ g:unite_cursor_line_highlight			*g:unite_cursor_line_highlight*
 g:unite_abbr_highlight				*g:unite_abbr_highlight*
 		候補の短縮文字列のハイライトを指定する。
 		
-		初期値は"Pmenu"である。
+		初期値は"Normal"である。
 
 g:unite_quick_match_table			*g:unite_quick_match_table*
 		入力文字と対応する、クイックマッチリストの補完候補のテーブルで
@@ -358,10 +376,10 @@ g:unite_no_default_keymappings			*g:unite_no_default_keymappings*
 sourceの変数					*unite-sources-variables*
 
 g:unite_source_file_ignore_pattern		*g:unite_source_file_ignore_pattern*
-		|unite-source-file|, |unite-source-file_rec|の候補に表示しな
-		いファイルの正規表現パターンを指定する。マッチングはファイル
-		のフルパスに対して行われる。この変数が空文字列以外であれば、
-		指定した正規表現で結果をフィルタリングする。
+		|unite-source-file|の候補に表示しないファイルの正規表現パター
+		ンを指定する。マッチングはファイルのフルパスに対して行われる。
+		この変数が空文字列以外であれば、指定した正規表現で結果をフィル
+		タリングする。
 
 		初期値は autoload/unite/sources/file.vim を参照。
 
@@ -382,7 +400,7 @@ g:unite_source_file_mru_filename_format		*g:unite_source_file_mru_filename_forma
 g:unite_source_file_mru_file			*g:unite_source_file_mru_file*
 		最近使用したファイルの情報を書き出すファイルを指定する。
 		
-		初期値は |g:unite_data_directory| . '/.file_mru' である。
+		初期値は |g:unite_data_directory| . '/file_mru' である。
 
 g:unite_source_file_mru_limit			*g:unite_source_file_mru_limit*
 		最近使用したファイルの最大保存件数を指定する。
@@ -405,11 +423,11 @@ g:unite_source_directory_mru_ignore_pattern	*g:unite_source_directory_mru_ignore
 		これらは対象が|unite-source-directory_mru|であること以外は
 		|unite-source-file_mru|の各変数と同じ仕様である。
 
-g:unite_source_bookmark_file			*g:unite_source_bookmark_file*
-		|unite-source-bookmark|がブックマークを書き出すファイルを指
+g:unite_source_bookmark_directory		*g:unite_source_bookmark_directory*
+		|unite-source-bookmark|がブックマークを書き出すディレクトリ名を指
 		定する。
 		
-		初期値は |g:unite_data_directory| . '/.bookmark' である。
+		初期値は |g:unite_data_directory| . '/bookmark' である。
 
 g:unite_source_file_rec_ignore_pattern		*g:unite_source_file_rec_ignore_pattern*
 		|unite-source-file_rec|の候補に表示しないファイルの正規表現
@@ -419,6 +437,13 @@ g:unite_source_file_rec_ignore_pattern		*g:unite_source_file_rec_ignore_pattern*
 		れる。
 		
 		初期値は autoload/unite/sources/file_rec.vim を参照。
+
+g:unite_source_file_rec_min_cache_files		*g:unite_source_file_rec_min_cache_files*
+		|unite-source-file_rec|が内部でキャッシュする最小のファイル
+		数を指定する。ディレクトリ中のファイル数が、ここで指定したファ
+		イル数よりも小さい場合はキャッシュされない。
+
+		初期値は50である。
 
 g:unite_source_grep_command			*g:unite_source_grep_command*
 		"grep"コマンドを指定する。
@@ -442,16 +467,71 @@ g:unite_source_grep_max_candidates		*g:unite_source_grep_max_candidates*
 
 		初期値は100である。
 
-g:unite_source_lines_enable_highlight		*g:unite_source_lines_enable_highlight*
+g:unite_source_find_command			*g:unite_source_find_command*
+		"find"コマンドを指定する。
+
+		初期値は"find"である。
+
+g:unite_source_find_max_candidates		*g:unite_source_find_max_candidates*
+		|unite-source-find|の候補の最大数を指定する。
+
+		初期値は100である。
+
+g:unite_source_line_enable_highlight		*g:unite_source_line_enable_highlight*
 		検索キーワードをハイライトするか制御する。
 
 		Default value is 1.
 
-g:unite_source_lines_search_word_highlight	*g:unite_source_lines_search_word_highlight*
-		|g:unite_source_lines_enable_highlight|が真のとき、検索文字
+g:unite_source_line_search_word_highlight	*g:unite_source_line_search_word_highlight*
+		|g:unite_source_line_enable_highlight|が真のとき、検索文字
 		列のハイライトを設定する。
 
 		初期値は"Search"である。
+
+g:unite_source_alias_aliases			*g:unite_source_alias_aliases*
+		|unite-source-alias|が定義するsourceのaliasを設定する。
+		この変数は辞書であり、キーとしてaliasとして定義するsourceの名前、
+		値として次の属性を持つ辞書を取る。
+		alias sourceは元々のsourceのコピーであるため、alias sourceの
+		中身を変更しても、元々のsourceに影響を与えることはない。
+		引数を静的に指定したsourceの別名を定義したり、元のsourceから
+		filterのみを変更したsourceを定義することができる。
+
+		source			(文字列)	(必須)
+		alias sourceの定義となるsource名を指定する。
+		ここで指定するsourceは、alias sourceが呼び出されるときには、
+		定義されていなければならない。
+
+		args			(文字列)	(任意)
+		alias sourceに自動的に与えられる引数。
+
+		description		(文字列)	(任意)
+		alias sourceの説明用文字列。
+
+		例えば、次の設定では"file_rec" sourceの定義を利用し、"test"というsourceが定義される。
+		このsourceの引数には自動的に"~/"がセットされる。
+>
+		let g:unite_source_alias_aliases = {
+		      \   'test' : {
+		      \     'source': 'file_rec',
+		      \     'args': '~/',
+		      \   },
+		      \ }
+<
+		初期値は{}である。
+
+g:unite_source_history_yank_enable		*g:unite_source_history_yank_enable*
+		|unite-source-history/yank|を有効化するかどうか決定する
+		。この変数が定義され、値が0以外なら有効化される。値は
+		.vimrc内でセットしなければならない。
+
+		この変数はデフォルトで定義されない。
+
+g:unite_source_history_yank_limit		*g:unite_source_history_yank_limit*
+		|unite-source-history/yank|が履歴を保存する最大数を指定
+		する。
+		
+		初期値は100である。
 
 kindの変数					*unite-kinds-variables*
 
@@ -483,7 +563,7 @@ g:unite_kind_openable_persist_open_blink_time	*g:unite_kind_openable_persist_ope
 		uniteを終了する。
 
 <Plug>(unite_restart)				*<Plug>(unite_restart)*
-		unitを再起動する。
+		uniteを再起動する。
 
 <Plug>(unite_do_default_action)			*<Plug>(unite_do_default_action)*
 		選択している候補に対してデフォルトのアクションを実行する。アク
@@ -547,6 +627,14 @@ g:unite_kind_openable_persist_open_blink_time	*g:unite_kind_openable_persist_ope
 <Plug>(unite_loop_cursor_up)			*<Plug>(unite_loop_cursor_up)*
 		前の行に移動。ただしバッファの一番上にいる場合はループする。
 
+<Plug>(unite_skip_cursor_down)			*<Plug>(unite_skip_cursor_down)*
+		次の行に移動するが、入力にマッチしていない候補はスキップする。
+		バッファの最後にいる場合はループする。
+
+<Plug>(unite_skip_cursor_up)			*<Plug>(unite_skip_cursor_up)*
+		前の行に移動するが、入力にマッチしていない候補はスキップする。
+		バッファの一番上にいる場合はループする。
+
 <Plug>(unite_quick_match_default_action)	*<Plug>(unite_quick_match_default_action)*
 		クイックマッチを行い、選択した候補のデフォルトアクションを実行
 		する。マークしている候補がある場合は無効となる。
@@ -558,13 +646,28 @@ g:unite_kind_openable_persist_open_blink_time	*g:unite_kind_openable_persist_ope
 		一つ上のパスまで削除する。
 		|i_<Plug>(unite_delete_backward_path)|を参照せよ。
 
+<Plug>(unite_toggle_transpose_window)		*<Plug>(unite_toggle_transpose_window)*
+		uniteバッファの分割方向を変更する。
+
+<Plug>(unite_narrowing_path)			*<Plug>(unite_narrowing_path)*
+		候補のパスもしくはwordにより絞り込みを行う。
+
+<Plug>(unite_narrowing_input_history)		*<Plug>(unite_narrowing_input_history)*
+		バッファの入力履歴により絞り込みを行う。
+
+<Plug>(unite_toggle_auto_preview)		*<Plug>(unite_toggle_auto_preview)*
+		uniteバッファのauto previewモードをトグルする。
+
+<Plug>(unite_toggle_max_candidates)		*<Plug>(unite_toggle_max_candidates)*
+		uniteバッファのmax_candidatesの有効化・無効化をトグルする。
+
 インサートモードマッピング
 
 <Plug>(unite_exit)				*i_<Plug>(unite_exit)*
 		uniteを終了する。
 
 <Plug>(unite_insert_leave)			*i_<Plug>(unite_insert_leave)*
-		ノーマルモードに移行する。
+		ノーマルモードに移行する。最初の候補にカーソルを動かす。
 
 <Plug>(unite_delete_backward_char)		*i_<Plug>(unite_delete_backward_char)*
 		カーソル直前の1文字を消す。文字が入力されていない場合はuniteを
@@ -591,6 +694,14 @@ g:unite_kind_openable_persist_open_blink_time	*g:unite_kind_openable_persist_ope
 <Plug>(unite_select_previous_line)		*i_<Plug>(unite_select_previous_line)*
 		前の候補に移動。ただし候補の先頭にいる場合はループする。
 
+<Plug>(unite_skip_next_line)			*i_<Plug>(unite_skip_next_line)*
+		次の候補に移動するが、入力にマッチしていない候補はスキップす
+		る。候補の最後にいる場合はループする。
+
+<Plug>(unite_skip_previous_line)		*i_<Plug>(unite_skip_previous_line)*
+		前の候補に移動するが、入力にマッチしていない候補はスキップす
+		る。候補の先頭にいる場合はループする。
+
 <Plug>(unite_select_next_page)			*i_<Plug>(unite_select_next_page)*
 		次の候補ページを表示。
 
@@ -615,6 +726,21 @@ g:unite_kind_openable_persist_open_blink_time	*g:unite_kind_openable_persist_ope
 <Plug>(unite_input_directory)			*i_<Plug>(unite_input_directory)*
 		|<Plug>(unite_input_directory)|と同じ。
 
+<Plug>(unite_toggle_transpose_window)		*i_<Plug>(unite_toggle_transpose_window)*
+		|<Plug>(unite_toggle_transpose_window)|と同じ。
+
+<Plug>(unite_narrowing_path)			*i_<Plug>(unite_narrowing_path)*
+		|<Plug>(unite_narrowing_path)|と同じ。
+
+<Plug>(unite_narrowing_input_history)		*i_<Plug>(unite_narrowing_input_history)*
+		|<Plug>(unite_narrowing_input_history)|と同じ。
+
+<Plug>(unite_toggle_auto_preview)		*i_<Plug>(unite_toggle_auto_preview)*
+		|<Plug>(unite_toggle_auto_preview)|と同じ。
+
+<Plug>(unite_toggle_max_candidates)		*i_<Plug>(unite_toggle_max_candidates)*
+		|<Plug>(unite_toggle_max_candidates)|と同じ。
+
 ビジュアルモードマッピング
 
 <Plug>(unite_toggle_mark_selected_candidates)	*v_<Plug>(unite_toggle_selected_candidates)*
@@ -635,6 +761,7 @@ q		|<Plug>(unite_exit)|
 <C-r>		|<Plug>(unite_restart)|
 <Space>		|<Plug>(unite_toggle_mark_current_candidate)|
 *		|<Plug>(unite_toggle_mark_all_candidates)|
+M		|<Plug>(unite_toggle_max_candidates)|
 <Tab>		|<Plug>(unite_choose_action)|
 <C-n>		|<Plug>(unite_rotate_next_source)|
 <C-p>		|<Plug>(unite_rotate_previous_source)|
@@ -646,6 +773,8 @@ j		|<Plug>(unite_loop_cursor_down)|
 <Down>		|<Plug>(unite_loop_cursor_down)|
 k		|<Plug>(unite_loop_cursor_up)|
 <Up>		|<Plug>(unite_loop_cursor_up)|
+J		|<Plug>(unite_skip_cursor_down)|
+K		|<Plug>(unite_skip_cursor_up)|
 <CR>		候補を選択している場合は default アクションの実行
 d		候補を選択している場合は delete アクションの実行
 b		候補を選択している場合は bookmark アクションの実行
@@ -656,7 +785,6 @@ x		候補を選択している場合は|<Plug>(unite_quick_match_default_action)
 インサートモードマッピング
 {lhs}		{rhs}
 --------	-----------------------------
-<ESC>		|i_<Plug>(unite_insert_leave)|
 <Tab>		|i_<Plug>(unite_choose_action)|
 <C-n>		|i_<Plug>(unite_select_next_line)|
 <Down>		|i_<Plug>(unite_select_next_line)|
@@ -695,10 +823,11 @@ unite#get_kinds([{kind-name}])			*unite#get_kinds()*
 			この戻り値を変更してはいけない。
 
 unite#get_sources([{source-name}])		*unite#get_sources()*
-			{source-name}に指定されたsourceを取得する。sourceが存
-			在しない場合は空のディクショナリを返す。{source-name}
-			を省略した場合、キーがsource名、値がそれぞれのsourceと
-			したディクショナリを返す。
+			現在のuniteバッファにおける{source-name}に指定された
+			sourceを取得する。sourceが存在しない場合は空のディク
+			ショナリを返す。{source-name}を省略した場合、キーが
+			source名、値がそれぞれのsourceとしたディクショナリを
+			返す。
 
 			この戻り値を変更してはいけない。
 
@@ -709,13 +838,28 @@ unite#start({sources}, [, {context}])				*unite#start()*
 		り込みテキストは保存される。
 
 		{sources}はリストであり、それぞれ
-		の要素は{source-name}または、[{source-name}, [{args},...]]とい
+		の要素は{source-name}または、[{source-name}, {args},...]とい
 		う形式である。{args}には{source-name}に渡す引数を文字列形式で
 		複数指定できる。
+		{source-name}にはsourceの定義となる辞書を渡すことができる。
+		その場合、そのsourceはそのuniteバッファのみで有効である。
 
 		{context}については、 |unite-notation-{context}|
 		を参照せよ。値を省略すると、デフォルト値が使用される。
 
+unite#start_complete({sources}, [{context}])			*unite#start_complete()*
+		|unite#start()|と似ているが、uniteバッファを補完用に初期化する
+		キーシーケンスを返す。{context}は上書きするcontext情報である。
+		自動的にセットされるcontext情報については、実装を参照せよ。
+
+		inoremap <buffer><expr>で通常用いる。
+		例:
+>
+		inoremap <buffer><expr> <C-l> unite#start_complete(
+		\ ['vimshell/history'], {
+		\ 'start_insert' : 0,
+		\ 'input' : vimshell#get_cur_text()})
+<
 unite#get_context()						*unite#get_context()*
 		現在のuniteバッファのコンテキスト情報を得る。
 		|unite#custom_action()|などで、|unite#start()|を内部で呼び出す
@@ -751,6 +895,17 @@ unite#smart_map({narrow-map}, {select-map})			*unite#smart_map()*
 >
 		inoremap <buffer><expr> ' unite#smart_map("'", unite#do_action('preview'))
 <
+unite#mappings#set_current_filters({filters})			*unite#mappings#set_current_filters()*
+		|unite#set_buffer_name_option()|で設定された、現在のuniteバッフ
+		ァのfilterを動的に変更する。以下のように、キーマッピングとして
+		呼び出すことも可能である。
+>
+  nnoremap <buffer><expr> S      unite#mappings#set_current_filters(
+        \ empty(unite#mappings#get_current_filters()) ? ['sorter_reverse'] : [])
+<
+unite#mappings#get_current_filters()				*unite#mappings#get_current_filters()*
+		現在のuniteバッファのfilterを取得する。
+
 unite#set_substitute_pattern({buffer-name}, {pattern}, {subst} [, {priority}])
 						*unite#set_substitute_pattern()*
 		uniteのバッファ名{buffer-name}における絞込みテキストの置換パタ
@@ -767,7 +922,7 @@ unite#set_substitute_pattern({buffer-name}, {pattern}, {subst} [, {priority}])
 		
 		この関数を使うと、曖昧マッチを模倣することができる。
 >
-		call unite#set_substitute_pattern('files', '[[:alnum:]]', '*\0', 100)
+		call unite#set_substitute_pattern('files', '[^*]\ze[[:alnum:]]', '\0*', 100)
 		call unite#set_substitute_pattern('files', '[[:alnum:]]', ' \0', 100)
 <
 		上の設定は/を越えずに曖昧検索をするが、下の場合は/を越えて曖昧
@@ -781,6 +936,7 @@ unite#set_substitute_pattern({buffer-name}, {pattern}, {subst} [, {priority}])
 		\ substitute(unite#util#substitute_path_separator($HOME), ' ', '\\\\ ', 'g'), -100)
 		call unite#set_substitute_pattern('files', '[^~.*]\ze/', '\0*', 100)
 		call unite#set_substitute_pattern('files', '/\ze[^~.*]', '/*', 100)
+		call unite#set_substitute_pattern('files', '\.', '*.', 1000)
 <
 unite#get_substitute_pattern({buffer-name})
 						*unite#get_substitute_pattern()*
@@ -803,15 +959,18 @@ unite#set_buffer_name_option({buffer-name}, {option-name}, {value})
 		filters				(リスト)
 		filter名のリストを指定する。ここで指定したfilterは、source毎
 		に呼び出される普通のfilterとは異なり、全候補を結合した後に呼
-		び出される。
+		び出される。filtersを動的に変更する場合は、
+		|unite#mappings#set_current_filters()|を使用する。
 		
 		ignorecase			(数値)
 		uniteバッファで一時的にセットされる'ignorecase'オプションの値を
 		決定する。省略すると、'ignorecase'の値と同じになる。
+		ただし、buffer_nameが"files"の場合は初期値が"1"になっている。
 		
 		smartcase			(数値)
 		大文字が入力されているときに、'ignorecase'オプションの値を無視
 		するかどうか決定する。省略すると、'smartcase'の値と同じになる。
+		ただし、buffer_nameが"files"の場合は初期値が"0"になっている。
 
 unite#custom_default_action({kind}, {default-action})
 						*unite#custom_default_action()*
@@ -833,8 +992,8 @@ unite#custom_action({kind}, {name}, {action})
 		function! my_tabopen.func(candidates)
 		  call unite#take_action('tabopen', a:candidates)
 		
-		  let l:dir = isdirectory(a:candidate.word) ? a:candidate.word : fnamemodify(a:candidate.word, ':p:h')
-		  execute g:unite_lcd_command '`=l:dir`'
+		  let dir = isdirectory(a:candidate.word) ? a:candidate.word : fnamemodify(a:candidate.word, ':p:h')
+		  execute g:unite_kind_openable_lcd_command '`=dir`'
 		endfunction
 		call unite#custom_action('file,buffer', 'tabopen', my_tabopen)
 		unlet my_tabopen
@@ -862,6 +1021,12 @@ unite#custom_filters({source-name}, {filters})	*unite#custom_filters()*
 		{filters}は"matcher", "sorter", "converter"の名前のリストで
 		指定することに注意しなければならない。特にmatcherの指定を忘
 		れると、絞り込みができなくなるであろう。
+
+unite#custom_max_candidates({source-name}, {max})
+						*unite#custom_max_candidates()*
+		{source-name}のmax_candidatesを{max}に変更する。
+		{source-name}は","区切りで複数指定ができる。
+		{max}に0を指定した場合、そのsourceの候補は全て表示される。
 
 unite#take_action({action-name}, {candidate})
 						*unite#take_action()*
@@ -953,6 +1118,16 @@ file_rec	入力された絞り込みテキストのディレクトリまたは�
 		source引数：
 		1. 絞り込み文字列
 
+						*unite-source-file_rec/async*
+file_rec/async	|unite-source-file_rec|と同じだが、候補の取得を完全に非同期
+		で行う。
+		
+		Note: このsourceはvimprocと外部lsコマンドを必要としている。
+		http://github.com/Shougo/vimproc/tree/master
+
+		source引数：
+		1. 絞り込み文字列
+
 						*unite-source-buffer*
 buffer		開いているバッファを候補とする。バッファは使用した順番に整列さ
 		れる。
@@ -1018,6 +1193,8 @@ grep		"grep"コマンドを実行した結果を候補とする。
 		2. "grep"に与えるオプション
 		3. 絞り込みパターン
 
+		候補の最大数：|g:unite_source_grep_max_candidates|
+
 		Example:
 >
 	:Unite grep:~/.vim/autoload/unite/sources:-iR:file
@@ -1027,14 +1204,71 @@ grep		"grep"コマンドを実行した結果を候補とする。
 		#         : 裏バッファ名
 		$buffers  : 全てのバッファ名
 
-						*unite-source-lines*
-lines		カレントバッファの行を候補とする。
+						*unite-source-find*
+find		"find"コマンドを実行した結果を候補とする。
+
+		Note: このsourceはvimprocを必要としている。
+		http://github.com/Shougo/vimproc/tree/master
+
+		source引数：
+		1. ターゲットとなるディレクトリ名
+		2. "find"に与えるオプション
+
+		候補の最大数：|g:unite_source_find_max_candidates|
+
+						*unite-source-line*
+line		カレントバッファの行を候補とする。
 		Note: このsourceはt9md氏によって作成された。
+
+		source引数：
+		1. 検索方向。 "all", "forward", "backward"のうちどれかを指定
+		する。省略すると"all"となる。
+
+		候補の最大数：100
 
 		Example:
 >
-	nnoremap <silent> /  :<C-u>Unite -buffer-name=search lines -start-insert -no-quit<CR>
+	nnoremap <silent> /  :<C-u>Unite -buffer-name=search line -start-insert -no-quit<CR>
 <
+						*unite-source-resume*
+resume		|:UniteResume|の引数となるuniteバッファを候補とする。uniteバッ
+		ファは使用した順番に並び換えられる。
+
+						*unite-source-jump*
+jump		|:jumps|の結果を候補とする。
+
+						*unite-source-change*
+change		|:changes|の結果を候補とする。
+
+						*unite-source-jump_point*
+jump_point	現在行の"file:line"形式をジャンプ先として、候補とする。
+		|vimshell|の出力に対して利用すると便利である。
+
+						*unite-source-file_point*
+file_point	現在行のカーソル位置にあるファイル名やURIを候補とする。
+		|vimshell|の出力に対して利用すると便利である。
+
+						*unite-source-launcher*
+launcher	$PATHにパスを通した実行ファイルを候補とする。
+
+		source引数：
+		1. カンマ区切りの実行ファイルへのパス
+
+						*unite-source-alias*
+alias		すでに存在するsourceの定義をコピーし、aliasのsourceを生成する。
+		このsource自体はダミーである。aliasというsourceは存在しない。
+		alias sourceの作り方については、|g:unite_source_alias_aliases|を
+		参照せよ。
+		Note: このsourceはtacroeによって作成された。
+
+						*unite-source-history/yank*
+history/yank	ヤンクされたテキストの履歴を候補とする。
+		このsourceを使用するためには、
+		|g:unite_source_history_yank_enable|を1にしなければなら
+		ない。
+		Note: このsourceは|g:unite_source_history_yank_enable|
+		が0か定義されていないときに無効化される。
+
 ==============================================================================
 kind						*unite-kinds*
 
@@ -1059,8 +1293,8 @@ cdable		cd可能インタフェース
 
 						*unite-kind-file*
 file		ファイル
-		このkindはcdable, openableを継承しているため、それらのkindが
-		使用する属性も必要である。
+		このkindはcdable, openable, uriを継承しているため、それらのkind
+		が使用する属性も必要である。
 
 			action__path		(文字列)		(必須)
 				対象となるファイルのパス
@@ -1100,8 +1334,14 @@ jump_list	ジャンプリスト
 			action__path		(文字列)		(必須)
 				ジャンプするファイルのパス
 
+			action__buffer_nr	(文字列)		(任意)
+				ジャンプするバッファのバッファ番号
+
 			action__line		(数値)			(任意)
 				ジャンプするファイルの行番号
+
+			action__col		(数値)			(任意)
+				ジャンプするファイルの桁番号
 
 			action__pattern		(文字列)		(任意)
 				ファイルを開いた後に検索するパターン
@@ -1156,14 +1396,38 @@ window		ウィンドウ
 						*unite-kind-completion*
 completion	補完
 
-			action__complete_word	(String)	(必須)
+			action__complete_word	(文字列)	(必須)
 				補完する文字列
 
-			action__complete_pos	(Number)	(必須)
+			action__complete_pos	(数値)	(必須)
 				補完する位置
 
-			action__complete_info	(String)	(任意)
+			action__complete_info	(数値)	(任意)
 				補完候補の追加情報
+
+						*unite-kind-source*
+source		unite.vimのsource
+
+			action__source_name	(文字列)	(必須)
+				実行するsourceの名前
+
+			action__source_name	(リスト)	(任意)
+				実行するsourceの引数
+
+						*unite-kind-uri*
+uri		ファイルやhttpといったプロトコル
+
+			action__path		(文字列)		(必須)
+				ファイルのパス
+
+						*unite-kind-guicmd*
+guicmd		GUI実行ファイル
+
+			action__path		(文字列)		(必須)
+				ファイルのパス
+
+			action__args		(リスト)		(任意)
+				実行ファイルに与える引数
 
 ==============================================================================
 filter						*unite-filter*
@@ -1173,9 +1437,11 @@ filter						*unite-filter*
 
 filterには大まかに分けて、"matcher", "sorter", "converter"の三種類が存在する。
 matcherは入力に合う候補を取り出し、sorterは候補の並べ換えを行い、converterは
-候補の見ためを変更する。
+候補の中身を変更する。converterが候補のabbrを変更するものなら、候補の表示が変わ
+ることになる。
 filterはデフォルトで、|unite-filter-default|にあるものが使用される。
 だが、|unite#custom_filters()|でsource毎に変更することも可能である。
+filterは指定したリストの順番で呼び出されるので注意せよ。
 
 						*unite-filter-default*
 default		特にfilterが指定されていないときに呼び出される、デフォルトの
@@ -1193,9 +1459,22 @@ matcher_default	|unite-filter-default|により呼び出される、デフォル
 
 						*unite-filter-matcher_glob*
 matcher_glob	ユーザーが入力したglobパターンにより候補をフィルタリングする
-		matcher。
+		matcher。"*"をワイルドカードとして認識する。"!"は否定となる。
 		絞り込みにはwordを使用する。
 
+						*unite-filter-matcher_regexp*
+matcher_regexp	ユーザーが入力したパターンを正規表現として、候補をフィルタリ
+		ングするmatcher。"!"は否定となる。絞り込みにはwordを使用する。
+
+						*unite-filter-matcher_fuzzy*
+matcher_fuzzy	ユーザーが入力したパターンを曖昧検索として、候補をフィルタリ
+		ングするmatcher。"!"は否定となる。絞り込みにはwordを使用する。
+		このmatcherを使用すると、絞り込みが遅くなるので注意すること。
+		|unite-source-file_rec|に対して設定すると便利かもしれない。
+>
+		call unite#custom_filters('file,buffer,file_rec',
+		\ ['matcher_fuzzy', 'sorter_default', 'converter_default'])
+<
 						*unite-filter-sorter_default*
 sorter_default	|unite-filter-default|により呼び出される、デフォルトのsorter。
 		初期状態では、["sorter_nothing"]のsorterを呼び出す。
@@ -1208,6 +1487,9 @@ sorter_nothing	何もsortをしないsorter。source側のsortがそのまま反
 						*unite-filter-sorter_word*
 sorter_word	wordを比較するsorter。
 
+						*unite-filter-sorter_reverse*
+sorter_reverse	順番を反転するsorter。
+
 						*unite-filter-converter_default*
 converter_default
 		|unite-filter-default|により呼び出される、デフォルトのconverter。
@@ -1218,6 +1500,24 @@ converter_default
 						*unite-filter-converter_nothing*
 converter_nothing
 		候補を何も変更しないconverter。
+
+						*unite-filter-converter_relative_word*
+converter_relative_word
+		候補のwordを相対パスに変換するconverter。wordはmatcherにおいて、
+		絞り込みに使用される。そのため、このconverterを使用する場合は、
+		matcherの前に指定しなければならない。
+		context情報に、source__directoryが含まれている場合は、そのパ
+		スを基準として相対パスに変換する。
+>
+		call unite#custom_filters('file_rec',
+		\ ['converter_relative_word', 'matcher_default',
+		\  'sorter_default', 'converter_relative_abbr'])
+<
+
+						*unite-filter-converter_relative_abbr*
+converter_relative_abbr
+		候補のabbrをwordの相対パスに変換するconverter。仕様は
+		|unite-filter-converter_relative_word|とほぼ同じである。
 
 ==============================================================================
 アクション					*unite-actions*
@@ -1325,6 +1625,9 @@ completion					*unite-action-completion*
 	insert		候補の挿入
 	preview		候補の情報を表示
 
+uri						*unite-action-uri*
+	start		ファイルを関連付けで開く
+
 source別アクション
 
 file_mru					*unite-action-file_mru*
@@ -1335,6 +1638,10 @@ directory_mru					*unite-action-directory_mru*
 
 bookmark					*unite-action-bookmark*
 	delete		ブックマークファイルの候補から削除
+
+register					*unite-action-register*
+	edit		レジスタの中身を変更する
+	delete		レジスタの中身を空にする
 
 						*unite-default-action*
 デフォルトアクション
@@ -1386,7 +1693,10 @@ gather_candidates	関数		(ほぼ必須)
 			リストを返す。
 			{args}は|:Unite|コマンドを実行された際にsourceに渡され
 			た引数リスト、{context}はsourceが呼ばれたときのコンテキ
-			スト情報である。
+			スト情報である。引数が省略されると、その引数には""が
+			渡される。よって、引数が空文字列であっても、うまく対
+			応しなければならない。引数は|get()|を用いてチェック
+			するようにするべきである。
 			{context}については|unite-notation-{context}|、
 			{candidate}については|unite-notation-{candidate}|を参照
 			せよ。
@@ -1464,20 +1774,45 @@ hooks			辞書		(任意)
 			をセットする際に使用する。
 			この関数は{args}と{context}を引数に取る。
 
+			on_pre_init		*unite-source-attribute-hooks-on_pre_init*
+			sourceが初期化される前に呼ばれる。{args}は空である。{context}には
+			現在のsourceが"a:context.source"にセットされている。
+			この関数内で"a:context.source"を変更することで、現在
+			のsourceを動的に初期化することができる。
+
 						*unite-source-attribute-action_table*
 action_table		辞書		(任意)
 			source独自のアクションテーブルを追加するときに使用する。
-			キーはアクションテーブルを追加するkindで、値は追加するアクションテーブルである。
-			キーに"*"を設定すると、どんなkindにもマッチするようになる。
-			アクションテーブルの詳細については、|unite-kind-attribute-action_table|
-			を参照せよ。もしこれが与えられない場合、空となる。
-
+			キーはアクションテーブルを追加するkindで、値は追加す
+			るアクションテーブルである。それぞれのアクションテーブ
+			ルの仕様は、|unite-kind-attribute-action_table|と同じで
+			ある。つまり、source側では候補のkind毎に
+			|unite-kind-attribute-action_table|を定義できる。
+			例えば、
+>
+			'action_table' : { 'buffer' : foo_action_table }
+<
+			の場合、このsourceのkind "buffer"では、foo_action_table
+			が使用される。
+			キーのkindに"*"を設定すると、どんなkindにもマッチするよ
+			うになる。候補のkindが一種類しかない場合に便利である。
+			もしこれが与えられない場合、空となる。
+			action_tableに、アクションテーブルをそのまま記述することも
+			できる。その場合、キーのkindは"*"だと解釈される。
+			つまり、次の二つは同じ意味である。
+>
+			'action_table' : foo_action_table
+			'action_table' : { '*' : foo_action_table }
+<
 						*unite-source-attribute-default_action*
 default_action		辞書		(任意)
 			source独自の標準的なアクションを追加するときに使用する。
 			キーはアクションテーブルを追加するkindで、値は標準ア
 			クションである。これを省略した場合はkindの
 			default_actionを使用する。
+			default_actionは文字列形式にすることもできる。
+			その場合、'default_action' : { '*' : action_name }と指
+			定したことと同じとなる。
 
 						*unite-source-attribute-alias_table*
 alias_table		辞書		(任意)
@@ -1514,6 +1849,11 @@ is_volatile		数値		(任意)
 			閉じられるまで有効である。もっと長い時間キャッシュした
 			い場合はsourceが自前でキャッシュするほかない。
 
+						*unite-source-attribute-is_listed*
+is_listed		数値		(任意)
+			source名がユーザーに見えるかどうか。内部的に使用する
+			sourceの場合は0にする。省略されると1になる。
+
 						*unite-source-attribute-description*
 description		文字列		(任意)
 			sourceを説明する文字列。省略すると""になる。
@@ -1529,6 +1869,12 @@ syntax			文字列		(任意)
 			ハイライトの設定自体は、
 			|unite-source-attribute-hooks-on_syntax|を使用しなけ
 			ればならない。
+
+						*unite-source-attribute-filters*
+filters			リスト		(任意)
+			そのsourceが使用するfilterのリスト。filterの仕様は、
+			|unite-filter-attributes|を参照せよ。これが省略されると
+			|unite-filter-default|が使用される。
 
 						*unite-source-attribute-source__*
 source__		不定		(任意)
@@ -1565,7 +1911,13 @@ NOTATION					*unite-notation*
 				|<Plug>(unite_redraw)|で呼び出されたかどうか。
 				ユーザーが明示的にキャッシュを破棄しているので、
 				自前でキャッシュを管理するsourceにとっては重
-				要な情報となる。
+				要な情報となる。アクションの実行により、キャッ
+				シュが無効化された場合も1になる。
+
+			is_invalidate		(数値)
+				アクションの実行により、キャッシュが無効化さ
+				れたかどうか。uniteバッファの初期化のときに
+				も1になる。
 
 			is_async		(数値)
 				sourceが非同期に候補を収集するかどうか。
@@ -1581,9 +1933,6 @@ NOTATION					*unite-notation*
 				|unite-source-attribute-hooks-on_post_filter|内
 				でのみ有効。
 
-			winnr			(数値)
-				uniteを呼び出したウィンドウの番号。
-
 			source__{name}		(不定)		(任意)
 				source独自の付加情報。source側で自由に使用でき
 				る。複数回同じsourceを呼び出せるようにするため
@@ -1593,7 +1942,7 @@ NOTATION					*unite-notation*
 {candidate}					*unite-notation-{candidate}*
 			候補を表す辞書変数。次の情報を持つ。
 
-			word			(文字列)
+			word			(文字列)	(必須)
 				画面に表示される候補を表す文字列。候補の絞り込
 				みに使われる。
 
@@ -1605,13 +1954,29 @@ NOTATION					*unite-notation*
 				候補が所属するsource名。省略された場合、自動
 				的にセットされる。
 
-			kind			(文字列)	(任意)
+			kind			(文字列/リスト)	(任意)
 				候補が所属するkind名。省略すると"common"となる。
+				ここにはkind名のリストを指定することもできる。
+				リストを指定すると、kindを継承した新しいkindを
+				わざわざ定義しなくても良い利点がある。リストの
+				場合、アクションの検索については、リストの順番
+				で辿っていき、後から見つかったものによって上書
+				きされる。例えば、["file", "command"]とすると、
+				"file"のアクションは"command"のアクションで上書
+				きされる。この場合、kindのデフォルトアクション
+				の検索は、"command" kindからしか行われないこと
+				に注意。kindではなく、sourceのデフォルトアクシ
+				ョンを利用したほうが無難である。
 
 			is_dummy		(数値)		(任意)
 				ダミー候補であるかどうか。省略すると0となる。
 				ダミー候補の場合、アクションや移動時に無視さ
 				れる。
+
+			is_matched		(数値)		(任意)
+				候補が入力にマッチしたかどうか。省略すると1となる。
+				matcherによっては一部の候補を0にセットする。
+				これが0の場合、一部の移動時にスキップされる。
 
 			source__{name}		(不定)		(任意)
 				source独自の付加情報。source側で自由に使用でき
@@ -1692,6 +2057,11 @@ action_table		辞書		(必須)
 				するかどうか。省略すると0になり、キャッシュは無
 				効化されない。
 
+			is_listed		(数値)		(任意)
+				該当するアクションがアクション一覧に表示され
+				るかどうか。内部的に使用するアクションの場合
+				はこれを0にする。省略すると1になる。
+
 						*unite-kind-attribute-alias_table*
 alias_table		辞書		(任意)
 			エイリアステーブルを指定する。
@@ -1733,10 +2103,10 @@ actionの解決順序				*unite-action-resolution-order*
 (4) Default action table for kind "source/file/*".
 (5) Custom action table for kind "file".
 (6) Default action table for kind "file".
-(7) Custom action table for kind "openable".
-(8) Default action table for kind "openable".
-(9) Custom action table for kind "cdable".
-(10) Default action table for kind "cdable".
+(7) Custom action table for kind "cdable".
+(8) Default action table for kind "cdable".
+(9) Custom action table for kind "openable".
+(10) Default action table for kind "openable".
 (11) Custom action table for kind "common".
 (12) Default action table for kind "common".
 
@@ -1815,12 +2185,6 @@ description		文字列		(任意)
 
 作者以外の手により作成されたsourceについては、Wikiのページを参照せよ。
 https://github.com/Shougo/unite.vim/wiki/unite-plugins
-
-==============================================================================
-TODO						*unite-todo*
-
-==============================================================================
-既知のバグ					*unite-bugs*
 
 ==============================================================================
 更新履歴					*unite-changelog*

@@ -72,6 +72,75 @@ endfunction
 function! unite#util#uniq(...)
   return call(s:V.Data.List.uniq, a:000)
 endfunction
+function! unite#util#input_yesno(message)"{{{
+  let yesno = input(a:message . ' [yes/no] : ')
+  while yesno !~? '^\%(y\%[es]\|n\%[o]\)$'
+    redraw
+    if yesno == ''
+      echo 'Canceled.'
+      break
+    endif
+
+    " Retry.
+    call unite#print_error('Invalid input.')
+    let yesno = input(a:message . ' [yes/no] : ')
+  endwhile
+
+  return yesno =~? 'y\%[es]'
+endfunction"}}}
+function! unite#util#input_directory(message)"{{{
+  echo a:message
+  let dir = unite#util#substitute_path_separator(expand(input('', '', 'dir')))
+  while !isdirectory(dir)
+    redraw
+    if dir == ''
+      echo 'Canceled.'
+      break
+    endif
+
+    " Retry.
+    call unite#print_error('Invalid path.')
+    echo a:message
+    let dir = unite#util#substitute_path_separator(expand(input('', '', 'dir')))
+  endwhile
+
+  return dir
+endfunction"}}}
+
+function! unite#util#alternate_buffer()"{{{
+  if bufnr('%') != bufnr('#') && buflisted(bufnr('#'))
+    buffer #
+    return
+  endif
+
+  let listed_buffer_len = len(filter(range(1, bufnr('$')),
+        \ 'buflisted(v:val) && getbufvar(v:val, "&filetype") !=# "unite"'))
+  if listed_buffer_len <= 1
+    enew
+    return
+  endif
+
+  let cnt = 0
+  let pos = 1
+  let current = 0
+  while pos <= bufnr('$')
+    if buflisted(pos)
+      if pos == bufnr('%')
+        let current = cnt
+      endif
+
+      let cnt += 1
+    endif
+
+    let pos += 1
+  endwhile
+
+  if current > cnt / 2
+    bprevious
+  else
+    bnext
+  endif
+endfunction"}}}
 
 let &cpo = s:save_cpo
 unlet s:save_cpo

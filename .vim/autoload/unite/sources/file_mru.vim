@@ -1,7 +1,7 @@
 "=============================================================================
 " FILE: file_mru.vim
 " AUTHOR:  Shougo Matsushita <Shougo.Matsu@gmail.com>
-" Last Modified: 19 Jun 2011.
+" Last Modified: 23 Sep 2011.
 " License: MIT license  {{{
 "     Permission is hereby granted, free of charge, to any person obtaining
 "     a copy of this software and associated documentation files (the
@@ -38,30 +38,37 @@ let s:mru_file_mtime = 0  " the last modified time of the mru file.
 
 call unite#util#set_default('g:unite_source_file_mru_time_format', '(%c) ')
 call unite#util#set_default('g:unite_source_file_mru_filename_format', ':~:.')
-call unite#util#set_default('g:unite_source_file_mru_file',  g:unite_data_directory . '/.file_mru')
+call unite#util#set_default('g:unite_source_file_mru_file',  g:unite_data_directory . '/file_mru')
 call unite#util#set_default('g:unite_source_file_mru_limit', 100)
 call unite#util#set_default('g:unite_source_file_mru_ignore_pattern',
-      \'\~$\|\.\%(o|exe|dll|bak|sw[po]\)$\|\%(^\|/\)\.\%(hg\|git\|bzr\|svn\)\%($\|/\)\|^\%(\\\\\|/mnt/\|/media/\|/Volumes/\)')
+      \'\~$\|\.\%(o\|exe\|dll\|bak\|sw[po]\)$\|\%(^\|/\)\.\%(hg\|git\|bzr\|svn\)\%($\|/\)\|^\%(\\\\\|/mnt/\|/media/\|/Volumes/\)')
 "}}}
 
 function! unite#sources#file_mru#define()"{{{
   return s:source
 endfunction"}}}
 function! unite#sources#file_mru#_append()"{{{
-  let l:path = unite#util#substitute_path_separator(simplify(expand('%:p')))
+  let path = unite#util#substitute_path_separator(
+        \ simplify(resolve(expand('%:p'))))
 
   " Append the current buffer to the mru list.
-  if !s:is_exists_path(path) || &l:buftype =~ 'help'
+  if !s:is_exists_path(path) || &buftype =~ 'help'
   \   || (g:unite_source_file_mru_ignore_pattern != ''
-  \      && l:path =~# g:unite_source_file_mru_ignore_pattern)
+  \      && path =~# g:unite_source_file_mru_ignore_pattern)
     return
   endif
 
   call s:load()
-  call insert(filter(s:mru_files, 'v:val.action__path !=# l:path'),
-  \           s:convert2dictionary([l:path, localtime()]))
 
-  if g:unite_source_file_mru_limit < len(s:mru_files)
+  let save_ignorecase = &ignorecase
+  let &ignorecase = unite#is_win()
+
+  call insert(filter(s:mru_files, 'v:val.action__path != path'),
+  \           s:convert2dictionary([path, localtime()]))
+
+  let &ignorecase = save_ignorecase
+
+  if g:unite_source_file_mru_limit > len(s:mru_files)
     let s:mru_files = s:mru_files[ : g:unite_source_file_mru_limit - 1]
   endif
 
@@ -78,16 +85,20 @@ let s:source = {
       \}
 
 function! s:source.hooks.on_syntax(args, context)"{{{
-  syntax match uniteSource__FileMru_Time /(.*)/ contained containedin=uniteSource__FileMru
+  syntax match uniteSource__FileMru_Time /\s\+\zs([^)]*)/ contained containedin=uniteSource__FileMru
   highlight default link uniteSource__FileMru_Time Statement
 endfunction"}}}
 function! s:source.hooks.on_post_filter(args, context)"{{{
-  for l:mru in a:context.candidates
-    let l:path = (g:unite_source_file_mru_filename_format == '') ? '' :
-          \ unite#util#substitute_path_separator(fnamemodify(l:mru.action__path, g:unite_source_file_mru_filename_format))
-    let l:mru.abbr = (g:unite_source_file_mru_filename_format == '' ? '' :
-          \ strftime(g:unite_source_file_mru_time_format, l:mru.source__time)) .
-          \ (l:path == '' ? l:mru.action__path : l:path)
+  for mru in a:context.candidates
+    let path = (g:unite_source_file_mru_filename_format == '') ?
+          \ mru.action__path :
+          \ unite#util#substitute_path_separator(
+          \     fnamemodify(mru.action__path, g:unite_source_file_mru_filename_format))
+    if path == ''
+      let path = mru.action__path
+    endif
+    let mru.abbr = (g:unite_source_file_mru_time_format == '' ? '' :
+          \ strftime(g:unite_source_file_mru_time_format, mru.source__time)) .path
   endfor
 endfunction"}}}
 
@@ -98,23 +109,19 @@ function! s:source.gather_candidates(args, context)"{{{
 endfunction"}}}
 
 " Actions"{{{
-let s:action_table = {}
-
-let s:action_table.delete = {
+let s:source.action_table.delete = {
       \ 'description' : 'delete from file_mru list',
       \ 'is_invalidate_cache' : 1,
       \ 'is_quit' : 0,
       \ 'is_selectable' : 1,
       \ }
-function! s:action_table.delete.func(candidates)"{{{
-  for l:candidate in a:candidates
-    call filter(s:mru_files, 'v:val.action__path !=# l:candidate.action__path')
+function! s:source.action_table.delete.func(candidates)"{{{
+  for candidate in a:candidates
+    call filter(s:mru_files, 'v:val.action__path !=# candidate.action__path')
   endfor
 
   call s:save()
 endfunction"}}}
-
-let s:source.action_table['*'] = s:action_table
 "}}}
 
 " Misc
@@ -152,13 +159,13 @@ function! s:is_exists_path(path)  "{{{
   return getftype(a:path) != ''
 endfunction"}}}
 function! s:convert2dictionary(list)  "{{{
-  let l:path = unite#util#substitute_path_separator(a:list[0])
+  let path = unite#util#substitute_path_separator(a:list[0])
   return {
-        \ 'word' : l:path,
-        \ 'kind' : (isdirectory(l:path) ? 'directory' : 'file'),
+        \ 'word' : path,
+        \ 'kind' : (isdirectory(path) ? 'directory' : 'file'),
         \ 'source__time' : a:list[1],
-        \ 'action__path' : l:path,
-        \ 'action__directory' : unite#util#path2directory(l:path),
+        \ 'action__path' : path,
+        \ 'action__directory' : unite#util#path2directory(path),
         \   }
 endfunction"}}}
 function! s:convert2list(dict)  "{{{

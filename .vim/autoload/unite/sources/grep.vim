@@ -2,7 +2,7 @@
 " FILE: grep.vim
 " AUTHOR:  Shougo Matsushita <Shougo.Matsu at gmail.com>
 "          Tomohiro Nishimura <tomohiro68 at gmail.com>
-" Last Modified: 26 Jun 2011.
+" Last Modified: 21 Sep 2011.
 " License: MIT license  {{{
 "     Permission is hereby granted, free of charge, to any person obtaining
 "     a copy of this software and associated documentation files (the
@@ -40,7 +40,9 @@ let s:action_grep_file = {
   \   'is_selectable': 1,
   \ }
 function! s:action_grep_file.func(candidates) "{{{
-  call unite#start([['grep', map(copy(a:candidates), 'v:val.action__path')]])
+  call unite#start([['grep', map(copy(a:candidates),
+        \ 'substitute(v:val.action__path, "/$", "", "g")'),
+        \ g:unite_source_grep_recursive_opt]], { 'no_quit' : 1 })
 endfunction "}}}
 
 let s:action_grep_directory = {
@@ -50,7 +52,8 @@ let s:action_grep_directory = {
   \   'is_selectable': 1,
   \ }
 function! s:action_grep_directory.func(candidates) "{{{
-  call unite#start([['grep', map(copy(a:candidates), 'v:val.action__directory'), g:unite_source_grep_recursive_opt]])
+  call unite#start([['grep', map(copy(a:candidates), 'v:val.action__directory'),
+        \ g:unite_source_grep_recursive_opt]], { 'no_quit' : 1 })
 endfunction "}}}
 if executable(g:unite_source_grep_command) && unite#util#has_vimproc()
   call unite#custom_action('file,buffer', 'grep', s:action_grep_file)
@@ -59,13 +62,8 @@ endif
 " }}}
 
 function! unite#sources#grep#define() "{{{
-  if !exists('*unite#version') || unite#version() <= 100
-    echoerr 'Your unite.vim is too old.'
-    echoerr 'Please install unite.vim Ver.1.1 or above.'
-    return []
-  endif
-
-  return executable(g:unite_source_grep_command) && unite#util#has_vimproc() ? s:grep_source : []
+  return executable(g:unite_source_grep_command) && unite#util#has_vimproc() ?
+        \ s:grep_source : []
 endfunction "}}}
 
 let s:grep_source = {
@@ -73,28 +71,29 @@ let s:grep_source = {
       \ 'max_candidates': g:unite_source_grep_max_candidates,
       \ 'hooks' : {},
       \ 'syntax' : 'uniteSource__Grep',
+      \ 'filters' : ['matcher_regexp', 'sorter_default', 'converter_default'],
       \ }
 
 function! s:grep_source.hooks.on_init(args, context) "{{{
-  let l:target  = get(a:args, 0, '')
-  if type(l:target) != type([])
-    if l:target == ''
-      let l:target = input('Target: ', '**', 'file')
+  let target  = get(a:args, 0, '')
+  if type(target) != type([])
+    if target == ''
+      let target = input('Target: ', '**', 'file')
     endif
 
-    if l:target == '%' || l:target == '#'
-      let l:target = unite#util#escape_file_searching(bufname(l:target))
-    elseif l:target ==# '$buffers'
-      let l:target = join(map(filter(range(1, bufnr('$')), 'buflisted(v:val)'),
+    if target == '%' || target == '#'
+      let target = unite#util#escape_file_searching(bufname(target))
+    elseif target ==# '$buffers'
+      let target = join(map(filter(range(1, bufnr('$')), 'buflisted(v:val)'),
             \ 'unite#util#escape_file_searching(bufname(v:val))'))
-    elseif l:target == '**'
+    elseif target == '**'
       " Optimized.
-      let l:target = '* ' . g:unite_source_grep_recursive_opt
+      let target = '* ' . g:unite_source_grep_recursive_opt
     endif
 
-    let a:context.source__target = [l:target]
+    let a:context.source__target = [target]
   else
-    let a:context.source__target = l:target
+    let a:context.source__target = target
   endif
 
   let a:context.source__extra_opts = get(a:args, 1, '')
@@ -103,9 +102,6 @@ function! s:grep_source.hooks.on_init(args, context) "{{{
   if a:context.source__input == ''
     let a:context.source__input = input('Pattern: ')
   endif
-
-  call unite#print_message('[grep] Target: ' . join(a:context.source__target))
-  call unite#print_message('[grep] Pattern: ' . a:context.source__input)
 endfunction"}}}
 function! s:grep_source.hooks.on_syntax(args, context)"{{{
   syntax case ignore
@@ -114,6 +110,11 @@ function! s:grep_source.hooks.on_syntax(args, context)"{{{
         \ . '/ contained containedin=uniteSource__Grep'
   highlight default link uniteSource__GrepPattern Search
 endfunction"}}}
+function! s:grep_source.hooks.on_close(args, context) "{{{
+  if has_key(a:context, 'source__proc')
+    call a:context.source__proc.waitpid()
+  endif
+endfunction "}}}
 
 function! s:grep_source.gather_candidates(args, context) "{{{
   if empty(a:context.source__target)
@@ -123,15 +124,19 @@ function! s:grep_source.gather_candidates(args, context) "{{{
     return []
   endif
 
-  let l:cmdline = printf('%s %s ''%s'' %s %s',
+  if a:context.is_redraw
+    let a:context.is_async = 1
+  endif
+
+  let cmdline = printf('%s %s %s ''%s'' %s',
     \   g:unite_source_grep_command,
     \   g:unite_source_grep_default_opts,
+    \   a:context.source__extra_opts,
     \   substitute(a:context.source__input, "'", "''", 'g'),
     \   join(a:context.source__target),
-    \   a:context.source__extra_opts)
-  call unite#print_message('[grep] Command-line: ' . l:cmdline)
-  let a:context.source__proc = vimproc#pgroup_open(l:cmdline)
-  " let a:context.source__proc = vimproc#popen3(l:cmdline)
+    \)
+  call unite#print_message('[grep] Command-line: ' . cmdline)
+  let a:context.source__proc = vimproc#pgroup_open(cmdline)
 
   " Close handles.
   call a:context.source__proc.stdin.close()
@@ -141,52 +146,27 @@ function! s:grep_source.gather_candidates(args, context) "{{{
 endfunction "}}}
 
 function! s:grep_source.async_gather_candidates(args, context) "{{{
-  let l:stdout = a:context.source__proc.stdout
-  if l:stdout.eof
+  let stdout = a:context.source__proc.stdout
+  if stdout.eof
     " Disable async.
     call unite#print_message('[grep] Completed.')
     let a:context.is_async = 0
   endif
 
-  let l:result = []
-  if has('reltime') && has('float')
-    let l:time = reltime()
-    while str2float(reltimestr(reltime(l:time))) < 0.2
-          \       && !l:stdout.eof
-      let l:output = l:stdout.read_line()
-      if l:output != ''
-        call add(l:result, l:output)
-      endif
-    endwhile
-  else
-    let i = 100
-    while 0 < i && !l:stdout.eof
-      let l:output = l:stdout.read_line()
-      if l:output != ''
-        call add(l:result, l:output)
-      endif
-
-      let i -= 1
-    endwhile
-  endif
-
-  let l:candidates = map(filter(l:result,
+  let candidates = map(filter(map(stdout.read_lines(-1, 300),
+        \ 'iconv(v:val, &termencoding, &encoding)'),
     \  'v:val =~ "^.\\+:.\\+:.\\+$"'),
     \ '[v:val, split(v:val[2:], ":")]')
 
-  return map(l:candidates,
+  return map(candidates,
     \ '{
     \   "word": v:val[0],
-    \   "source": "grep",
     \   "kind": "jump_list",
-    \   "action__path": v:val[0][:1].v:val[1][0],
+    \   "action__path": unite#util#substitute_path_separator(
+    \                   fnamemodify(v:val[0][:1].v:val[1][0], ":p")),
     \   "action__line": v:val[1][1],
     \   "action__text": join(v:val[1][2:], ":"),
     \ }')
-endfunction "}}}
-
-function! s:grep_source.on_close(args, context) "{{{
-  call a:context.source__proc.close()
 endfunction "}}}
 
 " vim: foldmethod=marker
