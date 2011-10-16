@@ -821,15 +821,23 @@ let g:neocomplcache_enable_camel_case_completion = 1
 " Use underbar completion.
 let g:neocomplcache_enable_underbar_completion = 1
 " Set minimum syntax keyword length.
-let g:neocomplcache_min_syntax_length = 3
+let g:neocomplcache_min_syntax_length = 2
 let g:neocomplcache_lock_buffer_name_pattern = '\*ku\*'
+
+let g:neocomplcache_auto_completion_start_length = 2
 
 " Define dictionary.
 let g:neocomplcache_dictionary_filetype_lists = {
-    \ 'default' : '',
-        \ 'vimshell' : $HOME.'/.vimshell_hist',
-            \ 'scheme' : $HOME.'/.gosh_completions'
-                \ }
+            \ 'default' : '',
+            \ 'vimshell' : $HOME.'/.vimshell_hist',
+            \ 'scheme' : $DOTVIM.'/.gosh_completions', 
+            \ 'scala' : $DOTVIM.'/dict/scala.dict', 
+            \ 'css' : $DOTVIM.'/dict/css.dict', 
+            \ 'html' : $DOTVIM.'/dict/html.dict', 
+            \ 'perl' : $DOTVIM.'/dict/perl.dict', 
+            \ 'ruby' : $DOTVIM.'/dict/ruby.dict'
+            \ }
+
 
 " Define keyword.
 if !exists('g:neocomplcache_keyword_patterns')
@@ -895,11 +903,11 @@ let g:neocomplcache_omni_patterns.c = '\%(\.\|->\)\h\w*'
 " 起動時にインサートモードで開始
 let g:unite_enable_start_insert = 1
 
-" インサート／ノーマルどちらからでも呼び出せるようにキーマップ
-nnoremap <silent> <C-f> :<C-u>UniteWithBufferDir -buffer-name=files file<CR>
-inoremap <silent> <C-f> <ESC>:<C-u>UniteWithBufferDir -buffer-name=files file<CR>
-nnoremap <silent> <C-b> :<C-u>Unite buffer file_mru<CR>
-inoremap <silent> <C-b> <ESC>:<C-u>Unite buffer file_mru<CR>
+"" インサート／ノーマルどちらからでも呼び出せるようにキーマップ
+"nnoremap <silent> <C-f> :<C-u>UniteWithBufferDir -buffer-name=files file<CR>
+"inoremap <silent> <C-f> <ESC>:<C-u>UniteWithBufferDir -buffer-name=files file<CR>
+"nnoremap <silent> <C-b> :<C-u>Unite buffer file_mru<CR>
+"inoremap <silent> <C-b> <ESC>:<C-u>Unite buffer file_mru<CR>
 
 nnoremap <silent> <space>fb :<C-u>Unite buffer<CR>
 nnoremap <silent> <space>fc :<C-u>Unite command<CR>
