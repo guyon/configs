@@ -362,6 +362,9 @@ noremap ms <Plug>QuickFixSave
 autocmd FileType scheme :let is_gauche=1
 autocmd FileType scheme :setlocal dictionary+=~/.vim/dict/gosh_completions.dict
 
+" QuicRun ----------------------------------------------------- {{{2
+nnoremap <Space>e :QuickRun<CR>
+
 " git.vim ----------------------------------------------------- {{{2
 nnoremap <Space>gs  :CD \| GitStatus<CR>
 nnoremap <Space>ga  :CD \| GitAdd

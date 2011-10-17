@@ -30,7 +30,7 @@ command -narg=? -range FtEvalLine   echo g:FtEval(getline('.'),                <
 command -narg=? -range FtEvalBuffer echo g:FtEval(join(getline(0, '$'), "\n"), <q-args>)
 command -narg=? -range FtEvalVisual echo g:FtEval(<SID>GetVisualText(),        <q-args>)
 
-nnoremap <Space>e :FtEvalLine<CR>
-nnoremap <Space>E :FtEvalBuffer<CR>
-vnoremap <Space>e :FtEvalVisual<CR>
-vnoremap <Space>E :FtEvalVisual vim<CR>
+nnoremap <Space>El :FtEvalLine<CR>
+nnoremap <Space>Eb :FtEvalBuffer<CR>
+vnoremap <Space>Ev :FtEvalVisual<CR>
+vnoremap <Space>EV :FtEvalVisual vim<CR>
