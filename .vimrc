@@ -905,6 +905,7 @@ let g:neocomplcache_omni_patterns.c = '\%(\.\|->\)\h\w*'
 """ Unite.vim
 " 起動時にインサートモードで開始
 let g:unite_enable_start_insert = 1
+let g:unite_source_history_yank_enable = 1
 
 "" インサート／ノーマルどちらからでも呼び出せるようにキーマップ
 "nnoremap <silent> <C-f> :<C-u>UniteWithBufferDir -buffer-name=files file<CR>
