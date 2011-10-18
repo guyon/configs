@@ -204,7 +204,7 @@ if [ "$TERM" = "screen" ]; then
   RPROMPT='['$LIGHTBLUE'%~ %(!.$RED.$GREEN)%D{%Y/%m/%d %H:%M:%S}'$DEFAULT_COLOR']' 
   #RPROMPT='['$LIGHTBLUE'%~ %(!.$RED.$GREEN)%D{%Y/%m/%d}$DEFAULT_COLOR($TODAY_COLOR%D{%a}$DEFAULT_COLOR)%*'$DEFAULT_COLOR']' 
   RPROMPT2='< %*]' 
-  PROMPT=$'[%n@%m %2~%{\ek\e\\%}%{fugitive#statusline()}]$ '
+  #PROMPT=$'[%n@%m %2~%{\ek\e\\%}%{fugitive#statusline()}]$ '
 fi
 
 # HISTORYファイルの設定
