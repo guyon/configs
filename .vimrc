@@ -110,6 +110,11 @@ if has("autocmd")
 
     " git.vim コミット後ログを表示する ----------------------------------------
     "autocmd BufWritePost COMMIT_EDITMSG exe ":bd" | exe ":Cd" | exe ":GitLog"
+    
+    " markdown
+    autocmd BufRead,BufNewFile *.mkd  setf markdown
+    autocmd BufRead,BufNewFile *.md  setf markdown
+
 
     " 前回終了したカーソル行に移動 --------------------------------------------
     autocmd BufReadPost * if line("'\"") > 0 && line("'\"") <= line("$") | exe "normal g`\"" | endif
@@ -178,10 +183,14 @@ if has('mac') && has('gui_running')
    let mapleader = "\\"
 endif
 
+
 if has('clipboard')
    noremap <silent> <space>tv :set clipboard=<CR>
    noremap <silent> <space>tc :set clipboard=unnamed<CR>
 endif
+
+" <c-[>のタイプがずれた時対策
+inoremap <C-@> <C-[>
 
 "noremap <C-Space> <Esc>
 "cnoremap <C-Space> <Esc>
@@ -364,6 +373,12 @@ autocmd FileType scheme :setlocal dictionary+=~/.vim/dict/gosh_completions.dict
 
 " QuicRun ----------------------------------------------------- {{{2
 nnoremap <Space>e :QuickRun<CR>
+let g:quickrun_config = {}
+let g:quickrun_config['markdown'] = {
+      \ 'type': 'markdown/pandoc',
+      \ 'outputter': 'browser',
+      \ 'cmdopt': '-s'
+      \ }
 
 " git.vim ----------------------------------------------------- {{{2
 nnoremap <Space>gs  :CD \| GitStatus<CR>
@@ -550,6 +565,7 @@ endfunction
 "endfunction
 "" インサート時のTabキーマッピングをInsertTabWrapperで書き換える
 "inoremap <silent> <tab> <c-r>=InsertTabWrapper()<cr>
+
 
 "------------------------------------------------
 " CSVのハイライト表示
