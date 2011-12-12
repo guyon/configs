@@ -3,7 +3,7 @@ termcap kterm hs@
 terminfo kterm hs@
 vbell off
 bind w windowlist -b
-hardstatus alwayslastline "[%02c] %`%-w%{=b bw}%n %t%{-}%+w"
+hardstatus alwayslastline " %`%-w%{=b bw}%n %t%{-}%+w"
 defhstatus I^En:^EtI
 shell -$SHELL
 startup_message off

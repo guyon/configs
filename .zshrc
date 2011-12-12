@@ -238,6 +238,24 @@ alias o='open'
 
 [ -f /Applications/MacVim.app/Contents/MacOS/vim ] && alias vim='/Applications/MacVim.app/Contents/MacOS/vim'
 
+# screenのhardstatus設定
+case $TERM in
+  screen)
+    preexec() {
+      echo -ne "\ek$1\e\\"
+    }
+    precmd() {
+      echo -ne "\ek$(basename $SHELL)\e\\"
+      #common_precmd
+    }
+    ;;
+  *)
+    precmd() {
+      #common_precmd
+    }
+    ;;
+esac
+
 #-----------------------------------------------------------------
 ## ローカル設定の読み込み
 ##-----------------------------------------------------------------
