@@ -59,24 +59,6 @@ syn keyword htmlTagName contained abbr acronym bdo button col label
 syn keyword htmlTagName contained colgroup del fieldset iframe ins legend
 syn keyword htmlTagName contained object optgroup q s tbody tfoot thead
 
-" HTML 5 tags
-syn keyword htmlTagName contained article aside audio bb canvas command datagrid
-syn keyword htmlTagName contained datalist details dialog embed figure footer
-syn keyword htmlTagName contained header hgroup keygen mark meter nav output
-syn keyword htmlTagName contained progress time ruby rt rp section time video
-syn keyword htmlTagName contained source figcaption
-
-" HTML 5 arguments
-syn keyword htmlArg contained autofocus autocomplete placeholder min max step
-syn keyword htmlArg contained contenteditable contextmenu draggable hidden item
-syn keyword htmlArg contained itemprop list sandbox subject spellcheck
-syn keyword htmlArg contained novalidate seamless pattern formtarget manifest
-syn keyword htmlArg contained formaction formenctype formmethod formnovalidate
-syn keyword htmlArg contained sizes scoped async reversed sandbox srcdoc
-syn keyword htmlArg contained hidden role
-syn match htmlArg "\<\(aria-[\-a-zA-Z0-9_]\+\)=" contained
-syn match htmlArg contained "\s*data-[-a-zA-Z0-9_]\+"
-
 " legal arg names
 syn keyword htmlArg contained action
 syn keyword htmlArg contained align alink alt archive background bgcolor
@@ -178,50 +160,50 @@ endif
 
 syn keyword htmlTagName         contained noscript
 syn keyword htmlSpecialTagName  contained script style
-" if main_syntax != 'java' || exists("java_javascript")
-"   " JAVA SCRIPT
-"   syn include @htmlJavaScript syntax/javascript.vim
-"   unlet b:current_syntax
-"   syn region  javaScript start=+<script[^>]*>+ keepend end=+</script>+me=s-1 contains=@htmlJavaScript,htmlCssStyleComment,htmlScriptTag,@htmlPreproc
-"   syn region  htmlScriptTag     contained start=+<script+ end=+>+       contains=htmlTagN,htmlString,htmlArg,htmlValue,htmlTagError,htmlEvent
-"   HtmlHiLink htmlScriptTag htmlTag
-" 
-"   " html events (i.e. arguments that include javascript commands)
-"   if exists("html_extended_events")
-"     syn region htmlEvent        contained start=+\<on\a\+\s*=[\t ]*'+ end=+'+ contains=htmlEventSQ
-"     syn region htmlEvent        contained start=+\<on\a\+\s*=[\t ]*"+ end=+"+ contains=htmlEventDQ
-"   else
-"     syn region htmlEvent        contained start=+\<on\a\+\s*=[\t ]*'+ end=+'+ keepend contains=htmlEventSQ
-"     syn region htmlEvent        contained start=+\<on\a\+\s*=[\t ]*"+ end=+"+ keepend contains=htmlEventDQ
-"   endif
-"   syn region htmlEventSQ        contained start=+'+ms=s+1 end=+'+me=s-1 contains=@htmlJavaScript
-"   syn region htmlEventDQ        contained start=+"+ms=s+1 end=+"+me=s-1 contains=@htmlJavaScript
-"   HtmlHiLink htmlEventSQ htmlEvent
-"   HtmlHiLink htmlEventDQ htmlEvent
-" 
-"   " a javascript expression is used as an arg value
-"   syn region  javaScriptExpression contained start=+&{+ keepend end=+};+ contains=@htmlJavaScript,@htmlPreproc
-" endif
+if main_syntax != 'java' || exists("java_javascript")
+  " JAVA SCRIPT
+  syn include @htmlJavaScript syntax/javascript.vim
+  unlet b:current_syntax
+  syn region  javaScript start=+<script[^>]*>+ keepend end=+</script>+me=s-1 contains=@htmlJavaScript,htmlCssStyleComment,htmlScriptTag,@htmlPreproc
+  syn region  htmlScriptTag     contained start=+<script+ end=+>+       contains=htmlTagN,htmlString,htmlArg,htmlValue,htmlTagError,htmlEvent
+  HtmlHiLink htmlScriptTag htmlTag
 
-" if main_syntax != 'java' || exists("java_vb")
-"   " VB SCRIPT
-"   syn include @htmlVbScript syntax/vb.vim
-"   unlet b:current_syntax
-"   syn region  javaScript start=+<script [^>]*language *=[^>]*vbscript[^>]*>+ keepend end=+</script>+me=s-1 contains=@htmlVbScript,htmlCssStyleComment,htmlScriptTag,@htmlPreproc
-" endif
+  " html events (i.e. arguments that include javascript commands)
+  if exists("html_extended_events")
+    syn region htmlEvent        contained start=+\<on\a\+\s*=[\t ]*'+ end=+'+ contains=htmlEventSQ
+    syn region htmlEvent        contained start=+\<on\a\+\s*=[\t ]*"+ end=+"+ contains=htmlEventDQ
+  else
+    syn region htmlEvent        contained start=+\<on\a\+\s*=[\t ]*'+ end=+'+ keepend contains=htmlEventSQ
+    syn region htmlEvent        contained start=+\<on\a\+\s*=[\t ]*"+ end=+"+ keepend contains=htmlEventDQ
+  endif
+  syn region htmlEventSQ        contained start=+'+ms=s+1 end=+'+me=s-1 contains=@htmlJavaScript
+  syn region htmlEventDQ        contained start=+"+ms=s+1 end=+"+me=s-1 contains=@htmlJavaScript
+  HtmlHiLink htmlEventSQ htmlEvent
+  HtmlHiLink htmlEventDQ htmlEvent
+
+  " a javascript expression is used as an arg value
+  syn region  javaScriptExpression contained start=+&{+ keepend end=+};+ contains=@htmlJavaScript,@htmlPreproc
+endif
+
+if main_syntax != 'java' || exists("java_vb")
+  " VB SCRIPT
+  syn include @htmlVbScript syntax/vb.vim
+  unlet b:current_syntax
+  syn region  javaScript start=+<script [^>]*language *=[^>]*vbscript[^>]*>+ keepend end=+</script>+me=s-1 contains=@htmlVbScript,htmlCssStyleComment,htmlScriptTag,@htmlPreproc
+endif
 
 syn cluster htmlJavaScript      add=@htmlPreproc
 
-" if main_syntax != 'java' || exists("java_css")
-"   " embedded style sheets
-"   syn keyword htmlArg           contained media
-"   syn include @htmlCss syntax/css.vim
-"   unlet b:current_syntax
-"   syn region cssStyle start=+<style+ keepend end=+</style>+ contains=@htmlCss,htmlTag,htmlEndTag,htmlCssStyleComment,@htmlPreproc
-"   syn match htmlCssStyleComment contained "\(<!--\|-->\)"
-"   syn region htmlCssDefinition matchgroup=htmlArg start='style="' keepend matchgroup=htmlString end='"' contains=css.*Attr,css.*Prop,cssComment,cssLength,cssColor,cssURL,cssImportant,cssError,cssString,@htmlPreproc
-"   HtmlHiLink htmlStyleArg htmlString
-" endif
+if main_syntax != 'java' || exists("java_css")
+  " embedded style sheets
+  syn keyword htmlArg           contained media
+  syn include @htmlCss syntax/css.vim
+  unlet b:current_syntax
+  syn region cssStyle start=+<style+ keepend end=+</style>+ contains=@htmlCss,htmlTag,htmlEndTag,htmlCssStyleComment,@htmlPreproc
+  syn match htmlCssStyleComment contained "\(<!--\|-->\)"
+  syn region htmlCssDefinition matchgroup=htmlArg start='style="' keepend matchgroup=htmlString end='"' contains=css.*Attr,css.*Prop,cssComment,cssLength,cssColor,cssURL,cssImportant,cssError,cssString,@htmlPreproc
+  HtmlHiLink htmlStyleArg htmlString
+endif
 
 if main_syntax == "html"
   " synchronizing (does not always work if a comment includes legal
