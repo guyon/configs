@@ -823,6 +823,16 @@ endif
 
 " Tmp: 一時な設定 ===================================================== {{{1
 
+" Copy and paste with fakeclip
+" Command-C and Command-V are also available in MacVim
+" see :help fakeclip-multibyte-on-mac
+map gy "*y
+map gp "*p
+if exists('$WINDOW') || exists('$TMUX')
+    map gY <Plug>(fakeclip-screen-y)
+    map gP <Plug>(fakeclip-screen-p)
+endif
+
 " Etc: その他 ========================================================= {{{1
 
 " ^@を削除するテスト
@@ -906,9 +916,9 @@ autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
 if !exists('g:neocomplcache_omni_patterns')
   let g:neocomplcache_omni_patterns = {}
 endif
+"let g:neocomplcache_omni_patterns.ruby = '[^. *\t]\.\w*\|\h\w*::'
+autocmd FileType ruby setlocal omnifunc=rubycomplete#Complete
 
-let g:neocomplcache_omni_patterns.ruby = '[^. *\t]\.\w*\|\h\w*::'
-"autocmd FileType ruby setlocal omnifunc=rubycomplete#Complete
 let g:neocomplcache_omni_patterns.php = '[^. \t]->\h\w*\|\h\w*::'
 let g:neocomplcache_omni_patterns.c = '\%(\.\|->\)\h\w*'
 
