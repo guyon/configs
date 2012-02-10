@@ -14,6 +14,9 @@ alias -g V='| vim -R -'
 
 # based by http://devel.aquahill.net/zsh/zshoptions
 
+# 日本語のUTF8ファイルを表示
+setopt combining_chars
+
 # 複数の zsh を同時に使う時など history ファイルに上書きせず追加する
 setopt append_history
 
@@ -233,6 +236,12 @@ alias la='ls -a'
 alias rm='rm -i' 
 alias o='open' 
 
+alias cdg='cd ~/repos_git' 
+alias cdc='cd ~/configs' 
+alias cds='cd ~/repos_svn' 
+alias cdw='cd ~/work' 
+alias wgets='wget --no-check-certificate' 
+
 #参考
 #http://mazgi.blog32.fc2.com/
 
@@ -255,6 +264,7 @@ case $TERM in
     }
     ;;
 esac
+
 
 #-----------------------------------------------------------------
 ## ローカル設定の読み込み
