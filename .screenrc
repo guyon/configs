@@ -1,4 +1,5 @@
 escape ^Tt
+defscrollback 10000
 termcap kterm hs@
 terminfo kterm hs@
 vbell off
