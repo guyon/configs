@@ -377,7 +377,7 @@ let g:quickrun_config = {}
 let g:quickrun_config['markdown'] = {
       \ 'type': 'markdown/pandoc',
       \ 'outputter': 'browser',
-      \ 'cmdopt': '-s'
+      \ 'cmdopt': '-c ~/style.css -s'
       \ }
 
 " git.vim ----------------------------------------------------- {{{2
