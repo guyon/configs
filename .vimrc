@@ -943,7 +943,7 @@ nnoremap <silent> <space>fb :<C-u>Unite buffer<CR>
 nnoremap <silent> <space>fc :<C-u>Unite command<CR>
 nnoremap <silent> <space>fd :<C-u>Unite directory_mru<CR>
 nnoremap <silent> <space>ff :<C-u>UniteWithBufferDir -buffer-name=files file<CR>
-nnoremap <silent> <space>fr :<C-u>Unite -buffer-name=register register<CR>
+nnoremap <silent> <space>fp :<C-u>Unite -buffer-name=register register<CR>
 nnoremap <silent> <space>fm :<C-u>Unite file_mru<CR>
 nnoremap <silent> <space>fv :<C-u>Unite bookmark<CR>
 
