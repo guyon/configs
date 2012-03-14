@@ -126,7 +126,7 @@ set ambiwidth=double                     " UTF-8で文字幅表示を２文字�
 set completeopt=menuone,preview
 set complete+=k                          " 辞書ファイルからの単語補間
 set nrformats=""                         " 8進数はインクリメントしない
-set expandtab                            " タブを展開
+"set expandtab                            " タブを展開
 set tabstop=4
 set softtabstop=4
 set shiftwidth=4
@@ -832,6 +832,29 @@ if exists('$WINDOW') || exists('$TMUX')
     map gY <Plug>(fakeclip-screen-y)
     map gP <Plug>(fakeclip-screen-p)
 endif
+
+" ckfix のエラー箇所を波線でハイライト
+let g:hier_enabled             = 1
+
+
+" quickfix に出力して、ポッポアップはしない outputter/quickfix
+" すでに quickfix ウィンドウが開いている場合は閉じるので注意
+let s:silent_quickfix = quickrun#outputter#quickfix#new()
+function! s:silent_quickfix.finish(session)
+    call call(quickrun#outputter#quickfix#new().finish, [a:session], self)
+    :cclose
+    " vim-hier の更新
+    :HierUpdate
+    " quickfix への出力後に quickfixstatus を有効に
+    :QuickfixStatusEnable
+endfunction
+" quickrun に登録
+call quickrun#register_outputter("silent_quickfix", s:silent_quickfix)
+
+" ファイルの保存後に quickrun.vim が実行するように設定する
+autocmd BufWritePost *.c,*.h,*.h :QuickRun c -outputter quickfix
+autocmd FileType qf nnoremap <buffer><silent> q :q<CR>:HierClear<CR>
+
 
 " Etc: その他 ========================================================= {{{1
 

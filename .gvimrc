@@ -92,3 +92,9 @@ match hiddenMark /\(\　\|\t\|\(\s\)\+$\)/
 if has('multi_byte_ime')
     highlight CursorIM guibg=dodgerblue guifg=NONE
 endif
+
+" ckfix のエラー箇所を波線でハイライト
+execute "highlight ucurl_my gui=undercurl guisp=Red"
+let g:hier_highlight_group_qf  = "qf_error_ucurl"
+execute "highlight qf_warning_ucurl gui=undercurl guisp=Blue"
+let g:hier_highlight_group_qfw = "qf_warning_ucurl"
