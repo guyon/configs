@@ -5,6 +5,7 @@ export PATH=/opt/local/bin:/opt/local/sbin:/usr/local/git/bin:$PATH
 export MANPATH=/opt/local/man:$MANPATH
 
 autoload -U compinit; compinit
+autoload -Uz VCS_INFO_get_data_git; VCS_INFO_get_data_git 2> /dev/null
 
 zstyle ':completion:*:sudo:*' command-path /usr/local/sbin /usr/local/bin \
                              /usr/sbin /usr/bin /sbin /bin /usr/X11R6/bin \
@@ -195,22 +196,15 @@ zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
 # この３行が超お勧め。コンソール右側に表示され、入力カーソルにかぶると自動的に消える。
 PROMPT='['%(!.$RED.$GREEN)'${USER}$PURPLE@$DEFAULT_COLOR${HOST}]%(!.#.$) ' 
 PROMPT2='[ >' 
-# 曜日つき
-#RPROMPT='['$LIGHTBLUE'%~ %(!.$RED.$GREEN)%D{%Y/%m/%d}$DEFAULT_COLOR($TODAY_COLOR%D{%a}$DEFAULT_COLOR)%*'$DEFAULT_COLOR']' 
-# 曜日なし
-RPROMPT='['$LIGHTBLUE'%~ %(!.$RED.$GREEN)%D{%Y/%m/%d %H:%M:%S}'$DEFAULT_COLOR']' 
+RPROMPT='[`rprompt-git-current-branch`%~]'
 RPROMPT2='< %*]' 
 
 if [ "$TERM" = "screen" ]; then
   PROMPT='['%(!.$RED.$GREEN)'${USER}$PURPLE@$DEFAULT_COLOR${HOST}]%(!.#.$) ' 
   PROMPT2='[ >' 
-  # 曜日つき
-  #RPROMPT='['$LIGHTBLUE'%~ %(!.$RED.$GREEN)%D{%Y/%m/%d}$DEFAULT_COLOR($TODAY_COLOR%D{%a}$DEFAULT_COLOR)%*'$DEFAULT_COLOR']' 
   # 曜日なし
-  RPROMPT='['$LIGHTBLUE'%~ %(!.$RED.$GREEN)%D{%Y/%m/%d %H:%M:%S}'$DEFAULT_COLOR']' 
-  #RPROMPT='['$LIGHTBLUE'%~ %(!.$RED.$GREEN)%D{%Y/%m/%d}$DEFAULT_COLOR($TODAY_COLOR%D{%a}$DEFAULT_COLOR)%*'$DEFAULT_COLOR']' 
+  RPROMPT='[`rprompt-git-current-branch`%~]'
   RPROMPT2='< %*]' 
-  #PROMPT=$'[%n@%m %2~%{\ek\e\\%}%{fugitive#statusline()}]$ '
 fi
 
 # HISTORYファイルの設定
@@ -265,6 +259,32 @@ case $TERM in
     ;;
 esac
 
+function rprompt-git-current-branch {
+    local name st color gitdir action
+    if [[ "$PWD" =~ '/\.git(/.*)?$' ]]; then
+        return
+    fi
+    name=`git branch 2> /dev/null | grep '^\*' | cut -b 3-`
+    if [[ -z $name ]]; then
+        return
+    fi
+
+    gitdir=`git rev-parse --git-dir 2> /dev/null`
+    action=`VCS_INFO_git_getaction "$gitdir"` && action="($action)"
+
+    st=`git status 2> /dev/null`
+    if [[ -n `echo "$st" | grep "^nothing to"` ]]; then
+        color=%F{green}
+    elif [[ -n `echo "$st" | grep "^nothing added"` ]]; then
+        color=%F{yellow}
+    elif [[ -n `echo "$st" | grep "^# Untracked"` ]]; then
+        color=%B%F{red}
+    else
+         color=%F{red}
+     fi
+          
+    echo "$color$name$action%f%b "
+}
 
 #-----------------------------------------------------------------
 ## ローカル設定の読み込み
